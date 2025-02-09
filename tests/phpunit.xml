@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit
+    bootstrap = "../vendor/autoload.php"
+    cacheDirectory = "../test-reports/phpunit-cache"
+    backupGlobals = "false"
+    colors = "true"
+    processIsolation = "false"
+    stopOnFailure = "false"
+>
+
+    <testsuites>
+        <testsuite name="unit">
+            <directory>unit</directory>
+        </testsuite>
+
+        <testsuite name="integration">
+            <directory>integration</directory>
+        </testsuite>
+
+        <testsuite name="system">
+            <directory>system</directory>
+        </testsuite>
+    </testsuites>
+
+    <source>
+        <include>
+            <directory suffix=".php">../src</directory>
+        </include>
+    </source>
+
+</phpunit>
