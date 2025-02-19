@@ -13,36 +13,15 @@ final class ObjectProperty implements PropertyInterface
     use Traits\ConstructWithNameAndNullableTrait;
     use Traits\ConvertToSamePhpValueOrDefault;
 
-    private object|null $default;
-
-    private bool $hasDefault = false;
-
     /** @var ObjectConstraintInterface[] */
     private array $valueConstraints = [];
 
-    /** @var ObjectKeyConstraintInterface[] */
+    /**
+     * @var ObjectKeyConstraintInterface[]
+     *
+     * @phpstan-ignore property.onlyWritten
+     */
     private array $keyConstraints = [];
-
-    public static function withDefaultValue(string $name, bool $nullable, object|null $default): self
-    {
-        $property = new self($name, $nullable);
-
-        $property->setDefaultValue($default);
-
-        return $property;
-    }
-
-    private function setDefaultValue(object|null $value): PropertyInterface
-    {
-        if (!$this->isPossibleValue($value)) {
-            throw new \Exception();
-        }
-
-        $this->default = $value;
-        $this->hasDefault = true;
-
-        return $this;
-    }
 
     public function withValueConstraint(ObjectConstraintInterface $constraint): self
     {
@@ -64,12 +43,12 @@ final class ObjectProperty implements PropertyInterface
 
     public function getDefaultValue(): object|null
     {
-        return $this->default;
+        return null;
     }
 
     public function hasDefaultValue(): bool
     {
-        return $this->hasDefault;
+        return false;
     }
 
     public function checkValueAgainstConstraints(PathInterface $path, mixed $value): Validation\ResultInterface
@@ -89,6 +68,7 @@ final class ObjectProperty implements PropertyInterface
             return new Validation\Result();
         }
 
+        /** @var array<string, mixed> $value */
         foreach ($value as $key => $item) {
             $result = $this->checkElementAgainstConstraints($path->withObjectKey($key), $item);
 
@@ -107,6 +87,8 @@ final class ObjectProperty implements PropertyInterface
                 return $constraint->getMismatchExplanation($path, $value);
             }
         }
+
+        return null;
     }
 
     private function isPossibleValue(mixed $value): bool

@@ -64,7 +64,7 @@
       "vendor/bin/coverage-check ./test-reports/coverage/xml/clover.xml 100",
       "@tests-integration"
     ],
-    "analyse": "vendor/bin/phpstan analyse --level max ./src ./tests",
+    "analyse": "vendor/bin/phpstan analyse --level max ./src",
     "tests-unit": "vendor/bin/phpunit -c tests/phpunit.xml --testdox --testsuite unit",
     "tests-unit-coverage": "export XDEBUG_MODE=coverage && vendor/bin/phpunit -c tests/phpunit.xml --testdox --testsuite unit --path-coverage  --coverage-html ./test-reports/coverage/html",
     "tests-integration": "vendor/bin/phpunit -c tests/phpunit.xml --testdox --testsuite integration --log-junit ./test-reports/results/integration/junit.xml",

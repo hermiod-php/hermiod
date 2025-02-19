@@ -54,10 +54,9 @@ final class Reflector implements ReflectorInterface
                 continue;
             }
 
-            $property = $this->properties->offsetGet($name);
-            $check = $property->checkValueAgainstConstraints($path, $value);
+            $check = $this->properties->offsetGet($name)?->checkValueAgainstConstraints($path, $value);
 
-            if (!$check->isValid()) {
+            if ($check && !$check->isValid()) {
                 $errors = \array_merge($errors, $check->getValidationErrors());
             }
         }
@@ -65,12 +64,21 @@ final class Reflector implements ReflectorInterface
         return new Result(...$errors);
     }
 
+    /**
+     * @param object|array<mixed, mixed> $json
+     *
+     * @return array<mixed, mixed>
+     */
     private function toIterableMap(object|array $json): array
     {
-        if (\is_object($json) || (\is_array($json) && !\array_is_list($json))) {
+        if (\is_object($json)) {
             return (array) $json;
         }
 
-        throw new \Exception();
+        if (\array_is_list($json)) {
+            throw new \Exception();
+        }
+
+        return $json;
     }
 }

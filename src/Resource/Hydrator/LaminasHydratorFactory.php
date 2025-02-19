@@ -13,6 +13,11 @@ final class LaminasHydratorFactory implements FactoryInterface
      */
     private array $hydrators = [];
 
+    /**
+     * @template Type of object
+     *
+     * @param class-string<Type> $class
+     */
     public function createHydratorForClass(string $class): HydratorInterface
     {
         return $this->hydrators[$class] ??= new LaminasHydrator(

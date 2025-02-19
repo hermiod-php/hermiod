@@ -10,5 +10,5 @@ interface ObjectConstraintInterface
 {
     public function mapValueMatchesConstraint(mixed $value): bool;
 
-    public function getMismatchExplanation(PathInterface $path, array $value): string;
+    public function getMismatchExplanation(PathInterface $path, mixed $value): string;
 }

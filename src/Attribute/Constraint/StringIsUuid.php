@@ -13,10 +13,10 @@ final class StringIsUuid implements StringConstraintInterface
 
     public function valueMatchesConstraint(string $value): bool
     {
-        return \is_string($value) || \preg_match('/' . self::VALID_PATTERN . '/Dms', $value);
+        return (bool) \preg_match('/' . self::VALID_PATTERN . '/Dms', $value);
     }
 
-    public function getMismatchExplanation(PathInterface $path, mixed $value): string
+    public function getMismatchExplanation(PathInterface $path, string $value): string
     {
         return \sprintf(
             "%s must be a UUID string but '%s' given",

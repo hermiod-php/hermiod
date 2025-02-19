@@ -14,11 +14,19 @@ trait MapValueConstraintProxy
 
     public function mapValueMatchesConstraint(mixed $value): bool
     {
+        /**
+         * We're passing broad types to specific types here for the sake of code reuse.
+         * @phpstan-ignore argument.type
+         */
         return $this->constraint->valueMatchesConstraint($value);
     }
 
     public function getMismatchExplanation(PathInterface $path, mixed $value): string
     {
+        /**
+         * We're passing broad types to specific types here for the sake of code reuse.
+         * @phpstan-ignore argument.type
+         */
         return $this->constraint->getMismatchExplanation($path, $value);
     }
 }

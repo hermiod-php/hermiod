@@ -6,6 +6,9 @@ namespace Hermiod\Resource\Path;
 
 final class Root implements PathInterface
 {
+    /**
+     * @var string[]
+     */
     private array $path = ['$'];
 
     public function __toString(): string

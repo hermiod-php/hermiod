@@ -9,6 +9,9 @@ use Hermiod\Resource\Reflector\Property;
 
 final class Collection implements CollectionInterface
 {
+    /**
+     * @var ErrorInterface[]
+     */
     private array $errors = [];
 
     public static function fromPropertyValidationResult(Property\Validation\ResultInterface $result): self

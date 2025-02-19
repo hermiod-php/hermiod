@@ -8,7 +8,7 @@ use Hermiod\Transposer;
 use Hermiod\Tests\Integration\Fakes\StringPropertiesFake;
 use PHPUnit\Framework\TestCase;
 
-class ObjectifierTest extends TestCase
+class TransposerTest extends TestCase
 {
     public function testSuccessfulHydrate(): void
     {

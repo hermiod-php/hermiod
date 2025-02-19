@@ -6,6 +6,9 @@ namespace Hermiod\Resource\Reflector\Property\Validation;
 
 final class Result implements ResultInterface
 {
+    /**
+     * @var string[]
+     */
     private array $validationErrors = [];
 
     public function __construct(string ...$validationError)

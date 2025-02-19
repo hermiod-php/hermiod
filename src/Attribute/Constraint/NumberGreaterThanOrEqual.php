@@ -18,7 +18,7 @@ final readonly class NumberGreaterThanOrEqual implements NumberConstraintInterfa
         return $value >= $this->value;
     }
 
-    public function getMismatchExplanation(PathInterface $path, mixed $value): string
+    public function getMismatchExplanation(PathInterface $path, int|float $value): string
     {
         return \sprintf(
             '%s must be a number greater than or equal to %d but %d given',

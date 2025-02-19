@@ -12,6 +12,9 @@ final class ArrayProperty implements PropertyInterface
     use Traits\ConstructWithNameAndNullableTrait;
     use Traits\ConvertToSamePhpValueOrDefault;
 
+    /**
+     * @var array<int|string, mixed>|null
+     */
     private array|null $default;
 
     private bool $hasDefault = false;
@@ -21,6 +24,11 @@ final class ArrayProperty implements PropertyInterface
      */
     private array $constraints = [];
 
+    /**
+     * @param string $name
+     * @param bool $nullable
+     * @param array<int|string, mixed>|null $default
+     */
     public static function withDefaultValue(string $name, bool $nullable, array|null $default): self
     {
         $property = new self($name, $nullable);
@@ -30,6 +38,9 @@ final class ArrayProperty implements PropertyInterface
         return $property;
     }
 
+    /**
+     * @param array<int|string, mixed>|null $value
+     */
     private function setDefaultValue(array|null $value): PropertyInterface
     {
         if (!$this->isPossibleValue($value)) {
@@ -51,6 +62,9 @@ final class ArrayProperty implements PropertyInterface
         return $copy;
     }
 
+    /**
+     * @return array<int|string, mixed>|null
+     */
     public function getDefaultValue(): array|null
     {
         return $this->default;
@@ -78,6 +92,7 @@ final class ArrayProperty implements PropertyInterface
             return new Validation\Result();
         }
 
+        /** @var array<int, mixed> $value */
         foreach ($value as $key => $item) {
             $result = $this->checkElementAgainstConstraints($path->withArrayKey($key), $item);
 
@@ -96,6 +111,8 @@ final class ArrayProperty implements PropertyInterface
                 return $constraint->getMismatchExplanation($path, $value);
             }
         }
+
+        return null;
     }
 
     private function isPossibleValue(mixed $value): bool

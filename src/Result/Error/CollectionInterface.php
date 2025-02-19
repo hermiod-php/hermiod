@@ -6,8 +6,14 @@ namespace Hermiod\Result\Error;
 
 use Traversable;
 
+/**
+ * @extends \IteratorAggregate<int, ErrorInterface>
+ */
 interface CollectionInterface extends \IteratorAggregate, \Countable, \JsonSerializable
 {
+    /**
+     * @return ErrorInterface[]
+     */
     public function jsonSerialize(): array;
 
     /**

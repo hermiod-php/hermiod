@@ -8,8 +8,18 @@ use Hermiod\Resource\Hydrator\HydratorInterface;
 use Hermiod\Resource\Reflector\ReflectorInterface;
 use Hermiod\Resource\Reflector\Property;
 
+/**
+ * @template TClass of object
+ *
+ * @implements ResultInterface<TClass>
+ */
 final readonly class Result implements ResultInterface
 {
+    /**
+     * @param ReflectorInterface $reflector
+     * @param HydratorInterface $hydrator
+     * @param object|array<mixed> $json
+     */
     public function __construct(
         private ReflectorInterface $reflector,
         private HydratorInterface $hydrator,
@@ -28,22 +38,22 @@ final readonly class Result implements ResultInterface
         );
     }
 
+    /**
+     * @return TClass|object
+     *
+     * @throws \Exception
+     */
     public function instance(): object
     {
         if ($this->isValid()) {
             throw new \Exception();
         }
 
-        return $this->hydrate();
+        return $this->hydrator->hydrate($this->json);
     }
 
     private function validate(): Property\Validation\ResultInterface
     {
-        return $this->reflector->validate($this->json);;
-    }
-
-    private function hydrate(): object
-    {
-        return $this->hydrator->hydrate($this->json);
+        return $this->reflector->validate($this->json);
     }
 }

@@ -6,7 +6,14 @@ namespace Hermiod\Resource\Reflector\Property;
 
 final class Collection implements CollectionInterface
 {
-    private array $hash;
+    /**
+     * @var array<string, PropertyInterface>
+     */
+    private array $hash = [];
+
+    /**
+     * @var PropertyInterface[]
+     */
     private array $list;
 
     public function __construct(PropertyInterface ...$properties)
@@ -52,7 +59,9 @@ final class Collection implements CollectionInterface
 
     public function current(): ?PropertyInterface
     {
-        return \current($this->list);
+        $property = \current($this->list);
+
+        return $property === false ? null : $property;
     }
 
     public function next(): void
@@ -60,9 +69,15 @@ final class Collection implements CollectionInterface
         \next($this->list);
     }
 
-    public function key(): string
+    public function key(): ?string
     {
-        return $this->list[\key($this->list)]?->getPropertyName();
+        $key = \key($this->list);
+
+        if (null === $key) {
+            return null;
+        }
+
+        return $this->list[$key]->getPropertyName();
     }
 
     public function valid(): bool

@@ -14,7 +14,7 @@ final class StringIsEmail implements StringConstraintInterface
         return false !== \filter_var($value, \FILTER_VALIDATE_EMAIL);
     }
 
-    public function getMismatchExplanation(PathInterface $path, mixed $value): string
+    public function getMismatchExplanation(PathInterface $path, string $value): string
     {
         return \sprintf(
             "%s must be an email address but '%s' given",

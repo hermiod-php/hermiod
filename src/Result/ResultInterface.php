@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Hermiod\Result;
 
-use Hermiod\Result\Error;
-
 /**
- * @template Type
+ * @template TClass of object
  */
 interface ResultInterface
 {
@@ -16,7 +14,7 @@ interface ResultInterface
     public function getErrors(): Error\CollectionInterface;
 
     /**
-     * @return Type
+     * @return TClass
      *
      * @throws \Exception
      */

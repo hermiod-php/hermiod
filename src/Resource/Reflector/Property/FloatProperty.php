@@ -73,7 +73,12 @@ final class FloatProperty implements PropertyInterface
             );
         }
 
+        if ($value === null) {
+            return new Validation\Result();
+        }
+
         foreach ($this->constraints as $constraint) {
+            /** @var float|int $value */
             if (!$constraint->valueMatchesConstraint($value)) {
                 return new Validation\Result(
                     $constraint->getMismatchExplanation($path, $value),

@@ -22,7 +22,13 @@ final class Resolver implements ResolverInterface
             throw new \Exception();
         }
 
-        if (!\in_array($interface, \class_implements($this->class), true)) {
+        $interfaces = \class_implements($interface);
+
+        if (false === $interfaces) {
+            throw new \Exception();
+        }
+
+        if (!\in_array($interface, $interfaces, true)) {
             throw new \Exception();
         }
 

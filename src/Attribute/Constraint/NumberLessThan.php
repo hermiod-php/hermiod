@@ -18,7 +18,7 @@ final readonly class NumberLessThan implements NumberConstraintInterface
         return $value < $this->value;
     }
 
-    public function getMismatchExplanation(PathInterface $path, mixed $value): string
+    public function getMismatchExplanation(PathInterface $path, int|float $value): string
     {
         return \sprintf(
             '%s must be a number less than %d but %d given',

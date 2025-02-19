@@ -20,7 +20,7 @@ final class Property implements PropertyInterface
             return;
         }
 
-        $this->name = \trim($name);
+        $this->name = \trim($this->name);
 
         if (empty($this->name)) {
             throw new \InvalidArgumentException('Property name cannot be empty.');

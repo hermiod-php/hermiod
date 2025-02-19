@@ -9,11 +9,9 @@ use Hermiod\Resource\Hydrator;
 use Hermiod\Result\Result;
 use Hermiod\Result\ResultInterface;
 
-final class Transposer
+final class Transposer implements TransposerInterface
 {
     private const MAX_RECURSION = 1024;
-
-    private array $resolvers = [];
 
     public static function create(): self
     {
@@ -31,12 +29,7 @@ final class Transposer
     ) {}
 
     /**
-     * @template Type
-     *
-     * @param string|object|array $json
-     * @param class-string<Type> $class
-     *
-     * @return ResultInterface<Type>
+     * @inheritDoc
      */
     public function parse(string|object|array $json, string $class): ResultInterface
     {
@@ -45,10 +38,17 @@ final class Transposer
 
         if (\is_string($json)) {
             $json = \json_decode($json, false, flags: JSON_THROW_ON_ERROR);
+
+            if (!is_object($json)) {
+                throw new \InvalidArgumentException('JSON string must be an object.');
+            }
         }
 
         $this->transpose($reflector, $json);
 
+        /**
+         * @phpstan-ignore return.type
+         */
         return new Result(
             $reflector,
             $hydrator,
@@ -56,23 +56,11 @@ final class Transposer
         );
     }
 
-    public function withInterfaceResolver(string $interface, string $concrete): self
-    {
-        if (!\interface_exists($interface)) {
-            throw new \Exception();
-        }
-
-        if (!\class_exists($concrete)) {
-            throw new \Exception();
-        }
-
-        $copy = clone $this;
-
-        $copy->resolvers[$interface] = $concrete;
-
-        return $copy;
-    }
-
+    /**
+     * @param Reflector\ReflectorInterface $reflector
+     * @param object|array<mixed, mixed> $json
+     * @param int $depth
+     */
     private function transpose(Reflector\ReflectorInterface $reflector, object|array &$json, int $depth = 0): void
     {
         if ($depth > self::MAX_RECURSION) {
@@ -81,18 +69,28 @@ final class Transposer
 
         $properties = $reflector->getProperties();
 
-        foreach ($json as $key => $value) {
+        $isObject = \is_object($json);
+
+        $list = $isObject ? \get_object_vars($json) : $json;
+
+        foreach ($list as $key => $value) {
             if (!$properties->offsetExists($key)) {
                 continue;
             }
 
-            $value = $properties->offsetGet($key)->convertToPhpValue($value);
+            if ($property = $properties->offsetGet($key)) {
+                $value = $property->convertToPhpValue($value);
+            }
 
             if (\is_array($value) || \is_object($value)) {
                 $this->transpose($reflector, $value, $depth + 1);
             }
 
-            $json[$key] = $value;
+            /**
+             * PhpStan can't tell we're repeating a cached check without explicit \is_object()
+             * @phpstan-ignore offsetAccess.nonOffsetAccessible
+             */
+            $isObject ? $json->{$key} = $value : $json[$key] = $value;
         }
     }
 }

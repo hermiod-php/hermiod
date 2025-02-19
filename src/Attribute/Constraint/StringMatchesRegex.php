@@ -21,7 +21,7 @@ final class StringMatchesRegex implements StringConstraintInterface
         return (bool) \preg_match($this->expression, $value);
     }
 
-    public function getMismatchExplanation(PathInterface $path, mixed $value): string
+    public function getMismatchExplanation(PathInterface $path, string $value): string
     {
         return \sprintf(
             "%s must must match regex '%s' but '%s' given",

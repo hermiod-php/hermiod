@@ -9,11 +9,10 @@ use Hermiod\Attribute\Constraint\NumberConstraintInterface;
 use Hermiod\Attribute\Constraint\ObjectConstraintInterface;
 use Hermiod\Attribute\Constraint\ObjectKeyConstraintInterface;
 use Hermiod\Attribute\Constraint\StringConstraintInterface;
-use Hermiod\Resource\Reflector\Property\Constraint\LogicalOr;
 
 final class Factory implements FactoryInterface
 {
-    public function createPropertyFromReflectionProperty(\ReflectionProperty $property): ?PropertyInterface
+    public function createPropertyFromReflectionProperty(\ReflectionProperty $property): PropertyInterface
     {
         $type = $property->getType();
 
@@ -38,7 +37,7 @@ final class Factory implements FactoryInterface
                 'object' => $this->createObjectTypeProperty($property),
                 'string' => $this->createStringTypeProperty($property),
                 'mixed' => $this->createMixedTypeProperty($property),
-                default => null,
+                default => throw new \Exception(),
             };
         }
 
@@ -47,21 +46,22 @@ final class Factory implements FactoryInterface
 
     private function createIntersectionProperty(\ReflectionProperty $reflection): PropertyInterface
     {
-
+        return new StringProperty('Foo', false);
     }
 
     private function createUnionProperty(\ReflectionProperty $reflection): PropertyInterface
     {
-
+        return new StringProperty('Foo', false);
     }
 
     private function createArrayTypeProperty(\ReflectionProperty $reflection): PropertyInterface
     {
         $name = $reflection->getName();
-        $nullable = $reflection->getType()->allowsNull();
+        $nullable = $reflection->getType()?->allowsNull() ?? true;
+        $default = $reflection->getDefaultValue();
 
         $property = $reflection->hasDefaultValue()
-            ? ArrayProperty::withDefaultValue($name, $nullable, $reflection->getDefaultValue())
+            ? ArrayProperty::withDefaultValue($name, $nullable, \is_array($default) ? $default : null)
             : new ArrayProperty($name, $nullable);
 
         foreach ($this->loadConstraintAttributes($reflection, ArrayConstraintInterface::class) as $constraint) {
@@ -74,11 +74,9 @@ final class Factory implements FactoryInterface
     private function createObjectTypeProperty(\ReflectionProperty $reflection): PropertyInterface
     {
         $name = $reflection->getName();
-        $nullable = $reflection->getType()->allowsNull();
+        $nullable = $reflection->getType()?->allowsNull() ?? true;
 
-        $property = $reflection->hasDefaultValue()
-            ? ObjectProperty::withDefaultValue($name, $nullable, $reflection->getDefaultValue())
-            : new ObjectProperty($name, $nullable);
+        $property = new ObjectProperty($name, $nullable);
 
         foreach ($this->loadConstraintAttributes($reflection, ObjectKeyConstraintInterface::class) as $constraint) {
             $property = $property->withKeyConstraint($constraint);
@@ -94,10 +92,11 @@ final class Factory implements FactoryInterface
     private function createBooleanTypeProperty(\ReflectionProperty $reflection): PropertyInterface
     {
         $name = $reflection->getName();
-        $nullable = $reflection->getType()->allowsNull();
+        $nullable = $reflection->getType()?->allowsNull() ?? true;
+        $default = $reflection->getDefaultValue();
 
         $property = $reflection->hasDefaultValue()
-            ? BooleanProperty::withDefaultValue($name, $nullable, $reflection->getDefaultValue())
+            ? BooleanProperty::withDefaultValue($name, $nullable, \is_bool($default) ? $default : null)
             : new BooleanProperty($name, $nullable);
 
         return $property;
@@ -106,10 +105,11 @@ final class Factory implements FactoryInterface
     private function createIntegerTypeProperty(\ReflectionProperty $reflection): PropertyInterface
     {
         $name = $reflection->getName();
-        $nullable = $reflection->getType()->allowsNull();
+        $nullable = $reflection->getType()?->allowsNull() ?? true;
+        $default = $reflection->getDefaultValue();
 
         $property = $reflection->hasDefaultValue()
-            ? IntegerProperty::withDefaultValue($name, $nullable, $reflection->getDefaultValue())
+            ? IntegerProperty::withDefaultValue($name, $nullable, \is_int($default) ? $default : null)
             : new IntegerProperty($name, $nullable);
 
         foreach ($this->loadConstraintAttributes($reflection, NumberConstraintInterface::class) as $constraint) {
@@ -122,10 +122,11 @@ final class Factory implements FactoryInterface
     private function createFloatTypeProperty(\ReflectionProperty $reflection): PropertyInterface
     {
         $name = $reflection->getName();
-        $nullable = $reflection->getType()->allowsNull();
+        $nullable = $reflection->getType()?->allowsNull() ?? true;
+        $default = $reflection->getDefaultValue();
 
         $property = $reflection->hasDefaultValue()
-            ? FloatProperty::withDefaultValue($name, $nullable, $reflection->getDefaultValue())
+            ? FloatProperty::withDefaultValue($name, $nullable, \is_float($default) || \is_int($default) ? $default : null)
             : new FloatProperty($name, $nullable);
 
         foreach ($this->loadConstraintAttributes($reflection, NumberConstraintInterface::class) as $constraint) {
@@ -138,10 +139,11 @@ final class Factory implements FactoryInterface
     private function createStringTypeProperty(\ReflectionProperty $reflection): PropertyInterface
     {
         $name = $reflection->getName();
-        $nullable = $reflection->getType()->allowsNull();
+        $nullable = $reflection->getType()?->allowsNull() ?? true;
+        $default = $reflection->getDefaultValue();
 
         $property = $reflection->hasDefaultValue()
-            ? StringProperty::withDefaultValue($name, $nullable, $reflection->getDefaultValue())
+            ? StringProperty::withDefaultValue($name, $nullable, \is_string($default) ? $default : null)
             : new StringProperty($name, $nullable);
 
         foreach ($this->loadConstraintAttributes($reflection, StringConstraintInterface::class) as $constraint) {
