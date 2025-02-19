@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JsonObjectify\Resource\Reflector\Property\Validation;
+namespace Hermiod\Resource\Reflector\Property\Validation;
 
 final class Result implements ResultInterface
 {

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace JsonObjectify\Resource\Reflector\Property\Validation;
+namespace Hermiod\Resource\Reflector\Property\Validation;
 
-use JsonObjectify\Result\Error;
+use Hermiod\Result\Error;
 
 interface ResultInterface
 {

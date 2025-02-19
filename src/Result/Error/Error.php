@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JsonObjectify\Result\Error;
+namespace Hermiod\Result\Error;
 
 final readonly class Error implements ErrorInterface
 {

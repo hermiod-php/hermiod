@@ -2,21 +2,22 @@
 
 declare(strict_types=1);
 
-namespace JsonObjectify\Resource\Reflector\Property;
+namespace Hermiod\Resource\Reflector\Property;
 
-use JsonObjectify\Resource\Attribute\Constraint\StringConstraintInterface;
-use JsonObjectify\Resource\Path\PathInterface;
+use Hermiod\Attribute\Constraint\StringConstraintInterface;
+use Hermiod\Resource\Path\PathInterface;
 
 final class StringProperty implements PropertyInterface
 {
     use Traits\ConstructWithNameAndNullableTrait;
+    use Traits\ConvertToSamePhpValueOrDefault;
 
     private string|null $default;
 
     private bool $hasDefault = false;
 
     /**
-     * @var StringConstraintInterface[]
+     * @var \Hermiod\Attribute\Constraint\StringConstraintInterface[]
      */
     private array $constraints = [];
 

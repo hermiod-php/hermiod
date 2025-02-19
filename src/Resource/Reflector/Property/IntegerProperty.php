@@ -2,21 +2,22 @@
 
 declare(strict_types=1);
 
-namespace JsonObjectify\Resource\Reflector\Property;
+namespace Hermiod\Resource\Reflector\Property;
 
-use JsonObjectify\Resource\Attribute\Constraint\NumberConstraintInterface;
-use JsonObjectify\Resource\Path\PathInterface;
+use Hermiod\Attribute\Constraint\NumberConstraintInterface;
+use Hermiod\Resource\Path\PathInterface;
 
 final class IntegerProperty implements PropertyInterface
 {
     use Traits\ConstructWithNameAndNullableTrait;
+    use Traits\ConvertToSamePhpValueOrDefault;
 
     private int|null $default;
 
     private bool $hasDefault = false;
 
     /**
-     * @var NumberConstraintInterface[]
+     * @var \Hermiod\Attribute\Constraint\NumberConstraintInterface[]
      */
     private array $constraints = [];
 

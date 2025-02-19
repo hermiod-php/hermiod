@@ -2,14 +2,15 @@
 
 declare(strict_types=1);
 
-namespace JsonObjectify\Resource\Reflector\Property;
+namespace Hermiod\Resource\Reflector\Property;
 
-use JsonObjectify\Resource\Attribute\Constraint\ArrayConstraintInterface;
-use JsonObjectify\Resource\Path\PathInterface;
+use Hermiod\Attribute\Constraint\ArrayConstraintInterface;
+use Hermiod\Resource\Path\PathInterface;
 
 final class ArrayProperty implements PropertyInterface
 {
     use Traits\ConstructWithNameAndNullableTrait;
+    use Traits\ConvertToSamePhpValueOrDefault;
 
     private array|null $default;
 
@@ -65,22 +66,36 @@ final class ArrayProperty implements PropertyInterface
         if (!$this->isPossibleValue($value)) {
             return new Validation\Result(
                 \sprintf(
-                    '%s must be an array but %s given',
+                    '%s must be an array%s but %s given',
                     $path->__toString(),
+                    $this->nullable ? ' or null' : '',
                     \gettype($value)
                 )
             );
         }
 
-        foreach ($this->constraints as $constraint) {
-            if (!$constraint->valueMatchesConstraint($value)) {
-                return new Validation\Result(
-                    $constraint->getMismatchExplanation($path, $value),
-                );
+        if (null === $value) {
+            return new Validation\Result();
+        }
+
+        foreach ($value as $key => $item) {
+            $result = $this->checkElementAgainstConstraints($path->withArrayKey($key), $item);
+
+            if ($result !== null) {
+                return new Validation\Result($result);
             }
         }
 
         return new Validation\Result();
+    }
+
+    private function checkElementAgainstConstraints(PathInterface $path, mixed $value): ?string
+    {
+        foreach ($this->constraints as $constraint) {
+            if (!$constraint->mapValueMatchesConstraint($value)) {
+                return $constraint->getMismatchExplanation($path, $value);
+            }
+        }
     }
 
     private function isPossibleValue(mixed $value): bool

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JsonObjectify\Resource\Reflector\Property;
+namespace Hermiod\Resource\Reflector\Property;
 
 final class Collection implements CollectionInterface
 {

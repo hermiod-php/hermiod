@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JsonObjectify\Tests\Integration\Fakes;
+namespace Hermiod\Tests\Integration\Fakes;
 
 final class IntegerPropertiesFake
 {

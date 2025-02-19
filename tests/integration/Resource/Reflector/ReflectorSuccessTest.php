@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace JsonObjectify\Tests\Integration\Resource\Reflector;
+namespace Hermiod\Tests\Integration\Resource\Reflector;
 
-use JsonObjectify\Resource\Reflector\Property\CollectionInterface;
-use JsonObjectify\Resource\Reflector\Property\Factory;
-use JsonObjectify\Resource\Reflector\Property\IntegerProperty;
-use JsonObjectify\Resource\Reflector\Property\MixedProperty;
-use JsonObjectify\Resource\Reflector\Property\PropertyInterface;
-use JsonObjectify\Resource\Reflector\Property\StringProperty;
-use JsonObjectify\Resource\Reflector\Reflector;
-use JsonObjectify\Tests\Integration\Fakes\IntegerPropertiesFake;
-use JsonObjectify\Tests\Integration\Fakes\StringPropertiesFake;
+use Hermiod\Resource\Reflector\Property\CollectionInterface;
+use Hermiod\Resource\Reflector\Property\Factory;
+use Hermiod\Resource\Reflector\Property\IntegerProperty;
+use Hermiod\Resource\Reflector\Property\MixedProperty;
+use Hermiod\Resource\Reflector\Property\PropertyInterface;
+use Hermiod\Resource\Reflector\Property\StringProperty;
+use Hermiod\Resource\Reflector\Reflector;
+use Hermiod\Tests\Integration\Fakes\IntegerPropertiesFake;
+use Hermiod\Tests\Integration\Fakes\StringPropertiesFake;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

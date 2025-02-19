@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JsonObjectify\Resource\Reflector;
+namespace Hermiod\Resource\Reflector;
 
 interface ReflectorInterface
 {

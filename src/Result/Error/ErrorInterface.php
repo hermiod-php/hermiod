@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace JsonObjectify\Result\Error;
+namespace Hermiod\Result\Error;
 
-use JsonObjectify\Resource\Path\PathInterface;
+use Hermiod\Resource\Path\PathInterface;
 
 interface ErrorInterface extends \JsonSerializable
 {

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace JsonObjectify\Resource\Reflector;
+namespace Hermiod\Resource\Reflector;
 
-use JsonObjectify\Resource\Path;
-use JsonObjectify\Resource\Reflector\Property\Validation\Result;
+use Hermiod\Resource\Path;
+use Hermiod\Resource\Reflector\Property\Validation\Result;
 
 final class Reflector implements ReflectorInterface
 {

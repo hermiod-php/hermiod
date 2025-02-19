@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JsonObjectify\Resource\Path;
+namespace Hermiod\Resource\Path;
 
 interface PathInterface
 {

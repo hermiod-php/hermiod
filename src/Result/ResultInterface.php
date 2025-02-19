@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace JsonObjectify\Result;
+namespace Hermiod\Result;
 
-use JsonObjectify\Result\Error;
+use Hermiod\Result\Error;
 
 /**
- * @template T
+ * @template Type
  */
 interface ResultInterface
 {
@@ -16,9 +16,9 @@ interface ResultInterface
     public function getErrors(): Error\CollectionInterface;
 
     /**
-     * @return T
+     * @return Type
      *
      * @throws \Exception
      */
-    public function toClassObject(): object;
+    public function instance(): object;
 }

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace JsonObjectify\Tests\Integration\Fakes;
+namespace Hermiod\Tests\Integration\Fakes;
 
-use JsonObjectify\Resource\Attribute\Constraint\StringIsEmail;
-use JsonObjectify\Resource\Attribute\Constraint\StringIsUuid;
-use JsonObjectify\Resource\Attribute\Constraint\StringMatchesExpression;
+use Hermiod\Attribute\Constraint\StringIsEmail;
+use Hermiod\Attribute\Constraint\StringIsUuid;
+use Hermiod\Attribute\Constraint\StringMatchesRegex;
 
 final class StringPropertiesFake
 {
@@ -30,21 +30,21 @@ final class StringPropertiesFake
     protected $protectedUntypedStringWithDefaultNotNullable = 'default';
     public $publicUntypedStringWithDefaultNotNullable = 'default';
 
-    #[StringMatchesExpression('/foo/')]
+    #[StringMatchesRegex('/foo/')]
     private string $stringWithAttrRegex;
 
     #[StringIsUuid()]
     private string $stringWithAttrUuid;
 
     #[StringIsUuid()]
-    #[StringMatchesExpression('/f00/')]
+    #[StringMatchesRegex('/f00/')]
     private string $stringWithAttrUuidAndRegex;
 
     #[StringIsEmail]
     private string $stringWithAttrEmail;
 
     #[StringIsEmail]
-    #[StringMatchesExpression('/foo/')]
+    #[StringMatchesRegex('/foo/')]
     private string $stringWithAttrEmailAndRegex;
 
     public function list(): array

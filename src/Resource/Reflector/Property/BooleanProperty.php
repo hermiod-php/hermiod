@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace JsonObjectify\Resource\Reflector\Property;
+namespace Hermiod\Resource\Reflector\Property;
 
-use JsonObjectify\Resource\Path\PathInterface;
+use Hermiod\Resource\Path\PathInterface;
 
 final class BooleanProperty implements PropertyInterface
 {
     use Traits\ConstructWithNameAndNullableTrait;
+    use Traits\ConvertToSamePhpValueOrDefault;
 
     private bool|null $default;
 

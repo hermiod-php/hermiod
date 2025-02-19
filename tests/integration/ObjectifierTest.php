@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace JsonObjectify\Tests\Integration;
+namespace Hermiod\Tests\Integration;
 
-use JsonObjectify\Objectifier;
-use JsonObjectify\Tests\Integration\Fakes\StringPropertiesFake;
+use Hermiod\Transposer;
+use Hermiod\Tests\Integration\Fakes\StringPropertiesFake;
 use PHPUnit\Framework\TestCase;
 
 class ObjectifierTest extends TestCase
@@ -40,9 +40,9 @@ class ObjectifierTest extends TestCase
             'stringWithAttrEmailAndRegex' => 'bar@foo.com',
         ];
 
-        $objectifier = new Objectifier();
+        $transposer = Transposer::create();
 
-        $class = $objectifier->decode($json, StringPropertiesFake::class)->toClassObject();
+        $class = $transposer->parse($json, StringPropertiesFake::class)->instance();
 
         $this->assertInstanceOf(StringPropertiesFake::class, $class);
         $this->assertSame($json, $class->list());

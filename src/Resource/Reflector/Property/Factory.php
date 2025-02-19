@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
-namespace JsonObjectify\Resource\Reflector\Property;
+namespace Hermiod\Resource\Reflector\Property;
 
-use JsonObjectify\Resource\Attribute\Constraint\ArrayConstraintInterface;
-use JsonObjectify\Resource\Attribute\Constraint\NumberConstraintInterface;
-use JsonObjectify\Resource\Attribute\Constraint\StringConstraintInterface;
-use JsonObjectify\Resource\Reflector\Property\Constraint\LogicalOr;
+use Hermiod\Attribute\Constraint\ArrayConstraintInterface;
+use Hermiod\Attribute\Constraint\NumberConstraintInterface;
+use Hermiod\Attribute\Constraint\ObjectConstraintInterface;
+use Hermiod\Attribute\Constraint\ObjectKeyConstraintInterface;
+use Hermiod\Attribute\Constraint\StringConstraintInterface;
+use Hermiod\Resource\Reflector\Property\Constraint\LogicalOr;
 
 final class Factory implements FactoryInterface
 {
@@ -77,6 +79,14 @@ final class Factory implements FactoryInterface
         $property = $reflection->hasDefaultValue()
             ? ObjectProperty::withDefaultValue($name, $nullable, $reflection->getDefaultValue())
             : new ObjectProperty($name, $nullable);
+
+        foreach ($this->loadConstraintAttributes($reflection, ObjectKeyConstraintInterface::class) as $constraint) {
+            $property = $property->withKeyConstraint($constraint);
+        }
+
+        foreach ($this->loadConstraintAttributes($reflection, ObjectConstraintInterface::class) as $constraint) {
+            $property = $property->withValueConstraint($constraint);
+        }
 
         return $property;
     }
@@ -152,6 +162,8 @@ final class Factory implements FactoryInterface
     }
 
     /**
+     * We are collecting these in a hashmap to deduplicate erroneous usage.
+     *
      * @template TAttribute
      *
      * @param \ReflectionProperty $reflection
@@ -164,10 +176,11 @@ final class Factory implements FactoryInterface
         $attributes = [];
 
         foreach ($reflection->getAttributes($class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
-            /** @var TAttribute $instance */
-            $instance = $attribute->newInstance();
+            $name = $attribute->getName();
 
-            $attributes[\get_class($instance)] = $instance;
+            if (!isset($attributes[$name])) {
+                $attributes[$name] = $attribute->newInstance();
+            }
         }
 
         return $attributes;

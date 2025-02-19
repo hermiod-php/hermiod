@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace JsonObjectify\Result\Error;
+namespace Hermiod\Result\Error;
 
 use Traversable;
-use JsonObjectify\Resource\Reflector\Property;
+use Hermiod\Resource\Reflector\Property;
 
 final class Collection implements CollectionInterface
 {

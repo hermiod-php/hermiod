@@ -2,28 +2,24 @@
 
 declare(strict_types=1);
 
-namespace JsonObjectify\Resource\Hydrator;
-
-use JsonObjectify\Resource\Hydrator\Trait\RecursiveObjectToArrayTrait;
+namespace Hermiod\Resource\Hydrator;
 
 final class LaminasHydrator implements HydratorInterface
 {
-    use RecursiveObjectToArrayTrait;
-
     private \ReflectionClass $reflection;
 
     public function __construct(
-        private string $className,
+        string $className,
         private \Laminas\Hydrator\HydratorInterface $hydrator,
     )
     {
-        $this->reflection = new \ReflectionClass($this->className);
+        $this->reflection = new \ReflectionClass($className);
     }
 
     public function hydrate(array|object $data): object
     {
         return $this->hydrator->hydrate(
-            $this->objectsToArrays($data),
+            (array)$data,
             $this->reflection->newInstanceWithoutConstructor(),
         );
     }

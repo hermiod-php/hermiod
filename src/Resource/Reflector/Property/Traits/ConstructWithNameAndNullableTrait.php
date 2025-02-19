@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JsonObjectify\Resource\Reflector\Property\Traits;
-
-use JsonObjectify\Resource\Reflector\Property\Constraint;
+namespace Hermiod\Resource\Reflector\Property\Traits;
 
 trait ConstructWithNameAndNullableTrait
 {

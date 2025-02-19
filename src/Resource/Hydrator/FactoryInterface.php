@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JsonObjectify\Resource\Hydrator;
+namespace Hermiod\Resource\Hydrator;
 
 interface FactoryInterface
 {

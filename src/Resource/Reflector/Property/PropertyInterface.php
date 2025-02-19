@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace JsonObjectify\Resource\Reflector\Property;
+namespace Hermiod\Resource\Reflector\Property;
 
-use JsonObjectify\Resource\Path\PathInterface;
+use Hermiod\Resource\Path\PathInterface;
 
 interface PropertyInterface
 {
@@ -15,4 +15,8 @@ interface PropertyInterface
     public function hasDefaultValue(): bool;
 
     public function checkValueAgainstConstraints(PathInterface $path, mixed $value): Validation\ResultInterface;
+
+    public function convertToPhpValue(mixed $value): mixed;
+
+    public function convertToJsonValue(mixed $value): mixed;
 }

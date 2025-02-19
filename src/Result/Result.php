@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace JsonObjectify\Result;
+namespace Hermiod\Result;
 
-use JsonObjectify\Resource\Hydrator\HydratorInterface;
-use JsonObjectify\Resource\Reflector\ReflectorInterface;
-use JsonObjectify\Resource\Reflector\Property;
+use Hermiod\Resource\Hydrator\HydratorInterface;
+use Hermiod\Resource\Reflector\ReflectorInterface;
+use Hermiod\Resource\Reflector\Property;
 
 final readonly class Result implements ResultInterface
 {
@@ -14,9 +14,7 @@ final readonly class Result implements ResultInterface
         private ReflectorInterface $reflector,
         private HydratorInterface $hydrator,
         private object|array $json,
-    )
-    {
-    }
+    ) {}
 
     public function isValid(): bool
     {
@@ -30,7 +28,7 @@ final readonly class Result implements ResultInterface
         );
     }
 
-    public function toClassObject(): object
+    public function instance(): object
     {
         if ($this->isValid()) {
             throw new \Exception();
