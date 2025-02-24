@@ -6,7 +6,7 @@ namespace Hermiod\Attribute\Constraint;
 
 use Hermiod\Resource\Path\PathInterface;
 
-interface NumberConstraintInterface
+interface NumberConstraintInterface extends ConstraintInterface
 {
     public function valueMatchesConstraint(int|float $value): bool;
 

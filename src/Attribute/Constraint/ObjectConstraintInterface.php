@@ -6,7 +6,7 @@ namespace Hermiod\Attribute\Constraint;
 
 use Hermiod\Resource\Path\PathInterface;
 
-interface ObjectConstraintInterface
+interface ObjectConstraintInterface extends ConstraintInterface
 {
     public function mapValueMatchesConstraint(mixed $value): bool;
 

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Hermiod\Tests\Integration\Resource\Reflector;
 
+use Hermiod\Resource\Reflector\Constraint\CachedFactory;
+use Hermiod\Resource\Reflector\Property\ArrayProperty;
 use Hermiod\Resource\Reflector\Property\CollectionInterface;
 use Hermiod\Resource\Reflector\Property\Factory;
 use Hermiod\Resource\Reflector\Property\IntegerProperty;
@@ -11,6 +13,7 @@ use Hermiod\Resource\Reflector\Property\MixedProperty;
 use Hermiod\Resource\Reflector\Property\PropertyInterface;
 use Hermiod\Resource\Reflector\Property\StringProperty;
 use Hermiod\Resource\Reflector\Reflector;
+use Hermiod\Tests\Integration\Fakes\ArrayPropertiesFake;
 use Hermiod\Tests\Integration\Fakes\IntegerPropertiesFake;
 use Hermiod\Tests\Integration\Fakes\StringPropertiesFake;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -20,9 +23,15 @@ class ReflectorSuccessTest extends TestCase
 {
     #[DataProvider('provideStringFakesPropertiesAndDefaults')]
     #[DataProvider('provideIntegerFakesPropertiesAndDefaults')]
+    #[DataProvider('provideArrayFakesPropertiesAndDefaults')]
     public function testCanParseTypedProperties(string $fake, string $name, string $class, bool $expectDefault, mixed $default = null): void
     {
-        $reflector = new Reflector($fake, new Factory());
+        $reflector = new Reflector(
+            $fake,
+            new Factory(
+                new CachedFactory()
+            )
+        );
 
         $properties = $reflector->getProperties();
 
@@ -63,270 +72,396 @@ class ReflectorSuccessTest extends TestCase
 
     public static function provideStringFakesPropertiesAndDefaults(): \Generator
     {
+        $fake = StringPropertiesFake::class;
+        $property = StringProperty::class;
+        
         yield self::normalise('privateStringWithoutDefaultNotNullable') => [
-            StringPropertiesFake::class,
-            'privateStringWithoutDefaultNotNullable',
-            StringProperty::class,
-            false,
+            'fake' => $fake,
+            'name' => 'privateStringWithoutDefaultNotNullable',
+            'class' => $property,
+            'expectDefault' => false,
         ];
 
         yield self::normalise('protectedStringWithoutDefaultNotNullable') => [
-            StringPropertiesFake::class,
-            'protectedStringWithoutDefaultNotNullable',
-            StringProperty::class,
-            false,
+            'fake' => $fake,
+            'name' => 'protectedStringWithoutDefaultNotNullable',
+            'class' => $property,
+            'expectDefault' => false,
         ];
 
         yield self::normalise('publicStringWithoutDefaultNotNullable') => [
-            StringPropertiesFake::class,
-            'protectedStringWithoutDefaultNotNullable',
-            StringProperty::class,
-            false,
+            'fake' => $fake,
+            'name' => 'protectedStringWithoutDefaultNotNullable',
+            'class' => $property,
+            'expectDefault' => false,
         ];
 
         yield self::normalise('privateStringWithDefaultNotNullable') => [
-            StringPropertiesFake::class,
-            'privateStringWithDefaultNotNullable',
-            StringProperty::class,
-            true,
-            'default',
+            'fake' => $fake,
+            'name' => 'privateStringWithDefaultNotNullable',
+            'class' => $property,
+            'expectDefault' => true,
+            'default' => 'default',
         ];
 
         yield self::normalise('protectedStringWithDefaultNotNullable') => [
-            StringPropertiesFake::class,
-            'protectedStringWithDefaultNotNullable',
-            StringProperty::class,
-            true,
-            'default',
+            'fake' => $fake,
+            'name' => 'protectedStringWithDefaultNotNullable',
+            'class' => $property,
+            'expectDefault' => true,
+            'default' => 'default',
         ];
 
         yield self::normalise('publicStringWithDefaultNotNullable') => [
-            StringPropertiesFake::class,
-            'publicStringWithDefaultNotNullable',
-            StringProperty::class,
-            true,
-            'default',
+            'fake' => $fake,
+            'name' => 'publicStringWithDefaultNotNullable',
+            'class' => $property,
+            'expectDefault' => true,
+            'default' => 'default',
         ];
 
         yield self::normalise('privateStringWithoutDefaultNullable') => [
-            StringPropertiesFake::class,
-            'privateStringWithoutDefaultNullable',
-            StringProperty::class,
-            false,
+            'fake' => $fake,
+            'name' => 'privateStringWithoutDefaultNullable',
+            'class' => $property,
+            'expectDefault' => false,
         ];
 
         yield self::normalise('protectedStringWithoutDefaultNullable') => [
-            StringPropertiesFake::class,
-            'protectedStringWithoutDefaultNullable',
-            StringProperty::class,
-            false,
+            'fake' => $fake,
+            'name' => 'protectedStringWithoutDefaultNullable',
+            'class' => $property,
+            'expectDefault' => false,
         ];
 
         yield self::normalise('publicStringWithoutDefaultNullable') => [
-            StringPropertiesFake::class,
-            'publicStringWithoutDefaultNullable',
-            StringProperty::class,
-            false,
+            'fake' => $fake,
+            'name' => 'publicStringWithoutDefaultNullable',
+            'class' => $property,
+            'expectDefault' => false,
         ];
 
         yield self::normalise('privateStringWithDefaultNullable') => [
-            StringPropertiesFake::class,
-            'privateStringWithDefaultNullable',
-            StringProperty::class,
-            true,
-            null,
+            'fake' => $fake,
+            'name' => 'privateStringWithDefaultNullable',
+            'class' => $property,
+            'expectDefault' => true,
+            'default' => null,
         ];
 
         yield self::normalise('protectedStringWithDefaultNullable') => [
-            StringPropertiesFake::class,
-            'protectedStringWithDefaultNullable',
-            StringProperty::class,
-            true,
-            null,
+            'fake' => $fake,
+            'name' => 'protectedStringWithDefaultNullable',
+            'class' => $property,
+            'expectDefault' => true,
+            'default' => null,
         ];
 
         yield self::normalise('publicStringWithDefaultNullable') => [
-            StringPropertiesFake::class,
-            'publicStringWithDefaultNullable',
-            StringProperty::class,
-            true,
-            null,
+            'fake' => $fake,
+            'name' => 'publicStringWithDefaultNullable',
+            'class' => $property,
+            'expectDefault' => true,
+            'default' => null,
         ];
 
         yield self::normalise('privateUntypedStringWithDefaultNotNullable') => [
-            StringPropertiesFake::class,
-            'privateUntypedStringWithDefaultNotNullable',
-            MixedProperty::class,
-            true,
-            'default',
+            'fake' => $fake,
+            'name' => 'privateUntypedStringWithDefaultNotNullable',
+            'class' => MixedProperty::class,
+            'expectDefault' => true,
+            'default' => 'default',
         ];
 
         yield self::normalise('protectedUntypedStringWithDefaultNotNullable') => [
-            StringPropertiesFake::class,
-            'protectedUntypedStringWithDefaultNotNullable',
-            MixedProperty::class,
-            true,
-            'default',
+            'fake' => $fake,
+            'name' => 'protectedUntypedStringWithDefaultNotNullable',
+            'class' => MixedProperty::class,
+            'expectDefault' => true,
+            'default' => 'default',
         ];
 
         yield self::normalise('publicUntypedStringWithDefaultNotNullable') => [
-            StringPropertiesFake::class,
-            'publicUntypedStringWithDefaultNotNullable',
-            MixedProperty::class,
-            true,
-            'default',
+            'fake' => $fake,
+            'name' => 'publicUntypedStringWithDefaultNotNullable',
+            'class' => MixedProperty::class,
+            'expectDefault' => true,
+            'default' => 'default',
         ];
 
         yield self::normalise('stringWithAttrRegex') => [
-            StringPropertiesFake::class,
-            'stringWithAttrRegex',
-            StringProperty::class,
-            false,
+            'fake' => $fake,
+            'name' => 'stringWithAttrRegex',
+            'class' => $property,
+            'expectDefault' => false,
         ];
 
         yield self::normalise('stringWithAttrUuid') => [
-            StringPropertiesFake::class,
-            'stringWithAttrUuid',
-            StringProperty::class,
-            false,
+            'fake' => $fake,
+            'name' => 'stringWithAttrUuid',
+            'class' => $property,
+            'expectDefault' => false,
         ];
 
         yield self::normalise('stringWithAttrUuidAndRegex') => [
-            StringPropertiesFake::class,
-            'stringWithAttrUuidAndRegex',
-            StringProperty::class,
-            false,
+            'fake' => $fake,
+            'name' => 'stringWithAttrUuidAndRegex',
+            'class' => $property,
+            'expectDefault' => false,
         ];
 
         yield self::normalise('stringWithAttrEmail') => [
-            StringPropertiesFake::class,
-            'stringWithAttrEmail',
-            StringProperty::class,
-            false,
+            'fake' => $fake,
+            'name' => 'stringWithAttrEmail',
+            'class' => $property,
+            'expectDefault' => false,
         ];
 
         yield self::normalise('stringWithAttrEmailAndRegex') => [
-            StringPropertiesFake::class,
-            'stringWithAttrEmailAndRegex',
-            StringProperty::class,
-            false,
+            'fake' => $fake,
+            'name' => 'stringWithAttrEmailAndRegex',
+            'class' => $property,
+            'expectDefault' => false,
         ];
     }
 
     public static function provideIntegerFakesPropertiesAndDefaults(): \Generator
     {
+        $fake = IntegerPropertiesFake::class;
+        $property = IntegerProperty::class;
+        
         yield self::normalise('privateIntegerWithoutDefaultNotNullable') => [
-            IntegerPropertiesFake::class,
-            'privateIntegerWithoutDefaultNotNullable',
-            IntegerProperty::class,
-            false,
+            'fake' => $fake,
+            'name' => 'privateIntegerWithoutDefaultNotNullable',
+            'class' => $property,
+            'expectDefault' => false,
         ];
 
         yield self::normalise('protectedIntegerWithoutDefaultNotNullable') => [
-            IntegerPropertiesFake::class,
-            'protectedIntegerWithoutDefaultNotNullable',
-            IntegerProperty::class,
-            false,
+            'fake' => $fake,
+            'name' => 'protectedIntegerWithoutDefaultNotNullable',
+            'class' => $property,
+            'expectDefault' => false,
         ];
 
         yield self::normalise('publicIntegerWithoutDefaultNotNullable') => [
-            IntegerPropertiesFake::class,
-            'protectedIntegerWithoutDefaultNotNullable',
-            IntegerProperty::class,
-            false,
+            'fake' => $fake,
+            'name' => 'protectedIntegerWithoutDefaultNotNullable',
+            'class' => $property,
+            'expectDefault' => false,
         ];
 
         yield self::normalise('privateIntegerWithDefaultNotNullable') => [
-            IntegerPropertiesFake::class,
-            'privateIntegerWithDefaultNotNullable',
-            IntegerProperty::class,
-            true,
-            42,
+            'fake' => $fake,
+            'name' => 'privateIntegerWithDefaultNotNullable',
+            'class' => $property,
+            'expectDefault' => true,
+            'default' => 42,
         ];
 
         yield self::normalise('protectedIntegerWithDefaultNotNullable') => [
-            IntegerPropertiesFake::class,
-            'protectedIntegerWithDefaultNotNullable',
-            IntegerProperty::class,
-            true,
-            42,
+            'fake' => $fake,
+            'name' => 'protectedIntegerWithDefaultNotNullable',
+            'class' => $property,
+            'expectDefault' => true,
+            'default' => 42,
         ];
 
         yield self::normalise('publicIntegerWithDefaultNotNullable') => [
-            IntegerPropertiesFake::class,
-            'publicIntegerWithDefaultNotNullable',
-            IntegerProperty::class,
-            true,
-            42,
+            'fake' => $fake,
+            'name' => 'publicIntegerWithDefaultNotNullable',
+            'class' => $property,
+            'expectDefault' => true,
+            'default' => 42,
         ];
 
         yield self::normalise('privateIntegerWithoutDefaultNullable') => [
-            IntegerPropertiesFake::class,
-            'privateIntegerWithoutDefaultNullable',
-            IntegerProperty::class,
-            false,
+            'fake' => $fake,
+            'name' => 'privateIntegerWithoutDefaultNullable',
+            'class' => $property,
+            'expectDefault' => false,
         ];
 
         yield self::normalise('protectedIntegerWithoutDefaultNullable') => [
-            IntegerPropertiesFake::class,
-            'protectedIntegerWithoutDefaultNullable',
-            IntegerProperty::class,
-            false,
+            'fake' => $fake,
+            'name' => 'protectedIntegerWithoutDefaultNullable',
+            'class' => $property,
+            'expectDefault' => false,
         ];
 
         yield self::normalise('publicIntegerWithoutDefaultNullable') => [
-            IntegerPropertiesFake::class,
-            'publicIntegerWithoutDefaultNullable',
-            IntegerProperty::class,
-            false,
+            'fake' => $fake,
+            'name' => 'publicIntegerWithoutDefaultNullable',
+            'class' => $property,
+            'expectDefault' => false,
         ];
 
         yield self::normalise('privateIntegerWithDefaultNullable') => [
-            IntegerPropertiesFake::class,
-            'privateIntegerWithDefaultNullable',
-            IntegerProperty::class,
-            true,
-            null,
+            'fake' => $fake,
+            'name' => 'privateIntegerWithDefaultNullable',
+            'class' => $property,
+            'expectDefault' => true,
+            'default' => null,
         ];
 
         yield self::normalise('protectedIntegerWithDefaultNullable') => [
-            IntegerPropertiesFake::class,
-            'protectedIntegerWithDefaultNullable',
-            IntegerProperty::class,
-            true,
-            null,
+            'fake' => $fake,
+            'name' => 'protectedIntegerWithDefaultNullable',
+            'class' => $property,
+            'expectDefault' => true,
+            'default' => null,
         ];
 
         yield self::normalise('publicIntegerWithDefaultNullable') => [
-            IntegerPropertiesFake::class,
-            'publicIntegerWithDefaultNullable',
-            IntegerProperty::class,
-            true,
-            null,
+            'fake' => $fake,
+            'name' => 'publicIntegerWithDefaultNullable',
+            'class' => $property,
+            'expectDefault' => true,
+            'default' => null,
         ];
 
         yield self::normalise('privateUntypedIntegerWithDefaultNotNullable') => [
-            IntegerPropertiesFake::class,
-            'privateUntypedIntegerWithDefaultNotNullable',
-            MixedProperty::class,
-            true,
-            42,
+            'fake' => $fake,
+            'name' => 'privateUntypedIntegerWithDefaultNotNullable',
+            'class' => MixedProperty::class,
+            'expectDefault' => true,
+            'default' => 42,
         ];
 
         yield self::normalise('protectedUntypedIntegerWithDefaultNotNullable') => [
-            IntegerPropertiesFake::class,
-            'protectedUntypedIntegerWithDefaultNotNullable',
-            MixedProperty::class,
-            true,
-            42,
+            'fake' => $fake,
+            'name' => 'protectedUntypedIntegerWithDefaultNotNullable',
+            'class' => MixedProperty::class,
+            'expectDefault' => true,
+            'default' => 42,
         ];
 
         yield self::normalise('publicUntypedIntegerWithDefaultNotNullable') => [
-            IntegerPropertiesFake::class,
-            'publicUntypedIntegerWithDefaultNotNullable',
-            MixedProperty::class,
-            true,
-            42,
+            'fake' => $fake,
+            'name' => 'publicUntypedIntegerWithDefaultNotNullable',
+            'class' => MixedProperty::class,
+            'expectDefault' => true,
+            'default' => 42,
+        ];
+    }
+
+    public static function provideArrayFakesPropertiesAndDefaults(): \Generator
+    {
+        $fake = ArrayPropertiesFake::class;
+        $property = ArrayProperty::class;
+
+        yield self::normalise('privateArrayWithoutDefaultNotNullable') => [
+            'fake' => $fake,
+            'name' => 'privateArrayWithoutDefaultNotNullable',
+            'class' => $property,
+            'expectDefault' => false,
+        ];
+
+        yield self::normalise('protectedArrayWithoutDefaultNotNullable') => [
+            'fake' => $fake,
+            'name' => 'protectedArrayWithoutDefaultNotNullable',
+            'class' => $property,
+            'expectDefault' => false,
+        ];
+
+        yield self::normalise('publicArrayWithoutDefaultNotNullable') => [
+            'fake' => $fake,
+            'name' => 'protectedArrayWithoutDefaultNotNullable',
+            'class' => $property,
+            'expectDefault' => false,
+        ];
+
+        yield self::normalise('privateArrayWithDefaultNotNullable') => [
+            'fake' => $fake,
+            'name' => 'privateArrayWithDefaultNotNullable',
+            'class' => $property,
+            'expectDefault' => true,
+            'default' => ['default'],
+        ];
+
+        yield self::normalise('protectedArrayWithDefaultNotNullable') => [
+            'fake' => $fake,
+            'name' => 'protectedArrayWithDefaultNotNullable',
+            'class' => $property,
+            'expectDefault' => true,
+            'default' => ['default'],
+        ];
+
+        yield self::normalise('publicArrayWithDefaultNotNullable') => [
+            'fake' => $fake,
+            'name' => 'publicArrayWithDefaultNotNullable',
+            'class' => $property,
+            'expectDefault' => true,
+            'default' => ['default'],
+        ];
+
+        yield self::normalise('privateArrayWithoutDefaultNullable') => [
+            'fake' => $fake,
+            'name' => 'privateArrayWithoutDefaultNullable',
+            'class' => $property,
+            'expectDefault' => false,
+        ];
+
+        yield self::normalise('protectedArrayWithoutDefaultNullable') => [
+            'fake' => $fake,
+            'name' => 'protectedArrayWithoutDefaultNullable',
+            'class' => $property,
+            'expectDefault' => false,
+        ];
+
+        yield self::normalise('publicArrayWithoutDefaultNullable') => [
+            'fake' => $fake,
+            'name' => 'publicArrayWithoutDefaultNullable',
+            'class' => $property,
+            'expectDefault' => false,
+        ];
+
+        yield self::normalise('privateArrayWithDefaultNullable') => [
+            'fake' => $fake,
+            'name' => 'privateArrayWithDefaultNullable',
+            'class' => $property,
+            'expectDefault' => true,
+            'default' => null,
+        ];
+
+        yield self::normalise('protectedArrayWithDefaultNullable') => [
+            'fake' => $fake,
+            'name' => 'protectedArrayWithDefaultNullable',
+            'class' => $property,
+            'expectDefault' => true,
+            'default' => null,
+        ];
+
+        yield self::normalise('publicArrayWithDefaultNullable') => [
+            'fake' => $fake,
+            'name' => 'publicArrayWithDefaultNullable',
+            'class' => $property,
+            'expectDefault' => true,
+            'default' => null,
+        ];
+
+        yield self::normalise('privateUntypedArrayWithDefaultNotNullable') => [
+            'fake' => $fake,
+            'name' => 'privateUntypedArrayWithDefaultNotNullable',
+            'class' => MixedProperty::class,
+            'expectDefault' => true,
+            'default' => ['default'],
+        ];
+
+        yield self::normalise('protectedUntypedArrayWithDefaultNotNullable') => [
+            'fake' => $fake,
+            'name' => 'protectedUntypedArrayWithDefaultNotNullable',
+            'class' => MixedProperty::class,
+            'expectDefault' => true,
+            'default' => ['default'],
+        ];
+
+        yield self::normalise('publicUntypedArrayWithDefaultNotNullable') => [
+            'fake' => $fake,
+            'name' => 'publicUntypedArrayWithDefaultNotNullable',
+            'class' => MixedProperty::class,
+            'expectDefault' => true,
+            'default' => ['default'],
         ];
     }
 

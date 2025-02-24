@@ -6,7 +6,7 @@ namespace Hermiod\Attribute\Constraint;
 
 use Hermiod\Resource\Path\PathInterface;
 
-interface StringConstraintInterface
+interface StringConstraintInterface extends ConstraintInterface
 {
     public function valueMatchesConstraint(string $value): bool;
 

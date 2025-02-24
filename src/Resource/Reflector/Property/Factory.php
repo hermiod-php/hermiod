@@ -5,13 +5,19 @@ declare(strict_types=1);
 namespace Hermiod\Resource\Reflector\Property;
 
 use Hermiod\Attribute\Constraint\ArrayConstraintInterface;
+use Hermiod\Attribute\Constraint\ConstraintInterface;
 use Hermiod\Attribute\Constraint\NumberConstraintInterface;
 use Hermiod\Attribute\Constraint\ObjectConstraintInterface;
 use Hermiod\Attribute\Constraint\ObjectKeyConstraintInterface;
 use Hermiod\Attribute\Constraint\StringConstraintInterface;
+use Hermiod\Resource\Reflector\Constraint;
 
-final class Factory implements FactoryInterface
+final readonly class Factory implements FactoryInterface
 {
+    public function __construct(
+        private Constraint\FactoryInterface $constraints,
+    ) {}
+
     public function createPropertyFromReflectionProperty(\ReflectionProperty $property): PropertyInterface
     {
         $type = $property->getType();
@@ -166,7 +172,7 @@ final class Factory implements FactoryInterface
     /**
      * We are collecting these in a hashmap to deduplicate erroneous usage.
      *
-     * @template TAttribute
+     * @template TAttribute of ConstraintInterface
      *
      * @param \ReflectionProperty $reflection
      * @param class-string<TAttribute> $class
@@ -181,10 +187,14 @@ final class Factory implements FactoryInterface
             $name = $attribute->getName();
 
             if (!isset($attributes[$name])) {
-                $attributes[$name] = $attribute->newInstance();
+                $attributes[$name] = $this->constraints->createConstraint(
+                    $name,
+                    $attribute->getArguments(),
+                );
             }
         }
 
-        return $attributes;
+        /** @var TAttribute[] $attributes */
+        return \array_values($attributes);
     }
 }

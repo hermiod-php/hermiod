@@ -17,7 +17,9 @@ final class Transposer implements TransposerInterface
     {
         return new self(
             new Reflector\Factory(
-                new Resource\Reflector\Property\Factory()
+                new Resource\Reflector\Property\Factory(
+                    new Resource\Reflector\Constraint\CachedFactory()
+                )
             ),
             new Hydrator\LaminasHydratorFactory()
         );

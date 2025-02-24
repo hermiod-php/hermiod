@@ -25,4 +25,9 @@ final class IntegerPropertiesFake
     private $privateUntypedIntegerWithDefaultNotNullable = 42;
     protected $protectedUntypedIntegerWithDefaultNotNullable = 42;
     public $publicUntypedIntegerWithDefaultNotNullable = 42;
+
+    public function list(): array
+    {
+        return \get_object_vars($this);
+    }
 }

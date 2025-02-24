@@ -6,7 +6,7 @@ namespace Hermiod\Attribute\Constraint;
 
 use Hermiod\Resource\Path\PathInterface;
 
-interface ObjectKeyConstraintInterface
+interface ObjectKeyConstraintInterface extends ConstraintInterface
 {
     public function mapKeyMatchesConstraint(string $key): bool;
 
