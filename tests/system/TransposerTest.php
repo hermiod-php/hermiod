@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Hermiod\Tests\Integration;
+namespace Hermiod\Tests\System;
 
-use Hermiod\Transposer;
 use Hermiod\Tests\Integration\Fakes\StringPropertiesFake;
+use Hermiod\Transposer;
 use PHPUnit\Framework\TestCase;
 
 class TransposerTest extends TestCase
