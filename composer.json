@@ -65,9 +65,9 @@
       "@tests-integration"
     ],
     "analyse": "vendor/bin/phpstan analyse --level max ./src",
-    "tests-unit": "vendor/bin/phpunit -c tests/phpunit.xml --testdox --testsuite unit",
-    "tests-unit-coverage": "export XDEBUG_MODE=coverage && vendor/bin/phpunit -c tests/phpunit.xml --testdox --testsuite unit --path-coverage  --coverage-html ./test-reports/coverage/html",
-    "tests-integration": "vendor/bin/phpunit -c tests/phpunit.xml --testdox --testsuite integration --log-junit ./test-reports/results/integration/junit.xml",
-    "tests-system": "vendor/bin/phpunit -c tests/phpunit.xml --testdox --testsuite system --log-junit ./test-reports/results/system/junit.xml"
+    "tests-unit": "vendor/bin/phpunit -c tests/phpunit.xml --testsuite unit",
+    "tests-unit-coverage": "export XDEBUG_MODE=coverage && vendor/bin/phpunit -c tests/phpunit.xml --testsuite unit --path-coverage  --coverage-html ./test-reports/coverage/html",
+    "tests-integration": "vendor/bin/phpunit -c tests/phpunit.xml --testsuite integration --log-junit ./test-reports/results/integration/junit.xml",
+    "tests-system": "vendor/bin/phpunit -c tests/phpunit.xml --testsuite system --log-junit ./test-reports/results/system/junit.xml"
   }
 }
