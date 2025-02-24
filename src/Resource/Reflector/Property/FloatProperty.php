@@ -6,6 +6,7 @@ namespace Hermiod\Resource\Reflector\Property;
 
 use Hermiod\Attribute\Constraint\NumberConstraintInterface;
 use Hermiod\Resource\Path\PathInterface;
+use Hermiod\Resource\Reflector\Property\Exception\InvalidDefaultValueException;
 
 final class FloatProperty implements PropertyInterface
 {
@@ -33,7 +34,7 @@ final class FloatProperty implements PropertyInterface
     private function setDefaultValue(int|float|null $value): PropertyInterface
     {
         if (!$this->isPossibleValue($value)) {
-            throw new \Exception();
+            throw InvalidDefaultValueException::new('float', $value, $this->nullable, 'int');
         }
 
         $this->default = $value;

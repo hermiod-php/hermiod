@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Hermiod\Resource\Reflector\Property;
 
 use Hermiod\Resource\Path\PathInterface;
+use Hermiod\Resource\Reflector\Property\Exception\InvalidDefaultValueException;
 
 final class BooleanProperty implements PropertyInterface
 {
@@ -27,7 +28,7 @@ final class BooleanProperty implements PropertyInterface
     private function setDefaultValue(bool|null $value): PropertyInterface
     {
         if (!$this->isPossibleValue($value)) {
-            throw new \Exception();
+            throw InvalidDefaultValueException::new('bool', $value, $this->nullable);
         }
 
         $this->default = $value;

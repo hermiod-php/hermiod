@@ -18,7 +18,7 @@ final class Result implements ResultInterface
 
     public function isValid(): bool
     {
-        return \count($this->validationErrors) !== 0;
+        return \count($this->validationErrors) === 0;
     }
 
     public function getValidationErrors(): array

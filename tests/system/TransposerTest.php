@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Hermiod\Tests\System;
 
+use Hermiod\Exception\TooMuchRecursionException;
+use Hermiod\Tests\System\Fakes\RecursiveTestClass;
 use Hermiod\Tests\Integration\Fakes\StringPropertiesFake;
 use Hermiod\Transposer;
+use PHPUnit\Framework\Attributes\Medium;
 use PHPUnit\Framework\TestCase;
 
+#[Medium]
 class TransposerTest extends TestCase
 {
     public function testSuccessfulHydrate(): void
@@ -46,5 +50,29 @@ class TransposerTest extends TestCase
 
         $this->assertInstanceOf(StringPropertiesFake::class, $class);
         $this->assertSame($json, $class->list());
+    }
+
+    public function testRecursionDepthLimitThrows(): void
+    {
+        $generate = function (array &$inital, int $depth) use (&$generate): array
+        {
+            if ($depth >= 129) {
+                return $inital;
+            }
+
+            $array = [];
+
+            $inital['object'] = $generate($array, $depth + 1 );
+
+            return $inital;
+        };
+
+        $transposer = Transposer::create();
+
+        $this->expectException(TooMuchRecursionException::class);
+
+        $json = [];
+
+        $transposer->parse($generate($json, 0), RecursiveTestClass::class)->instance();
     }
 }

@@ -7,6 +7,11 @@ namespace Hermiod\Resource\Reflector\Property;
 use Hermiod\Attribute\Constraint\StringConstraintInterface;
 use Hermiod\Attribute\Constraint\StringIsUuid;
 use Hermiod\Resource\Path\PathInterface;
+use Hermiod\Resource\Reflector\Property\Exception\InvalidUuidTypeException;
+use Hermiod\Resource\Reflector\Property\Exception\InvalidUuidValueException;
+use Ramsey\Uuid\Exception\UuidExceptionInterface;
+use Ramsey\Uuid\UuidInterface;
+use Ramsey\Uuid\Uuid;
 
 final class RamseyUuidProperty implements PropertyInterface
 {
@@ -45,29 +50,33 @@ final class RamseyUuidProperty implements PropertyInterface
         return new Validation\Result();
     }
 
-    public function convertToPhpValue(mixed $value): \DateTime
+    public function convertToPhpValue(mixed $value): UuidInterface
     {
-        if ($value instanceof \DateTime) {
+        if ($value instanceof UuidInterface) {
             return $value;
         }
 
-        if ($value instanceof \DateTimeImmutable) {
-            return \DateTime::createFromImmutable($value);
-        }
-
         if (\is_string($value)) {
-            return new \DateTime($value);
+            try {
+                return Uuid::fromString($value);
+            } catch (UuidExceptionInterface $exception) {
+                throw InvalidUuidValueException::new($value, $exception);
+            }
         }
 
-        throw new \InvalidArgumentException('Expected a DateTime or \DateTimeImmutable');
+        throw InvalidUuidTypeException::new($value);
     }
 
     public function convertToJsonValue(mixed $value): string
     {
-        if ($value instanceof \DateTimeInterface) {
-            return $value->format(\DateTimeInterface::ATOM);
+        if ($value instanceof UuidInterface) {
+            return $value->toString();
         }
 
-        throw new \InvalidArgumentException('Expected a DateTime or \DateTimeInterface');
+        if (\is_string($value)) {
+            return $value;
+        }
+
+        throw InvalidUuidTypeException::new($value);
     }
 }

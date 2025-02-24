@@ -11,6 +11,7 @@ use Hermiod\Attribute\Constraint\ObjectConstraintInterface;
 use Hermiod\Attribute\Constraint\ObjectKeyConstraintInterface;
 use Hermiod\Attribute\Constraint\StringConstraintInterface;
 use Hermiod\Resource\Reflector\Constraint;
+use Hermiod\Resource\Reflector\Property\Exception\UnsupportedPropertyTypeException;
 
 final readonly class Factory implements FactoryInterface
 {
@@ -43,7 +44,7 @@ final readonly class Factory implements FactoryInterface
                 'object' => $this->createObjectTypeProperty($property),
                 'string' => $this->createStringTypeProperty($property),
                 'mixed' => $this->createMixedTypeProperty($property),
-                default => throw new \Exception(),
+                default => throw UnsupportedPropertyTypeException::new($type->getName()),
             };
         }
 

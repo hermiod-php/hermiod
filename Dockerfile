@@ -3,7 +3,8 @@ FROM php:8.2-cli-alpine
 # Linux configuration
 RUN apk add --no-cache linux-headers ${PHPIZE_DEPS} \
     && pecl install xdebug \
-    && docker-php-ext-enable xdebug \
+    && docker-php-ext-install pcntl \
+    && docker-php-ext-enable xdebug pcntl \
     && apk del linux-headers ${PHPIZE_DEPS} \
     && docker-php-source delete
 

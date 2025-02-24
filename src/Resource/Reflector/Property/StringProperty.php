@@ -6,6 +6,7 @@ namespace Hermiod\Resource\Reflector\Property;
 
 use Hermiod\Attribute\Constraint\StringConstraintInterface;
 use Hermiod\Resource\Path\PathInterface;
+use Hermiod\Resource\Reflector\Property\Exception\InvalidDefaultValueException;
 
 final class StringProperty implements PropertyInterface
 {
@@ -33,7 +34,7 @@ final class StringProperty implements PropertyInterface
     private function setDefaultValue(string|null $value): PropertyInterface
     {
         if (!$this->isPossibleValue($value)) {
-            throw new \Exception();
+            throw InvalidDefaultValueException::new('string', $value, $this->nullable);
         }
 
         $this->default = $value;

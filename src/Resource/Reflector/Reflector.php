@@ -75,10 +75,6 @@ final class Reflector implements ReflectorInterface
             return (array) $json;
         }
 
-        if (\array_is_list($json)) {
-            throw new \Exception();
-        }
-
         return $json;
     }
 }

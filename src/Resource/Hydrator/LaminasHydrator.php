@@ -19,7 +19,7 @@ final class LaminasHydrator implements HydratorInterface
      * @param \Laminas\Hydrator\HydratorInterface $hydrator
      */
     public function __construct(
-        string $className,
+        private string $className,
         private \Laminas\Hydrator\HydratorInterface $hydrator,
     )
     {
@@ -35,5 +35,10 @@ final class LaminasHydrator implements HydratorInterface
             (array)$data,
             $this->reflection->newInstanceWithoutConstructor(),
         );
+    }
+
+    public function getTargetClassname(): string
+    {
+        return $this->className;
     }
 }

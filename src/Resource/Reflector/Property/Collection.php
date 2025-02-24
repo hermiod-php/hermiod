@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Hermiod\Resource\Reflector\Property;
 
+use Hermiod\Resource\Reflector\Property\Exception\AddingToSealedCollectionException;
+use Hermiod\Resource\Reflector\Property\Exception\DeletingFromSealedCollectionException;
+
 final class Collection implements CollectionInterface
 {
     /**
@@ -46,7 +49,7 @@ final class Collection implements CollectionInterface
      */
     public function offsetSet(mixed $offset, mixed $value): void
     {
-        throw new \RuntimeException();
+        throw AddingToSealedCollectionException::new($offset, $value);
     }
 
     /**
@@ -54,7 +57,7 @@ final class Collection implements CollectionInterface
      */
     public function offsetUnset(mixed $offset): void
     {
-        throw new \RuntimeException();
+        throw DeletingFromSealedCollectionException::new($offset);
     }
 
     public function current(): ?PropertyInterface

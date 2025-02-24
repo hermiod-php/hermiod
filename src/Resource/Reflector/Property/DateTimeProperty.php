@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Hermiod\Resource\Reflector\Property;
 
 use Hermiod\Resource\Path\PathInterface;
+use Hermiod\Resource\Reflector\Property\Exception\InvalidDateTimeTypeException;
+use Hermiod\Resource\Reflector\Property\Exception\InvalidDateTimeValueException;
 
 final class DateTimeProperty implements PropertyInterface
 {
@@ -27,15 +29,19 @@ final class DateTimeProperty implements PropertyInterface
             return $value;
         }
 
-        if ($value instanceof \DateTimeImmutable) {
-            return \DateTime::createFromImmutable($value);
+        if ($value instanceof \DateTimeInterface) {
+            return \DateTime::createFromInterface($value);
         }
 
         if (\is_string($value)) {
-            return new \DateTime($value);
+            try {
+                return new \DateTime($value);
+            } catch (\Throwable $exception) {
+                throw InvalidDateTimeValueException::new($value, $exception);
+            }
         }
 
-        throw new \InvalidArgumentException('Expected a DateTime or \DateTimeImmutable');
+        throw InvalidDateTimeTypeException::new($value);
     }
 
     public function convertToJsonValue(mixed $value): string
@@ -44,6 +50,10 @@ final class DateTimeProperty implements PropertyInterface
             return $value->format(\DateTimeInterface::ATOM);
         }
 
-        throw new \InvalidArgumentException('Expected a DateTime or \DateTimeInterface');
+        if (\is_string($value)) {
+            return $value;
+        }
+
+        throw InvalidDateTimeTypeException::new($value);
     }
 }

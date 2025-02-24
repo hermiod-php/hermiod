@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Hermiod\Resource\Reflector\Constraint;
 
 use Hermiod\Attribute\Constraint\ConstraintInterface;
+use Hermiod\Resource\Reflector\Constraint\Exception\ClassIsNotConstraintException;
+use Hermiod\Resource\Reflector\Constraint\Exception\MissingConstraintClassException;
 
 /**
  * @template TClass of ConstraintInterface
@@ -35,12 +37,12 @@ final class CachedFactory implements FactoryInterface
         }
 
         if (!\class_exists($class)) {
-            throw new \Exception("Class $class does not exist.");
+            throw MissingConstraintClassException::new($class);
         }
 
         /** @phpstan-ignore function.alreadyNarrowedType */
         if (!\is_subclass_of($class, ConstraintInterface::class)) {
-            throw new \Exception("Class $class must implement ConstraintInterface.");
+            throw ClassIsNotConstraintException::new($class);
         }
 
         $constraint = new $class(...$arguments);

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Hermiod;
 
+use Hermiod\Exception\JsonValueMustBeObjectException;
+use Hermiod\Exception\TooMuchRecursionException;
 use Hermiod\Resource\Reflector;
 use Hermiod\Resource\Hydrator;
 use Hermiod\Result\Result;
@@ -11,7 +13,7 @@ use Hermiod\Result\ResultInterface;
 
 final class Transposer implements TransposerInterface
 {
-    private const MAX_RECURSION = 1024;
+    private const MAX_RECURSION = 128;
 
     public static function create(): self
     {
@@ -41,8 +43,8 @@ final class Transposer implements TransposerInterface
         if (\is_string($json)) {
             $json = \json_decode($json, false, flags: JSON_THROW_ON_ERROR);
 
-            if (!is_object($json)) {
-                throw new \InvalidArgumentException('JSON string must be an object.');
+            if (!\is_object($json)) {
+                throw JsonValueMustBeObjectException::new($json);
             }
         }
 
@@ -66,7 +68,7 @@ final class Transposer implements TransposerInterface
     private function transpose(Reflector\ReflectorInterface $reflector, object|array &$json, int $depth = 0): void
     {
         if ($depth > self::MAX_RECURSION) {
-            throw new \OverflowException();
+            throw TooMuchRecursionException::new(self::MAX_RECURSION);
         }
 
         $properties = $reflector->getProperties();
