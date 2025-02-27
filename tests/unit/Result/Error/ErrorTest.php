@@ -7,9 +7,11 @@ namespace Hermiod\Tests\Unit\Result\Error;
 use Hermiod\Result\Error\Error;
 use Hermiod\Result\Error\ErrorInterface;
 use JsonSerializable;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Error::class)]
 final class ErrorTest extends TestCase
 {
     #[DataProvider('invalidMessageProvider')]

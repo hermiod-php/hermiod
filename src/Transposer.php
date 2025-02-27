@@ -8,6 +8,7 @@ use Hermiod\Exception\JsonValueMustBeObjectException;
 use Hermiod\Exception\TooMuchRecursionException;
 use Hermiod\Resource\Reflector;
 use Hermiod\Resource\Hydrator;
+use Hermiod\Resource\Name;
 use Hermiod\Result\Result;
 use Hermiod\Result\ResultInterface;
 
@@ -23,13 +24,15 @@ final class Transposer implements TransposerInterface
                     new Resource\Reflector\Constraint\CachedFactory()
                 )
             ),
-            new Hydrator\LaminasHydratorFactory()
+            new Hydrator\LaminasHydratorFactory(),
+            new Name\CamelCase(),
         );
     }
 
     public function __construct(
         private Reflector\FactoryInterface $reflections,
         private Hydrator\FactoryInterface  $hydrators,
+        private Name\StrategyInterface $naming,
     ) {}
 
     /**
@@ -78,23 +81,34 @@ final class Transposer implements TransposerInterface
         $list = $isObject ? \get_object_vars($json) : $json;
 
         foreach ($list as $key => $value) {
-            if (!$properties->offsetExists($key)) {
+            $normalised = $this->naming->normalise($key);
+            $property = $properties->offsetGet($normalised);
+
+            if (!$property) {
                 continue;
             }
 
-            if ($property = $properties->offsetGet($key)) {
-                $value = $property->convertToPhpValue($value);
-            }
+            $value = $property->convertToPhpValue($value);
 
             if (\is_array($value) || \is_object($value)) {
                 $this->transpose($reflector, $value, $depth + 1);
+            }
+
+            if ($isObject) {
+                unset($json->{$key});
+                $json->{$property->getPropertyName()} = $value;
+
+                continue;
             }
 
             /**
              * PhpStan can't tell we're repeating a cached check without explicit \is_object()
              * @phpstan-ignore offsetAccess.nonOffsetAccessible
              */
-            $isObject ? $json->{$key} = $value : $json[$key] = $value;
+            unset($json[$key]);
+
+            /** @phpstan-ignore offsetAccess.nonOffsetAccessible */
+            $json[$property->getPropertyName()] = $value;
         }
     }
 }

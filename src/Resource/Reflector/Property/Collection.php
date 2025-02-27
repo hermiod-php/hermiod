@@ -22,7 +22,7 @@ final class Collection implements CollectionInterface
     public function __construct(PropertyInterface ...$properties)
     {
         foreach ($properties as $property) {
-            $this->hash[$property->getPropertyName()] = $property;
+            $this->hash[\strtolower($property->getPropertyName())] = $property;
         }
 
         $this->list = $properties;
@@ -33,7 +33,7 @@ final class Collection implements CollectionInterface
      */
     public function offsetExists(mixed $offset): bool
     {
-        return isset($this->hash[$offset]);
+        return isset($this->hash[\strtolower($offset)]);
     }
 
     /**
@@ -41,7 +41,7 @@ final class Collection implements CollectionInterface
      */
     public function offsetGet(mixed $offset): ?PropertyInterface
     {
-        return $this->hash[$offset] ?? null;
+        return $this->hash[\strtolower($offset)] ?? null;
     }
 
     /**
