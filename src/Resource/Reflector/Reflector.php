@@ -43,18 +43,18 @@ final class Reflector implements ReflectorInterface
         $json = $this->toIterableMap($json);
 
         foreach ($json as $name => $value) {
-            $path = $path->withObjectKey($name);
+            $next = $path->withObjectKey($name);
 
             if (!$this->properties->offsetExists($name)) {
                 $errors[] = \sprintf(
                     'Property %s is not permitted',
-                    $path->__toString(),
+                    $next->__toString(),
                 );
 
                 continue;
             }
 
-            $check = $this->properties->offsetGet($name)?->checkValueAgainstConstraints($path, $value);
+            $check = $this->properties->offsetGet($name)?->checkValueAgainstConstraints($next, $value);
 
             if ($check && !$check->isValid()) {
                 $errors = \array_merge($errors, $check->getValidationErrors());
