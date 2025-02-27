@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Hermiod\Resource\Path;
 
+use Hermiod\Resource\Path\Exception\EmptyJsonPathObjectKeyException;
+
 final class Root implements PathInterface
 {
+    private const ESCAPE_CHARACTERS = '/^[\d\W]|[\s\[\]\{\}\(\),;\'"``~\-!@#$%^&*+=<>?\/\\\\]|\./';
+
     /**
      * @var string[]
      */
@@ -13,14 +17,22 @@ final class Root implements PathInterface
 
     public function __toString(): string
     {
-        return \implode('.', $this->path);
+        return \implode('', $this->path);
     }
 
     public function withObjectKey(string $key): Root
     {
+        $key = \trim($key);
+
+        if (empty($key)) {
+            throw EmptyJsonPathObjectKeyException::new($this, $key);
+        }
+
         $copy = clone $this;
 
-        $copy->path[] = \trim($key, " \n\r\t\v\0.[]{}\"'");
+        $copy->path[] = \preg_match(self::ESCAPE_CHARACTERS, $key)
+            ? \sprintf('["%s"]', $key)
+            : \sprintf('.%s', $key);
 
         return $copy;
     }
