@@ -64,7 +64,8 @@
       "@analyse",
       "export XDEBUG_MODE=coverage && vendor/bin/phpunit -c tests/phpunit.xml --testsuite unit --path-coverage  --coverage-clover ./test-reports/coverage/xml/clover.xml --log-junit ./test-reports/results/unit/junit.xml",
       "vendor/bin/coverage-check ./test-reports/coverage/xml/clover.xml 100",
-      "@tests-integration"
+      "@tests-integration",
+      "@tests-system"
     ],
     "analyse": "vendor/bin/phpstan analyse --level max ./src",
     "tests-unit": "vendor/bin/phpunit -c tests/phpunit.xml --testsuite unit",
