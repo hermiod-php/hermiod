@@ -57,7 +57,7 @@ final class Collection implements CollectionInterface
      */
     public function offsetUnset(mixed $offset): void
     {
-        throw DeletingFromSealedCollectionException::new($offset);
+        throw DeletingFromSealedCollectionException::new($this, $offset);
     }
 
     public function current(): ?PropertyInterface
