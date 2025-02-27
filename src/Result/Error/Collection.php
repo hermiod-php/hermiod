@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Hermiod\Result\Error;
 
+use Hermiod\Resource\Property;
 use Traversable;
-use Hermiod\Resource\Reflector\Property;
 
 final class Collection implements CollectionInterface
 {

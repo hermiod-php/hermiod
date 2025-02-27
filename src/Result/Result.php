@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Hermiod\Result;
 
 use Hermiod\Resource\Hydrator\HydratorInterface;
-use Hermiod\Resource\Reflector\ReflectorInterface;
-use Hermiod\Resource\Reflector\Property;
+use Hermiod\Resource\Property;
+use Hermiod\Resource\ResourceInterface;
 use Hermiod\Result\Exception\InvalidJsonPayloadException;
 
 /**
@@ -19,12 +19,12 @@ final class Result implements ResultInterface
     private Property\Validation\ResultInterface $validation;
 
     /**
-     * @param ReflectorInterface $reflector
+     * @param ResourceInterface $reflector
      * @param HydratorInterface $hydrator
      * @param object|array<mixed> $json
      */
     public function __construct(
-        readonly private ReflectorInterface $reflector,
+        readonly private ResourceInterface $reflector,
         readonly private HydratorInterface $hydrator,
         readonly private object|array $json,
     ) {}

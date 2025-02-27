@@ -6,7 +6,6 @@ namespace Hermiod;
 
 use Hermiod\Exception\JsonValueMustBeObjectException;
 use Hermiod\Exception\TooMuchRecursionException;
-use Hermiod\Resource\Reflector;
 use Hermiod\Resource\Hydrator;
 use Hermiod\Resource\Name;
 use Hermiod\Result\Result;
@@ -19,9 +18,9 @@ final class Transposer implements TransposerInterface
     public static function create(): self
     {
         return new self(
-            new Reflector\Factory(
-                new Resource\Reflector\Property\Factory(
-                    new Resource\Reflector\Constraint\CachedFactory()
+            new Resource\Factory(
+                new Resource\Property\Factory(
+                    new Resource\Constraint\CachedFactory()
                 )
             ),
             new Hydrator\LaminasHydratorFactory(),
@@ -30,8 +29,8 @@ final class Transposer implements TransposerInterface
     }
 
     public function __construct(
-        private Reflector\FactoryInterface $reflections,
-        private Hydrator\FactoryInterface  $hydrators,
+        private Resource\FactoryInterface $reflections,
+        private Hydrator\FactoryInterface $hydrators,
         private Name\StrategyInterface $naming,
     ) {}
 
@@ -64,11 +63,11 @@ final class Transposer implements TransposerInterface
     }
 
     /**
-     * @param Reflector\ReflectorInterface $reflector
+     * @param Resource\ResourceInterface $reflector
      * @param object|array<mixed, mixed> $json
      * @param int $depth
      */
-    private function transpose(Reflector\ReflectorInterface $reflector, object|array &$json, int $depth = 0): void
+    private function transpose(Resource\ResourceInterface $reflector, object|array &$json, int $depth = 0): void
     {
         if ($depth > self::MAX_RECURSION) {
             throw TooMuchRecursionException::new(self::MAX_RECURSION);

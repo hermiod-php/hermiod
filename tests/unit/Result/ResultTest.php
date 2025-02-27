@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Hermiod\Tests\Unit\Result;
 
-use Hermiod\Result\Result;
-use Hermiod\Result\ResultInterface;
+use Hermiod\Resource\Hydrator\HydratorInterface;
+use Hermiod\Resource\Property\Validation\ResultInterface as ValidationResultInterface;
+use Hermiod\Resource\ResourceInterface;
 use Hermiod\Result\Error\CollectionInterface;
 use Hermiod\Result\Exception\InvalidJsonPayloadException;
-use Hermiod\Resource\Hydrator\HydratorInterface;
-use Hermiod\Resource\Reflector\ReflectorInterface;
-use Hermiod\Resource\Reflector\Property\Validation\ResultInterface as ValidationResultInterface;
+use Hermiod\Result\Result;
+use Hermiod\Result\ResultInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -84,9 +84,9 @@ final class ResultTest extends TestCase
         );
     }
 
-    private function mockReflector(?ValidationResultInterface $validation = null): ReflectorInterface & \PHPUnit\Framework\MockObject\MockObject
+    private function mockReflector(?ValidationResultInterface $validation = null): ResourceInterface & \PHPUnit\Framework\MockObject\MockObject
     {
-        $reflector = $this->createMock(ReflectorInterface::class);
+        $reflector = $this->createMock(ResourceInterface::class);
         $reflector->method('validate')->willReturn($validation ?? $this->mockValidation());
 
         return $reflector;

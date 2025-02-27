@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Hermiod\Tests\Unit\Result\Error;
 
+use Hermiod\Resource\Property\Validation\ResultInterface as ValidationResultInterface;
 use Hermiod\Result\Error\Collection;
 use Hermiod\Result\Error\CollectionInterface;
 use Hermiod\Result\Error\ErrorInterface;
-use Hermiod\Resource\Reflector\Property\Validation\ResultInterface as ValidationResultInterface;
 use PHPUnit\Framework\TestCase;
 
 final class CollectionTest extends TestCase
