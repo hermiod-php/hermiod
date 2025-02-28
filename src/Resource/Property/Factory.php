@@ -11,7 +11,6 @@ use Hermiod\Attribute\Constraint\ObjectConstraintInterface;
 use Hermiod\Attribute\Constraint\ObjectKeyConstraintInterface;
 use Hermiod\Attribute\Constraint\StringConstraintInterface;
 use Hermiod\Resource\Property\Exception\UnsupportedPropertyTypeException;
-use Hermiod\Resource\Reflector\Constraint;
 
 final readonly class Factory implements FactoryInterface
 {
@@ -178,7 +177,7 @@ final readonly class Factory implements FactoryInterface
      * @param \ReflectionProperty $reflection
      * @param class-string<TAttribute> $class
      *
-     * @return ConstraintInterface
+     * @return TAttribute[]
      */
     private function loadConstraintAttributes(\ReflectionProperty $reflection, string $class): array
     {
@@ -195,7 +194,7 @@ final readonly class Factory implements FactoryInterface
             }
         }
 
-        /** @var ConstraintInterface $attributes */
+        /** @var TAttribute[] $attributes */
         return \array_values($attributes);
     }
 }
