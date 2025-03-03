@@ -50,33 +50,34 @@ final class RamseyUuidProperty implements PropertyInterface
         return new Validation\Result();
     }
 
-    public function convertToPhpValue(mixed $value): UuidInterface
+    public function normalisePhpValue(mixed $value): ?string
     {
-        if ($value instanceof UuidInterface) {
+        return $this->normalise($value);
+    }
+
+    public function normaliseJsonValue(mixed $value): ?string
+    {
+        return $this->normalise($value);
+    }
+
+    private function normalise(mixed $value): ?string
+    {
+        if ($value === null && $this->nullable) {
             return $value;
         }
 
-        if (\is_string($value)) {
-            try {
-                return Uuid::fromString($value);
-            } catch (UuidExceptionInterface $exception) {
-                throw InvalidUuidValueException::new($value, $exception);
-            }
-        }
-
-        throw InvalidUuidTypeException::new($value);
-    }
-
-    public function convertToJsonValue(mixed $value): string
-    {
         if ($value instanceof UuidInterface) {
             return $value->toString();
         }
 
-        if (\is_string($value)) {
-            return $value;
+        if (!\is_string($value)) {
+            throw InvalidUuidTypeException::new($value);
         }
 
-        throw InvalidUuidTypeException::new($value);
+        if (!Uuid::isValid($value)) {
+            throw InvalidUuidValueException::new($value);
+        }
+
+        return $value;
     }
 }

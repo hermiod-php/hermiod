@@ -1,5 +1,6 @@
 {
   "name": "hermiod/hermiod",
+  "version": "1.0.0",
   "type": "library",
   "description": "A library to validate json against native PHP objects and hydrate from JSON to PHP",
   "keywords": [

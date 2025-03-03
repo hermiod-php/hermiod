@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Hermiod\Resource;
 
+use Hermiod\Resource\Path\PathInterface;
+
 final class Resource implements ResourceInterface
 {
     private Property\CollectionInterface $properties;
@@ -32,9 +34,8 @@ final class Resource implements ResourceInterface
         return $this->properties;
     }
 
-    public function validate(object|array $json): Property\Validation\ResultInterface
+    public function validate(PathInterface $path, object|array $json): Property\Validation\ResultInterface
     {
-        $path = new Path\Root();
         $errors = [];
 
         $json = $this->toIterableMap($json);

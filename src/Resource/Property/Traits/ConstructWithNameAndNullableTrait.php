@@ -6,7 +6,7 @@ namespace Hermiod\Resource\Property\Traits;
 
 trait ConstructWithNameAndNullableTrait
 {
-   use GetPropertyNameTrait;
+    use GetPropertyNameTrait;
 
     public function __construct(
         string $name,

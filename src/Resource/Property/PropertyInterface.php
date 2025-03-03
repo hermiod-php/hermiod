@@ -16,7 +16,7 @@ interface PropertyInterface
 
     public function checkValueAgainstConstraints(PathInterface $path, mixed $value): Validation\ResultInterface;
 
-    public function convertToPhpValue(mixed $value): mixed;
+    public function normalisePhpValue(mixed $value): mixed;
 
-    public function convertToJsonValue(mixed $value): mixed;
+    public function normaliseJsonValue(mixed $value): mixed;
 }

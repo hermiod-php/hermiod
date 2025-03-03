@@ -6,5 +6,5 @@ namespace Hermiod\Resource;
 
 interface FactoryInterface
 {
-    public function createReflectorForClass(string $class): ResourceInterface;
+    public function createResourceForClass(string $class): ResourceInterface;
 }

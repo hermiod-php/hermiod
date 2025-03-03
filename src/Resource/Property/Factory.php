@@ -16,6 +16,7 @@ final readonly class Factory implements FactoryInterface
 {
     public function __construct(
         private \Hermiod\Resource\Constraint\FactoryInterface $constraints,
+        private \Hermiod\Resource\FactoryInterface $resources,
     ) {}
 
     public function createPropertyFromReflectionProperty(\ReflectionProperty $property): PropertyInterface
@@ -34,20 +35,35 @@ final readonly class Factory implements FactoryInterface
             return $this->createUnionProperty($property);
         }
 
-        if ($type instanceof \ReflectionNamedType && $type->isBuiltin()) {
-            return match ($type->getName()) {
-                'array' => $this->createArrayTypeProperty($property),
-                'bool' => $this->createBooleanTypeProperty($property),
-                'float' => $this->createFloatTypeProperty($property),
-                'int' => $this->createIntegerTypeProperty($property),
-                'object' => $this->createObjectTypeProperty($property),
-                'string' => $this->createStringTypeProperty($property),
-                'mixed' => $this->createMixedTypeProperty($property),
-                default => throw UnsupportedPropertyTypeException::new($type->getName()),
-            };
+        if ($type instanceof \ReflectionNamedType) {
+            return $type->isBuiltin()
+                ? $this->createBuiltinProperty($type, $property)
+                : $this->createUserlandClassProperty($type, $property);
         }
 
         return $this->createMixedTypeProperty($property);
+    }
+
+    private function createBuiltInProperty(\ReflectionNamedType $type, \ReflectionProperty $reflection): PropertyInterface
+    {
+        return match ($type->getName()) {
+            'array' => $this->createArrayTypeProperty($reflection),
+            'bool' => $this->createBooleanTypeProperty($reflection),
+            'float' => $this->createFloatTypeProperty($reflection),
+            'int' => $this->createIntegerTypeProperty($reflection),
+            'object' => $this->createObjectTypeProperty($reflection),
+            'string' => $this->createStringTypeProperty($reflection),
+            'mixed' => $this->createMixedTypeProperty($reflection),
+            default => throw UnsupportedPropertyTypeException::new($type->getName()),
+        };
+    }
+
+    private function createUserlandClassProperty(\ReflectionNamedType $type, \ReflectionProperty $reflection): PropertyInterface
+    {
+        return match ($type->getName()) {
+            \DateTime::class, \DateTimeInterface::class, \DateTimeImmutable::class => $this->createDateTimeInterfaceProperty($type, $reflection),
+            default => $this->createClassProperty($type, $reflection),
+        };
     }
 
     private function createIntersectionProperty(\ReflectionProperty $reflection): PropertyInterface
@@ -167,6 +183,27 @@ final readonly class Factory implements FactoryInterface
         return $reflection->hasDefaultValue()
             ? MixedProperty::withDefaultValue($name, $nullable, $reflection->getDefaultValue())
             : new MixedProperty($name, $nullable);
+    }
+
+    private function createDateTimeInterfaceProperty(\ReflectionNamedType $type, \ReflectionProperty $reflection): PropertyInterface
+    {
+        $name = $reflection->getName();
+        $nullable = $type->allowsNull();
+
+        return $reflection->hasDefaultValue()
+            ? DateTimeInterfaceProperty::withDefaultNullValue($name, $nullable)
+            : new DateTimeInterfaceProperty($name, $nullable);
+    }
+
+    private function createClassProperty(\ReflectionNamedType $type, \ReflectionProperty $reflection): PropertyInterface
+    {
+        $name = $reflection->getName();
+        $nullable = $type->allowsNull();
+        $class = $type->getName();
+
+        return $reflection->hasDefaultValue()
+            ? ClassProperty::withDefaultNullValue($name, $class, $nullable, $this->resources)
+            : new ClassProperty($name, $class, $nullable, $this->resources);
     }
 
     /**

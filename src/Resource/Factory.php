@@ -10,7 +10,7 @@ final class Factory implements FactoryInterface
         private Property\FactoryInterface $properties,
     ) {}
 
-    public function createReflectorForClass(string $class): ResourceInterface
+    public function createResourceForClass(string $class): ResourceInterface
     {
         return new Resource($class, $this->properties);
     }

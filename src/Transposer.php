@@ -18,9 +18,12 @@ final class Transposer implements TransposerInterface
     public static function create(): self
     {
         return new self(
-            new Resource\Factory(
+            $factory = new Resource\Factory(
                 new Resource\Property\Factory(
-                    new Resource\Constraint\CachedFactory()
+                    new Resource\Constraint\CachedFactory(),
+                    new Resource\ProxyCallbackFactory(function () use (&$factory) {
+                        return $factory;
+                    })
                 )
             ),
             new Hydrator\LaminasHydratorFactory(),
@@ -39,7 +42,7 @@ final class Transposer implements TransposerInterface
      */
     public function parse(string|object|array $json, string $class): ResultInterface
     {
-        $reflector = $this->reflections->createReflectorForClass($class);
+        $resource = $this->reflections->createResourceForClass($class);
         $hydrator = $this->hydrators->createHydratorForClass($class);
 
         if (\is_string($json)) {
@@ -50,36 +53,36 @@ final class Transposer implements TransposerInterface
             }
         }
 
-        $this->transpose($reflector, $json);
+        $this->transpose($resource, $json);
 
         /**
          * @phpstan-ignore return.type
          */
         return new Result(
-            $reflector,
+            $resource,
             $hydrator,
             $json
         );
     }
 
     /**
-     * @param Resource\ResourceInterface $reflector
+     * @param Resource\ResourceInterface $resource
      * @param object|array<mixed, mixed> $json
      * @param int $depth
      */
-    private function transpose(Resource\ResourceInterface $reflector, object|array &$json, int $depth = 0): void
+    private function transpose(Resource\ResourceInterface $resource, object|array &$json, int $depth = 0): void
     {
         if ($depth > self::MAX_RECURSION) {
             throw TooMuchRecursionException::new(self::MAX_RECURSION);
         }
 
-        $properties = $reflector->getProperties();
+        $properties = $resource->getProperties();
 
         $isObject = \is_object($json);
 
         $list = $isObject ? \get_object_vars($json) : $json;
 
-        foreach ($list as $key => $value) {
+        foreach ($list as $key => $data) {
             $normalised = $this->naming->normalise($key);
             $property = $properties->offsetGet($normalised);
 
@@ -87,10 +90,10 @@ final class Transposer implements TransposerInterface
                 continue;
             }
 
-            $value = $property->convertToPhpValue($value);
+            $value = $property->normalisePhpValue($data);
 
-            if (\is_array($value) || \is_object($value)) {
-                $this->transpose($reflector, $value, $depth + 1);
+            if (\is_array($data) || \is_object($data)) {
+                $this->transpose($resource, $data, $depth + 1);
             }
 
             if ($isObject) {

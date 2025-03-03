@@ -10,7 +10,7 @@ trait ConvertToSamePhpValueOrDefault
 
     abstract public function hasDefaultValue(): bool;
 
-    public function convertToPhpValue(mixed $value): mixed
+    public function normalisePhpValue(mixed $value): mixed
     {
         if (null === $value && $this->hasDefaultValue()) {
             return $this->getDefaultValue();
@@ -19,7 +19,7 @@ trait ConvertToSamePhpValueOrDefault
         return $value;
     }
 
-    public function convertToJsonValue(mixed $value): mixed
+    public function normaliseJsonValue(mixed $value): mixed
     {
         return $value;
     }

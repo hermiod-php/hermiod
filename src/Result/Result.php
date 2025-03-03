@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Hermiod\Result;
 
 use Hermiod\Resource\Hydrator\HydratorInterface;
+use Hermiod\Resource\Path\Root;
 use Hermiod\Resource\Property;
 use Hermiod\Resource\ResourceInterface;
 use Hermiod\Result\Exception\InvalidJsonPayloadException;
@@ -60,6 +61,9 @@ final class Result implements ResultInterface
 
     private function getValidationResult(): Property\Validation\ResultInterface
     {
-        return $this->validation ??= $this->reflector->validate($this->json);
+        return $this->validation ??= $this->reflector->validate(
+            new Root(),
+            $this->json,
+        );
     }
 }
