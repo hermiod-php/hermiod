@@ -1,0 +1,32 @@
+x-common: &php-common
+  volumes:
+    - ../..:/var/www/html
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+  environment:
+    XDEBUG_CONFIG: 'mode=develop,debug client_host=host.docker.internal client_port=9003 start_with_request=yes idekey=PHPSTORM discover_client_host=0'
+
+services:
+  php82:
+    <<: *php-common
+    build:
+      context: ../..
+      dockerfile: ci/docker/Dockerfile
+      args:
+        PHP_VERSION: 8.2
+
+  php83:
+    <<: *php-common
+    build:
+      context: ../..
+      dockerfile: ci/docker/Dockerfile
+      args:
+        PHP_VERSION: 8.3
+
+  php84:
+    <<: *php-common
+    build:
+      context: ../..
+      dockerfile: ci/docker/Dockerfile
+      args:
+        PHP_VERSION: 8.4

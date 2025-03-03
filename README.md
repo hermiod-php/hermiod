@@ -1,6 +1,8 @@
 # Hermiod
 
 ![version](https://img.shields.io/badge/version-1.0.0-green?labelColor=blue&style=flat)
+![PHP](https://img.shields.io/badge/PHP-8.2.*_8.3.*_8.4.*-orange?labelColor=blue&style=flat)
+![coverage](https://img.shields.io/badge/coverage-100%25-green?labelColor=blue&style=flat)
 
 ## About
 

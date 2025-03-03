@@ -1,4 +1,6 @@
-FROM php:8.2-cli-alpine
+# Define build stages for each PHP version
+ARG PHP_VERSION=8.2
+FROM php:${PHP_VERSION}-cli-alpine AS builder
 
 # Linux configuration
 RUN apk add --no-cache linux-headers ${PHPIZE_DEPS} \
@@ -13,14 +15,8 @@ COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
 WORKDIR /var/www/html
 
-# Add application files
-COPY src src
-COPY composer.json composer.json
-
 # We no longer need to do anything as root
 USER www-data
-
-RUN composer install --no-dev --no-scripts
 
 # Use the default entrypoint for the base image
 CMD ["docker-php-entrypoint"]
