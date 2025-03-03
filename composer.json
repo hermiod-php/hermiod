@@ -52,19 +52,19 @@
       "@tests-system"
     ],
     "tests-coverage": [
+      "@php-version",
       "composer install",
       "@analyse",
-      "export PHP_VERSION=$(php -r 'echo PHP_VERSION;')",
-      "@tests-unit-coverage --coverage-clover ./test-reports/$PHP_VERSION/coverage/xml/clover.xml",
+      "export XDEBUG_MODE=coverage && vendor/bin/phpunit -c tests/phpunit.xml --testsuite unit --path-coverage  --coverage-clover ./test-reports/$PHP_VERSION/coverage/xml/clover.xml",
       "vendor/bin/coverage-check ./test-reports/$PHP_VERSION/coverage/xml/clover.xml 100",
       "@tests-integration"
     ],
     "tests-ci": [
+      "@php-version",
       "composer install",
       "composer outdated --minor-only --direct --strict",
       "composer audit --no-dev",
       "@analyse",
-      "export PHP_VERSION=$(php -r 'echo PHP_VERSION;')",
       "export XDEBUG_MODE=coverage && vendor/bin/phpunit -c tests/phpunit.xml --testsuite unit --path-coverage  --coverage-clover ./test-reports/$PHP_VERSION/coverage/xml/clover.xml --log-junit ./test-reports/results/unit/junit.xml",
       "vendor/bin/coverage-check ./test-reports/$PHP_VERSION/coverage/xml/clover.xml 100",
       "@tests-integration",
@@ -73,16 +73,17 @@
     "analyse": "vendor/bin/phpstan analyse --level max ./src",
     "tests-unit": "vendor/bin/phpunit -c tests/phpunit.xml --testsuite unit",
     "tests-unit-coverage": [
-      "export PHP_VERSION=$(php -r 'echo PHP_VERSION;')",
+      "@php-version",
       "export XDEBUG_MODE=coverage && vendor/bin/phpunit -c tests/phpunit.xml --testsuite unit --path-coverage  --coverage-html ./test-reports/$PHP_VERSION/coverage/html"
     ],
     "tests-integration": [
-      "export PHP_VERSION=$(php -r 'echo PHP_VERSION;')",
+      "@php-version",
       "vendor/bin/phpunit -c tests/phpunit.xml --testsuite integration --log-junit ./test-reports/$PHP_VERSION/results/integration/junit.xml"
     ],
     "tests-system": [
-      "export PHP_VERSION=$(php -r 'echo PHP_VERSION;')",
+      "@php-version",
       "vendor/bin/phpunit -c tests/phpunit.xml --testsuite system --log-junit ./test-reports/$PHP_VERSION/results/system/junit.xml"
-    ]
+    ],
+    "php-version": "export PHP_VERSION=$(php -r 'echo PHP_VERSION;')"
   }
 }
