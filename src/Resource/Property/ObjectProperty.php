@@ -8,6 +8,10 @@ use Hermiod\Attribute\Constraint\ObjectConstraintInterface;
 use Hermiod\Attribute\Constraint\ObjectKeyConstraintInterface;
 use Hermiod\Resource\Path\PathInterface;
 
+/**
+ * @no-named-arguments No backwards compatibility guaranteed
+ * @internal No backwards compatibility guaranteed
+ */
 final class ObjectProperty implements PropertyInterface
 {
     use Traits\ConstructWithNameAndNullableTrait;

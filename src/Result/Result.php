@@ -47,7 +47,7 @@ final class Result implements ResultInterface
      *
      * @throws \Exception
      */
-    public function instance(): object
+    public function getInstance(): object
     {
         if (!$this->isValid()) {
             throw InvalidJsonPayloadException::new(

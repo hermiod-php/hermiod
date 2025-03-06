@@ -6,6 +6,10 @@ namespace Hermiod\Resource\Property\Traits;
 
 use Hermiod\Resource\Property\Exception\InvalidPropertyNameException;
 
+/**
+ * @no-named-arguments No backwards compatibility guaranteed
+ * @internal No backwards compatibility guaranteed
+ */
 trait GetPropertyNameTrait
 {
     private const VALID_PHP_PROPERTY_NAME = '/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/D';

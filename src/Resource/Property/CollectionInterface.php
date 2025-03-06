@@ -7,6 +7,9 @@ namespace Hermiod\Resource\Property;
 /**
  * @extends \ArrayAccess<string, PropertyInterface>
  * @extends \Iterator<string, PropertyInterface>
+ *
+ * @no-named-arguments No backwards compatibility guaranteed
+ * @internal No backwards compatibility guaranteed
  */
 interface CollectionInterface extends \Iterator, \ArrayAccess
 {

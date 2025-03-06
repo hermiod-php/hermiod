@@ -6,6 +6,9 @@ namespace Hermiod\Resource\Hydrator;
 
 /**
  * @template Type of object
+ *
+ * @no-named-arguments No backwards compatibility guaranteed
+ * @internal No backwards compatibility guaranteed
  */
 final class LaminasHydrator implements HydratorInterface
 {

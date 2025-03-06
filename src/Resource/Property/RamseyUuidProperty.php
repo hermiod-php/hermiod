@@ -13,6 +13,10 @@ use Ramsey\Uuid\Exception\UuidExceptionInterface;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
+/**
+ * @no-named-arguments No backwards compatibility guaranteed
+ * @internal No backwards compatibility guaranteed
+ */
 final class RamseyUuidProperty implements PropertyInterface
 {
     use Traits\ConstructWithNameAndNullableTrait;

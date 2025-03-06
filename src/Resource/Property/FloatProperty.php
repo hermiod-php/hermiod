@@ -8,6 +8,10 @@ use Hermiod\Attribute\Constraint\NumberConstraintInterface;
 use Hermiod\Resource\Path\PathInterface;
 use Hermiod\Resource\Property\Exception\InvalidDefaultValueException;
 
+/**
+ * @no-named-arguments No backwards compatibility guaranteed
+ * @internal No backwards compatibility guaranteed
+ */
 final class FloatProperty implements PropertyInterface
 {
     use Traits\ConstructWithNameAndNullableTrait;

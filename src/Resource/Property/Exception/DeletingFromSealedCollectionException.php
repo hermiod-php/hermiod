@@ -6,6 +6,10 @@ namespace Hermiod\Resource\Property\Exception;
 
 use Hermiod\Resource\Property\CollectionInterface;
 
+/**
+ * @no-named-arguments No backwards compatibility guaranteed
+ * @internal No backwards compatibility guaranteed
+ */
 final class DeletingFromSealedCollectionException extends \InvalidArgumentException implements Exception
 {
     public static function new(CollectionInterface $collection, mixed $offset): self

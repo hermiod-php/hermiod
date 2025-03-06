@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Hermiod\Resource\Property\Validation;
 
+/**
+ * @no-named-arguments No backwards compatibility guaranteed
+ * @internal No backwards compatibility guaranteed
+ */
 final class Result implements ResultInterface
 {
     /**

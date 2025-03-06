@@ -7,6 +7,10 @@ namespace Hermiod\Resource\Property;
 use Hermiod\Resource\Path\PathInterface;
 use Hermiod\Resource\Property\Exception\InvalidDefaultValueException;
 
+/**
+ * @no-named-arguments No backwards compatibility guaranteed
+ * @internal No backwards compatibility guaranteed
+ */
 final class BooleanProperty implements PropertyInterface
 {
     use Traits\ConstructWithNameAndNullableTrait;

@@ -6,6 +6,10 @@ namespace Hermiod\Resource;
 
 use Hermiod\Resource\Path\PathInterface;
 
+/**
+ * @no-named-arguments No backwards compatibility guaranteed
+ * @internal No backwards compatibility guaranteed
+ */
 final class Resource implements ResourceInterface
 {
     private Property\CollectionInterface $properties;

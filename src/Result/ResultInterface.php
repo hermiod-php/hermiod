@@ -18,5 +18,5 @@ interface ResultInterface
      *
      * @throws \Exception
      */
-    public function instance(): object;
+    public function getInstance(): object;
 }

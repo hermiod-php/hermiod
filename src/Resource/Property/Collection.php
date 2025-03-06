@@ -7,6 +7,10 @@ namespace Hermiod\Resource\Property;
 use Hermiod\Resource\Property\Exception\AddingToSealedCollectionException;
 use Hermiod\Resource\Property\Exception\DeletingFromSealedCollectionException;
 
+/**
+ * @no-named-arguments No backwards compatibility guaranteed
+ * @internal No backwards compatibility guaranteed
+ */
 final class Collection implements CollectionInterface
 {
     /**

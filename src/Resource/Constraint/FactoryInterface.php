@@ -6,6 +6,10 @@ namespace Hermiod\Resource\Constraint;
 
 use Hermiod\Attribute\Constraint\ConstraintInterface;
 
+/**
+ * @no-named-arguments No backwards compatibility guaranteed
+ * @internal No backwards compatibility guaranteed
+ */
 interface FactoryInterface
 {
     /**

@@ -6,6 +6,10 @@ namespace Hermiod\Result\Exception;
 
 use Hermiod\Exception\Exception;
 
+/**
+ * @no-named-arguments No backwards compatibility guaranteed
+ * @internal No backwards compatibility guaranteed
+ */
 final class InvalidJsonPayloadException extends \DomainException implements Exception
 {
     /**

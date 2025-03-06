@@ -8,6 +8,10 @@ use Hermiod\Attribute\Constraint\ArrayConstraintInterface;
 use Hermiod\Resource\Path\PathInterface;
 use Hermiod\Resource\Property\Exception\InvalidDefaultValueException;
 
+/**
+ * @no-named-arguments No backwards compatibility guaranteed
+ * @internal No backwards compatibility guaranteed
+ */
 final class ArrayProperty implements PropertyInterface
 {
     use Traits\ConstructWithNameAndNullableTrait;

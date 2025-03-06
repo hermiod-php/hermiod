@@ -6,6 +6,10 @@ namespace Hermiod\Resource\Property;
 
 use Hermiod\Resource\Path\PathInterface;
 
+/**
+ * @no-named-arguments No backwards compatibility guaranteed
+ * @internal No backwards compatibility guaranteed
+ */
 final class MixedProperty implements PropertyInterface
 {
     use Traits\ConstructWithNameAndNullableTrait;

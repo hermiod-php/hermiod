@@ -10,6 +10,9 @@ use Hermiod\Resource\Constraint\Exception\MissingConstraintClassException;
 
 /**
  * @template TClass of ConstraintInterface
+ *
+ * @no-named-arguments No backwards compatibility guaranteed
+ * @internal No backwards compatibility guaranteed
  */
 final class CachedFactory implements FactoryInterface
 {

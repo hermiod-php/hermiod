@@ -12,6 +12,10 @@ use Hermiod\Attribute\Constraint\ObjectKeyConstraintInterface;
 use Hermiod\Attribute\Constraint\StringConstraintInterface;
 use Hermiod\Resource\Property\Exception\UnsupportedPropertyTypeException;
 
+/**
+ * @no-named-arguments No backwards compatibility guaranteed
+ * @internal No backwards compatibility guaranteed
+ */
 final readonly class Factory implements FactoryInterface
 {
     public function __construct(

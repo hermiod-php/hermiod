@@ -7,6 +7,10 @@ namespace Hermiod\Resource\Property;
 use Hermiod\Resource\Path\PathInterface;
 use Hermiod\Resource;
 
+/**
+ * @no-named-arguments No backwards compatibility guaranteed
+ * @internal No backwards compatibility guaranteed
+ */
 final class ClassProperty implements PropertyInterface, Resource\ResourceInterface
 {
     use Traits\GetPropertyNameTrait;

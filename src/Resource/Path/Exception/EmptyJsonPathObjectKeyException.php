@@ -6,6 +6,10 @@ namespace Hermiod\Resource\Path\Exception;
 
 use Hermiod\Resource\Path\PathInterface;
 
+/**
+ * @no-named-arguments No backwards compatibility guaranteed
+ * @internal No backwards compatibility guaranteed
+ */
 final class EmptyJsonPathObjectKeyException extends \DomainException implements Exception
 {
     public static function new(PathInterface $root, string $key): self

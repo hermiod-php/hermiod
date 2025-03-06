@@ -6,6 +6,10 @@ namespace Hermiod\Resource\Path;
 
 use Hermiod\Resource\Path\Exception\EmptyJsonPathObjectKeyException;
 
+/**
+ * @no-named-arguments No backwards compatibility guaranteed
+ * @internal No backwards compatibility guaranteed
+ */
 final class Root implements PathInterface
 {
     private const ESCAPE_CHARACTERS = '/^[\d\W]|[\s\[\]\{\}\(\),;\'"``~\-!@#$%^&*+=<>?\/\\\\]|\./';

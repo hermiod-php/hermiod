@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Hermiod\Exception;
 
-use Hermiod\Exception\Exception;
-
+/**
+ * @no-named-arguments No backwards compatibility guaranteed
+ * @internal No backwards compatibility guaranteed
+ */
 final class JsonValueMustBeObjectException extends \InvalidArgumentException implements Exception
 {
     public static function new(mixed $actual): self

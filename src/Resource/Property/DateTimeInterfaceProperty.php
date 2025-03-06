@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Hermiod\Resource\Property;
 
-use DateTimeImmutable;
 use Hermiod\Resource\Property\Exception\InvalidDateTimeTypeException;
 use Hermiod\Resource\Property\Exception\InvalidDateTimeValueException;
-use Hermiod\Resource\Property\Exception\InvalidDefaultValueException;
 
+/**
+ * @no-named-arguments No backwards compatibility guaranteed
+ * @internal No backwards compatibility guaranteed
+ */
 final class DateTimeInterfaceProperty implements PropertyInterface
 {
     use Traits\ConstructWithNameAndNullableTrait;
