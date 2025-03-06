@@ -65,13 +65,16 @@
       "composer outdated --minor-only --direct --strict",
       "composer audit --no-dev",
       "@analyse",
-      "export XDEBUG_MODE=coverage && vendor/bin/phpunit -c tests/phpunit.xml --testsuite unit --path-coverage  --coverage-clover ./test-reports/$PHP_VERSION/coverage/xml/clover.xml --log-junit ./test-reports/results/unit/junit.xml",
+      "export XDEBUG_MODE=coverage && vendor/bin/phpunit -c tests/phpunit.xml --testsuite unit --path-coverage  --coverage-clover ./test-reports/$PHP_VERSION/coverage/xml/clover.xml --log-junit ./test-reports/$PHP_VERSION/results/unit/junit.xml",
       "vendor/bin/coverage-check ./test-reports/$PHP_VERSION/coverage/xml/clover.xml 100",
       "@tests-integration",
       "@tests-system"
     ],
     "analyse": "vendor/bin/phpstan analyse --level max ./src",
-    "tests-unit": "vendor/bin/phpunit -c tests/phpunit.xml --testsuite unit",
+    "tests-unit": [
+      "@php-version",
+      "vendor/bin/phpunit -c tests/phpunit.xml --testsuite unit --log-junit ./test-reports/$PHP_VERSION/results/unit/junit.xml"
+    ],
     "tests-unit-coverage": [
       "@php-version",
       "export XDEBUG_MODE=coverage && vendor/bin/phpunit -c tests/phpunit.xml --testsuite unit --path-coverage  --coverage-html ./test-reports/$PHP_VERSION/coverage/html"
