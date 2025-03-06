@@ -68,9 +68,10 @@ If validation fails, we can list the errors and even json-encode them directly t
 API responses.
 
 ```php
-$transposer = \Hermiod\Transposer::create();
+$manager = \Hermiod\ResourceManager::create();
+$resource = $manager->getResource(\App\Customer::class);
 
-$result = $transposer->parse($json, \App\Customer::class);
+$result = $resource->unserialize($json);
 
 if (!$result->isValid()) {
     return \json_encode(
@@ -78,7 +79,7 @@ if (!$result->isValid()) {
     );
 }
 
-$instance = $result->instance(); // App\Customer
+$instance = $result->getInstance(); // App\Customer with all of the data set
 ```
 
 If you want to covert your object back to JSON you can do so with PHP's `\JsonSerializable` interface.

@@ -65,7 +65,7 @@ final class ResultTest extends TestCase
 
         $this->expectException(InvalidJsonPayloadException::class);
 
-        $result->instance();
+        $result->getInstance();
     }
 
     public function testInstanceReturnsHydratedObject(): void
@@ -79,7 +79,7 @@ final class ResultTest extends TestCase
 
         $this->assertSame(
             $object,
-            $result->instance(),
+            $result->getInstance(),
             'instance() should return the hydrated object'
         );
     }

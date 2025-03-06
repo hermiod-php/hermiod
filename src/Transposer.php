@@ -11,39 +11,33 @@ use Hermiod\Resource\Name;
 use Hermiod\Result\Result;
 use Hermiod\Result\ResultInterface;
 
-final class Transposer implements TransposerInterface
+/**
+ * @template Type of object
+ * @template-implements TransposerInterface<Type>
+ */
+final readonly class Transposer implements TransposerInterface
 {
     private const MAX_RECURSION = 128;
 
-    public static function create(): self
-    {
-        return new self(
-            $factory = new Resource\Factory(
-                new Resource\Property\Factory(
-                    new Resource\Constraint\CachedFactory(),
-                    new Resource\ProxyCallbackFactory(function () use (&$factory) {
-                        return $factory;
-                    })
-                )
-            ),
-            new Hydrator\LaminasHydratorFactory(),
-            new Name\CamelCase(),
-        );
-    }
-
+    /**
+     * @param class-string<Type> $class
+     */
     public function __construct(
         private Resource\FactoryInterface $reflections,
         private Hydrator\FactoryInterface $hydrators,
         private Name\StrategyInterface $naming,
+        private string $class,
     ) {}
 
     /**
-     * @inheritDoc
+     * @param string|object|array<mixed, mixed> $json
+     *
+     * @return ResultInterface<Type>
      */
-    public function parse(string|object|array $json, string $class): ResultInterface
+    public function unserialize(string|object|array $json): ResultInterface
     {
-        $resource = $this->reflections->createResourceForClass($class);
-        $hydrator = $this->hydrators->createHydratorForClass($class);
+        $resource = $this->reflections->createResourceForClass($this->class);
+        $hydrator = $this->hydrators->createHydratorForClass($this->class);
 
         if (\is_string($json)) {
             $json = \json_decode($json, false, flags: JSON_THROW_ON_ERROR);

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Hermiod\Tests\System;
 
 use Hermiod\Exception\TooMuchRecursionException;
+use Hermiod\ResourceManager;
 use Hermiod\Tests\System\Fakes\RecursiveTestClass;
 use Hermiod\Tests\Integration\Fakes\StringPropertiesFake;
-use Hermiod\Transposer;
 use PHPUnit\Framework\Attributes\Medium;
 use PHPUnit\Framework\TestCase;
 
@@ -44,9 +44,9 @@ class TransposerTest extends TestCase
             'stringWithAttrEmailAndRegex' => 'bar@foo.com',
         ];
 
-        $transposer = Transposer::create();
+        $transposer = ResourceManager::create()->getResource(StringPropertiesFake::class);
 
-        $class = $transposer->parse($json, StringPropertiesFake::class)->instance();
+        $class = $transposer->unserialize($json)->getInstance();
 
         $this->assertInstanceOf(StringPropertiesFake::class, $class);
         $this->assertSame($json, $class->list());
@@ -67,12 +67,12 @@ class TransposerTest extends TestCase
             return $inital;
         };
 
-        $transposer = Transposer::create();
+        $transposer = ResourceManager::create()->getResource(RecursiveTestClass::class);
 
         $this->expectException(TooMuchRecursionException::class);
 
         $json = [];
 
-        $transposer->parse($generate($json, 0), RecursiveTestClass::class)->instance();
+        $transposer->unserialize($generate($json, 0))->getInstance();
     }
 }

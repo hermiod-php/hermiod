@@ -6,15 +6,15 @@ namespace Hermiod;
 
 use Hermiod\Result\ResultInterface;
 
+/**
+ * @template Type of object
+ */
 interface TransposerInterface
 {
     /**
-     * @template Type of object
-     *
      * @param string|object|array<mixed, mixed> $json
-     * @param class-string<Type> $class
      *
      * @return ResultInterface<Type>
      */
-    public function parse(string|object|array $json, string $class): ResultInterface;
+    public function unserialize(string|object|array $json): ResultInterface;
 }
