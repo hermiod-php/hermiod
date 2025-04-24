@@ -9,6 +9,8 @@ use Hermiod\Resource\Path\PathInterface;
 /**
  * @no-named-arguments No backwards compatibility guaranteed
  * @internal No backwards compatibility guaranteed
+ *
+ * @template Type of object
  */
 interface ResourceInterface
 {
@@ -18,5 +20,5 @@ interface ResourceInterface
      * @param PathInterface $path
      * @param object|array<mixed> $json
      */
-    public function validate(PathInterface $path, object|array $json): Property\Validation\ResultInterface;
+    public function validateAndTranspose(PathInterface $path, object|array &$json): Property\Validation\ResultInterface;
 }

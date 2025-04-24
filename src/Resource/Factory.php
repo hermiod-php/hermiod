@@ -14,6 +14,13 @@ final class Factory implements FactoryInterface
         private Property\FactoryInterface $properties,
     ) {}
 
+    /**
+     * @template Type of object
+     *
+     * @param class-string<Type> $class
+     *
+     * @return Resource<Type>
+     */
     public function createResourceForClass(string $class): ResourceInterface
     {
         return new Resource($class, $this->properties);

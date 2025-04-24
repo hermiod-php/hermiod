@@ -14,21 +14,21 @@ final readonly class Resource implements ResourceInterface
     public const INCLUDE_EXPLICIT_ONLY = 0b000;
 
     public function __construct(
-        private int $properties = self::INCLUDE_ALL,
+        private int $include = self::INCLUDE_ALL,
     ) {}
 
     public function autoIncludePublicProperties(): bool
     {
-        return (self::INCLUDE_PUBLIC & $this->properties) === 0;
+        return (self::INCLUDE_PUBLIC & $this->include) === 0;
     }
 
     public function autoIncludeProtectedProperties(): bool
     {
-        return (self::INCLUDE_PROTECTED & $this->properties) === 0;
+        return (self::INCLUDE_PROTECTED & $this->include) === 0;
     }
 
     public function autoIncludePrivateProperties(): bool
     {
-        return (self::INCLUDE_PRIVATE & $this->properties) === 0;
+        return (self::INCLUDE_PRIVATE & $this->include) === 0;
     }
 }

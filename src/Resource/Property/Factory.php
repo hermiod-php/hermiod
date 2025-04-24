@@ -203,6 +203,8 @@ final readonly class Factory implements FactoryInterface
     {
         $name = $reflection->getName();
         $nullable = $type->allowsNull();
+
+        /** @var class-string $class */
         $class = $type->getName();
 
         return $reflection->hasDefaultValue()

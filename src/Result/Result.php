@@ -11,23 +11,28 @@ use Hermiod\Resource\ResourceInterface;
 use Hermiod\Result\Exception\InvalidJsonPayloadException;
 
 /**
- * @template TClass of object
+ * @template Type of object
  *
- * @implements ResultInterface<TClass>
+ * @implements ResultInterface<Type>
  */
 final class Result implements ResultInterface
 {
     private Property\Validation\ResultInterface $validation;
 
     /**
-     * @param ResourceInterface $reflector
-     * @param HydratorInterface $hydrator
+     * @var \WeakReference<Type>
+     */
+    private \WeakReference $instance;
+
+    /**
+     * @param ResourceInterface<Type> $resource
+     * @param HydratorInterface<Type> $hydrator
      * @param object|array<mixed> $json
      */
     public function __construct(
-        readonly private ResourceInterface $reflector,
+        readonly private ResourceInterface $resource,
         readonly private HydratorInterface $hydrator,
-        readonly private object|array $json,
+        private object|array &$json,
     ) {}
 
     public function isValid(): bool
@@ -43,12 +48,16 @@ final class Result implements ResultInterface
     }
 
     /**
-     * @return TClass|object
+     * @return Type|object
      *
      * @throws \Exception
      */
     public function getInstance(): object
     {
+        if (isset($this->instance) && ($instance = $this->instance->get())) {
+            return $instance;
+        }
+
         if (!$this->isValid()) {
             throw InvalidJsonPayloadException::new(
                 $this->hydrator->getTargetClassname(),
@@ -56,12 +65,19 @@ final class Result implements ResultInterface
             );
         }
 
-        return $this->hydrator->hydrate($this->json);
+        /** @var Type $instance */
+        $instance = $this->hydrator->hydrate(
+            $this->json,
+        );
+
+        $this->instance = \WeakReference::create($instance);
+
+        return $instance;
     }
 
     private function getValidationResult(): Property\Validation\ResultInterface
     {
-        return $this->validation ??= $this->reflector->validate(
+        return $this->validation ??= $this->resource->validateAndTranspose(
             new Root(),
             $this->json,
         );

@@ -9,7 +9,6 @@ use Hermiod\Attribute\Constraint\StringIsUuid;
 use Hermiod\Resource\Path\PathInterface;
 use Hermiod\Resource\Property\Exception\InvalidUuidTypeException;
 use Hermiod\Resource\Property\Exception\InvalidUuidValueException;
-use Ramsey\Uuid\Exception\UuidExceptionInterface;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 

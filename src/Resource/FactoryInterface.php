@@ -10,5 +10,12 @@ namespace Hermiod\Resource;
  */
 interface FactoryInterface
 {
+    /**
+     * @template Type of object
+     *
+     * @param class-string<Type> $class
+     *
+     * @return ResourceInterface<Type>
+     */
     public function createResourceForClass(string $class): ResourceInterface;
 }

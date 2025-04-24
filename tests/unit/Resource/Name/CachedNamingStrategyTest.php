@@ -70,28 +70,6 @@ final class CachedNamingStrategyTest extends TestCase
         $this->assertSame('FOO', $cache->format('fOo'));
     }
 
-    public function testSuccessiveNormaliseCallAreCached(): void
-    {
-        $strategy = $this->createStrategyMock();
-
-        $value = 'foo bar-baz FOO_BAR';
-        $normalised = 'foobarbazfoobar';
-
-        $strategy
-            ->expects($this->once())
-            ->method('normalise')
-            ->with($value)
-            ->willReturn($normalised);
-
-        $cache = new CachedNamingStrategy($strategy);
-
-        $iterations = 5;
-
-        while ($iterations--) {
-            $this->assertSame($normalised, $cache->normalise($value));
-        }
-    }
-
     public function testDifferentNormaliseCallsDelegateToStrategy(): void
     {
         $strategy = $this->createStrategyMock();

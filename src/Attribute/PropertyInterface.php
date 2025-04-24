@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Hermiod\Attribute\Property;
+namespace Hermiod\Attribute;
 
 interface PropertyInterface
 {

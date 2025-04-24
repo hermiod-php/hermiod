@@ -10,5 +10,12 @@ namespace Hermiod\Resource\Hydrator;
  */
 interface FactoryInterface
 {
+    /**
+     * @template Type of object
+     *
+     * @param class-string<Type> $class
+     *
+     * @return HydratorInterface<Type>
+     */
     public function createHydratorForClass(string $class): HydratorInterface;
 }

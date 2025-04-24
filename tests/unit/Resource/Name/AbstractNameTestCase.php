@@ -8,25 +8,6 @@ use PHPUnit\Framework\TestCase;
 
 abstract class AbstractNameTestCase extends TestCase
 {
-    public static function validNormaliseCases(): array
-    {
-        return [
-            'PascalCase' => ['PascalCase', 'pascalcase'],
-            'kebab-case' => ['kebab-case', 'kebabcase'],
-            'snake_case' => ['snake_case', 'snakecase'],
-            'camelCase' => ['camelCase', 'camelcase'],
-            'COBOL-CASE' => ['COBOL-CASE', 'cobolcase'],
-            'SCREAMING_SNAKE_CASE' => ['SCREAMING_SNAKE_CASE', 'screamingsnakecase'],
-            'Pascal_Snake_Case' => ['Pascal_Snake_Case', 'pascalsnakecase'],
-            'whitespace padded' => [' whitespace-padded ', 'whitespacepadded'],
-            'whitespace within' => ['whitespace within', 'whitespacewithin'],
-            'Number34Inside' => ['Number34Inside', 'number34inside'],
-            'digits only (123)' => ['123', '123'],
-            'digits starting (123)' => ['123something', '123something'],
-            'digits ending (123)' => ['Something123', 'something123'],
-        ];
-    }
-
     public static function emptyStringCases(): array
     {
         return [

@@ -6,6 +6,7 @@ namespace Hermiod\Resource\Hydrator;
 
 /**
  * @template Type of object
+ * @template-implements HydratorInterface<Type>
  *
  * @no-named-arguments No backwards compatibility guaranteed
  * @internal No backwards compatibility guaranteed

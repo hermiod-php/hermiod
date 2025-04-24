@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Hermiod\Attribute\Property;
+namespace Hermiod\Attribute;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 final class Property implements PropertyInterface
@@ -22,7 +22,7 @@ final class Property implements PropertyInterface
 
         $this->name = \trim($this->name);
 
-        if (empty($this->name)) {
+        if (\strlen($this->name) === 0) {
             throw new \InvalidArgumentException('Property name cannot be empty.');
         }
     }

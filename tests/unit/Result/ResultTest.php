@@ -19,10 +19,12 @@ final class ResultTest extends TestCase
 {
     public function testImplementsResultInterface(): void
     {
+        $json = [];
+
         $result = new Result(
             $this->mockReflector(),
             $this->mockHydrator(),
-            []
+            $json,
         );
 
         $this->assertInstanceOf(
@@ -34,9 +36,10 @@ final class ResultTest extends TestCase
 
     public function testIsValid(): void
     {
+        $json = [];
         $validation = $this->mockValidation(true);
         $reflector = $this->mockReflector($validation);
-        $result = new Result($reflector, $this->mockHydrator(), []);
+        $result = new Result($reflector, $this->mockHydrator(), $json);
 
         $this->assertTrue(
             $result->isValid(),
@@ -46,9 +49,10 @@ final class ResultTest extends TestCase
 
     public function testGetErrors(): void
     {
+        $json = [];
         $validation = $this->mockValidation();
         $reflector = $this->mockReflector($validation);
-        $result = new Result($reflector, $this->mockHydrator(), []);
+        $result = new Result($reflector, $this->mockHydrator(), $json);
 
         $this->assertInstanceOf(
             CollectionInterface::class,
@@ -59,9 +63,10 @@ final class ResultTest extends TestCase
 
     public function testInstanceThrowsOnInvalid(): void
     {
+        $json = [];
         $validation = $this->mockValidation(false);
         $reflector = $this->mockReflector($validation);
-        $result = new Result($reflector, $this->mockHydrator(), []);
+        $result = new Result($reflector, $this->mockHydrator(), $json);
 
         $this->expectException(InvalidJsonPayloadException::class);
 
@@ -70,12 +75,13 @@ final class ResultTest extends TestCase
 
     public function testInstanceReturnsHydratedObject(): void
     {
+        $json = [];
         $object = new \stdClass();
         $validation = $this->mockValidation(true);
         $reflector = $this->mockReflector($validation);
         $hydrator = $this->mockHydrator($object);
 
-        $result = new Result($reflector, $hydrator, []);
+        $result = new Result($reflector, $hydrator, $json);
 
         $this->assertSame(
             $object,
@@ -87,7 +93,7 @@ final class ResultTest extends TestCase
     private function mockReflector(?ValidationResultInterface $validation = null): ResourceInterface & \PHPUnit\Framework\MockObject\MockObject
     {
         $reflector = $this->createMock(ResourceInterface::class);
-        $reflector->method('validate')->willReturn($validation ?? $this->mockValidation());
+        $reflector->method('validateAndTranspose')->willReturn($validation ?? $this->mockValidation());
 
         return $reflector;
     }

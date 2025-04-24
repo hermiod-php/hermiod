@@ -36,19 +36,6 @@ final class CobolCaseTest extends AbstractNameTestCase
         );
     }
 
-    #[DataProvider('validNormaliseCases')]
-    #[DataProvider('emptyStringCases')]
-    public function testNormalise(string $input, string $expected): void
-    {
-        $strategy = new CobolCase();
-
-        $this->assertSame(
-            $expected,
-            $strategy->normalise($input),
-            "normalise('$input') should return '$expected'"
-        );
-    }
-
     #[DataProvider('nonStringCases')]
     public function testNonStringCasesThrowTypeErrorForFormat(mixed $input): void
     {
@@ -56,15 +43,6 @@ final class CobolCaseTest extends AbstractNameTestCase
 
         $strategy = new CobolCase();
         $strategy->format($input);
-    }
-
-    #[DataProvider('nonStringCases')]
-    public function testNonStringCasesThrowTypeErrorForNormalise(mixed $input): void
-    {
-        $this->expectException(\TypeError::class);
-
-        $strategy = new CobolCase();
-        $strategy->normalise($input);
     }
 
     public static function validFormatCases(): array

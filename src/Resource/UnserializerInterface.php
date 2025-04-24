@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Hermiod;
+namespace Hermiod\Resource;
 
 use Hermiod\Result\ResultInterface;
 
 /**
  * @template Type of object
  */
-interface TransposerInterface
+interface UnserializerInterface
 {
     /**
      * @param string|object|array<mixed, mixed> $json

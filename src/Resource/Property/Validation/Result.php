@@ -30,6 +30,15 @@ final class Result implements ResultInterface
         return $this->validationErrors;
     }
 
+    public function withError(string $error): ResultInterface
+    {
+        $copy = clone $this;
+
+        $copy->validationErrors[] = $error;
+
+        return $copy;
+    }
+
     public function withMergedResult(ResultInterface $result): ResultInterface
     {
         $copy = clone $this;

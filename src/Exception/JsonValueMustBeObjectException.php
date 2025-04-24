@@ -14,7 +14,7 @@ final class JsonValueMustBeObjectException extends \InvalidArgumentException imp
     {
         return new self(
             \sprintf(
-                'JSON string must decode to an object, but %s given.',
+                'JSON string must decode to an object, but resulting type was %s.',
                 \gettype($actual),
             )
         );

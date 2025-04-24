@@ -6,11 +6,16 @@ namespace Hermiod\Resource\Name;
 
 final class FlatCase extends AbstractStrategy
 {
+    private const CLEAN_PATTERN = '/[\s\-_]+/i';
+
     public function format(string $name): string
     {
-        /**
-         * FlatCase happens to be our normalised format as well
-         */
-        return $this->normalise($name);
+        return \strtolower(
+            (string) \preg_replace(
+                self::CLEAN_PATTERN,
+                '',
+                \trim($name),
+            )
+        );
     }
 }

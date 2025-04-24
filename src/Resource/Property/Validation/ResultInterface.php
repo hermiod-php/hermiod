@@ -16,4 +16,6 @@ interface ResultInterface
      * @return string[]
      */
     public function getValidationErrors(): array;
+
+    public function withError(string $error): ResultInterface;
 }

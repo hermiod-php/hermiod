@@ -36,19 +36,6 @@ final class FlatCaseTest extends AbstractNameTestCase
         );
     }
 
-    #[DataProvider('validCases')]
-    #[DataProvider('emptyStringCases')]
-    public function testNormalise(string $input, string $expected): void
-    {
-        $strategy = new FlatCase();
-
-        $this->assertSame(
-            $expected,
-            $strategy->normalise($input),
-            "normalise('$input') should return '$expected'"
-        );
-    }
-
     #[DataProvider('nonStringCases')]
     public function testNonStringCasesThrowTypeErrorForFormat(mixed $input): void
     {
@@ -58,17 +45,22 @@ final class FlatCaseTest extends AbstractNameTestCase
         $strategy->format($input);
     }
 
-    #[DataProvider('nonStringCases')]
-    public function testNonStringCasesThrowTypeErrorForNormalise(mixed $input): void
-    {
-        $this->expectException(\TypeError::class);
-
-        $strategy = new FlatCase();
-        $strategy->normalise($input);
-    }
-
     public static function validCases(): array
     {
-        return self::validNormaliseCases();
+        return [
+            'PascalCase' => ['PascalCase', 'pascalcase'],
+            'kebab-case' => ['kebab-case', 'kebabcase'],
+            'snake_case' => ['snake_case', 'snakecase'],
+            'camelCase' => ['camelCase', 'camelcase'],
+            'COBOL-CASE' => ['COBOL-CASE', 'cobolcase'],
+            'SCREAMING_SNAKE_CASE' => ['SCREAMING_SNAKE_CASE', 'screamingsnakecase'],
+            'Pascal_Snake_Case' => ['Pascal_Snake_Case', 'pascalsnakecase'],
+            'whitespace padded' => [' whitespace-padded ', 'whitespacepadded'],
+            'whitespace within' => ['whitespace within', 'whitespacewithin'],
+            'Number34Inside' => ['Number34Inside', 'number34inside'],
+            'digits only (123)' => ['123', '123'],
+            'digits starting (123)' => ['123something', '123something'],
+            'digits ending (123)' => ['Something123', 'something123'],
+        ];
     }
 }

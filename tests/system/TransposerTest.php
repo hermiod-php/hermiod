@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Hermiod\Tests\System;
 
 use Hermiod\Exception\TooMuchRecursionException;
+use Hermiod\Resource\Resource;
 use Hermiod\ResourceManager;
 use Hermiod\Tests\System\Fakes\RecursiveTestClass;
 use Hermiod\Tests\Integration\Fakes\StringPropertiesFake;
@@ -67,9 +68,13 @@ class TransposerTest extends TestCase
             return $inital;
         };
 
+        $reflection = new \ReflectionClass(Resource::class);
+        $reflection->setStaticPropertyValue('maxRecursion', 25);
+
         $transposer = ResourceManager::create()->getResource(RecursiveTestClass::class);
 
         $this->expectException(TooMuchRecursionException::class);
+        $this->expectExceptionMessage('Exceeded the maximum object depth of 25 nested objects');
 
         $json = [];
 
