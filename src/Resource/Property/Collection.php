@@ -13,6 +13,11 @@ use Hermiod\Resource\Property\Exception\DeletingFromSealedCollectionException;
  */
 final class Collection implements CollectionInterface
 {
+    private const NORMALISATION_PATTERN = '/[\s\-_]+/i';
+
+    /** @var array<string, string> $cache */
+    private static array $cache = [];
+
     /**
      * @var array<string, PropertyInterface>
      */
@@ -26,7 +31,7 @@ final class Collection implements CollectionInterface
     public function __construct(PropertyInterface ...$properties)
     {
         foreach ($properties as $property) {
-            $this->hash[\strtolower($property->getPropertyName())] = $property;
+            $this->hash[$this->normalisePropertyName($property->getPropertyName())] = $property;
         }
 
         $this->list = $properties;
@@ -37,7 +42,7 @@ final class Collection implements CollectionInterface
      */
     public function offsetExists(mixed $offset): bool
     {
-        return isset($this->hash[\strtolower($offset)]);
+        return isset($this->hash[$this->normalisePropertyName($offset)]);
     }
 
     /**
@@ -45,7 +50,7 @@ final class Collection implements CollectionInterface
      */
     public function offsetGet(mixed $offset): ?PropertyInterface
     {
-        return $this->hash[\strtolower($offset)] ?? null;
+        return $this->hash[$this->normalisePropertyName($offset)] ?? null;
     }
 
     /**
@@ -95,5 +100,16 @@ final class Collection implements CollectionInterface
     public function rewind(): void
     {
         \reset($this->list);
+    }
+
+    private function normalisePropertyName(string $name): string
+    {
+        return self::$cache[$name] ??= \strtolower(
+            (string) \preg_replace(
+                self::NORMALISATION_PATTERN,
+                '',
+                \trim($name),
+            )
+        );
     }
 }

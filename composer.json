@@ -2,20 +2,20 @@
   "name": "hermiod/hermiod",
   "version": "1.0.0",
   "type": "library",
-  "description": "A library to validate json against native PHP objects and hydrate from JSON to PHP",
+  "description": "A library to validate json against native PHP objects and hydrate them from JSON to PHP",
   "keywords": [
     "json",
     "body",
     "schema",
     "validator",
-    "hydrator"
+    "unserialize"
   ],
   "homepage": "https://github.com/jdjenvey/json-objectify",
   "license": "MIT",
   "authors": [
     {
       "name": "Joel Jenvey",
-      "email": "jdjenveys@gmail.com"
+      "email": "jdjenvey@gmail.com"
     }
   ],
   "require": {

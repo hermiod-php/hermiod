@@ -15,8 +15,6 @@ use Hermiod\Exception\TooMuchRecursionException;
  */
 final class Resource implements ResourceInterface
 {
-    private const CLEAN_PATTERN = '/[\s\-_]+/i';
-
     private static int $maxRecursion = 128;
     private static int $depth = 0;
 
@@ -77,13 +75,12 @@ final class Resource implements ResourceInterface
         $list = \get_object_vars($json);
 
         foreach ($list as $key => $data) {
-            $normalised = $this->normalise($key);
-            $property = $properties->offsetGet($normalised);
+            $property = $properties->offsetGet($key);
             $next = $path->withObjectKey($key);
 
             // TODO: Allow for optional key overloading
             if (!$property) {
-                $result = $result->withError(
+                $result = $result->withErrors(
                     \sprintf(
                         'Property %s is not permitted',
                         $next->__toString(),
@@ -97,12 +94,7 @@ final class Resource implements ResourceInterface
             $check = $property->checkValueAgainstConstraints($next, $data);
 
             if (!$check->isValid()) {
-                $result = $result->withError(
-                    \sprintf(
-                        'Property %s is not permitted',
-                        $next->__toString(),
-                    )
-                );
+                $result = $result->withErrors(...$check->getValidationErrors());
 
                 continue;
             }
@@ -136,13 +128,12 @@ final class Resource implements ResourceInterface
         $list = $json;
 
         foreach ($list as $key => $data) {
-            $normalised = $this->normalise($key);
-            $property = $properties->offsetGet($normalised);
+            $property = $properties->offsetGet($key);
             $next = $path->withObjectKey($key);
 
             // TODO: Allow for optional key overloading
             if (!$property) {
-                $result = $result->withError(
+                $result = $result->withErrors(
                     \sprintf(
                         'Property %s is not permitted',
                         $next->__toString(),
@@ -156,12 +147,7 @@ final class Resource implements ResourceInterface
             $check = $property->checkValueAgainstConstraints($next, $data);
 
             if (!$check->isValid()) {
-                $result = $result->withError(
-                    \sprintf(
-                        'Property %s is not permitted',
-                        $next->__toString(),
-                    )
-                );
+                $result = $result->withErrors(...$check->getValidationErrors());
 
                 continue;
             }
@@ -176,16 +162,5 @@ final class Resource implements ResourceInterface
         --self::$depth;
 
         return $result;
-    }
-
-    public function normalise(string $name): string
-    {
-        return \strtolower(
-            (string) \preg_replace(
-                self::CLEAN_PATTERN,
-                '',
-                \trim($name),
-            )
-        );
     }
 }

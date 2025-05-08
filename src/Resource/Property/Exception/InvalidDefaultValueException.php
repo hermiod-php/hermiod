@@ -20,9 +20,10 @@ final class InvalidDefaultValueException extends \InvalidArgumentException imple
 
         return new self(
             \sprintf(
-                "The value %s is not a valid default for the property type '%s'. Acceptable types are %s.",
+                "The value %s is not a valid default for the property type '%s'. Acceptable %s %s.",
                 \print_r($given, true),
                 $type,
+                \count($otherAcceptableTypes) > 1 ? 'types are' : 'type is',
                 \implode(', ', $otherAcceptableTypes),
             )
         );

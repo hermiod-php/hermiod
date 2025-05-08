@@ -15,9 +15,9 @@ use Hermiod\Resource\Property\Exception\InvalidDefaultValueException;
 final class StringProperty implements PropertyInterface
 {
     use Traits\ConstructWithNameAndNullableTrait;
-    use Traits\ConvertToSamePhpValueOrDefault;
+    use Traits\ConvertToSameJsonValue;
 
-    private string|null $default;
+    private string|null $default = null;
 
     private bool $hasDefault = false;
 
@@ -64,7 +64,7 @@ final class StringProperty implements PropertyInterface
                 \sprintf(
                     '%s must be a string but %s given',
                     $path->__toString(),
-                    \gettype($value)
+                    \strtolower(\gettype($value)),
                 )
             );
         }
@@ -92,6 +92,27 @@ final class StringProperty implements PropertyInterface
         $copy->constraints[] = $constraint;
 
         return $copy;
+    }
+
+    public function normalisePhpValue(mixed $value): string|null
+    {
+        if (\is_string($value)) {
+            return $value;
+        }
+
+        if (null === $value && $this->nullable) {
+            return null;
+        }
+
+        if (\is_numeric($value)) {
+            return (string) $value;
+        }
+
+        if (\is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+
+        return $this->hasDefaultValue() ? $this->getDefaultValue() : '';
     }
 
     private function isPossibleValue(mixed $value): bool

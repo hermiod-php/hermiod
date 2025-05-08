@@ -15,7 +15,7 @@ use Hermiod\Resource\Property\Exception\InvalidDefaultValueException;
 final class ArrayProperty implements PropertyInterface
 {
     use Traits\ConstructWithNameAndNullableTrait;
-    use Traits\ConvertToSamePhpValueOrDefault;
+    use Traits\ConvertToSameJsonValue;
 
     /**
      * @var array<int|string, mixed>|null
@@ -88,7 +88,7 @@ final class ArrayProperty implements PropertyInterface
                     '%s must be an array%s but %s given',
                     $path->__toString(),
                     $this->nullable ? ' or null' : '',
-                    \gettype($value)
+                    \strtolower(\gettype($value)),
                 )
             );
         }
@@ -107,6 +107,15 @@ final class ArrayProperty implements PropertyInterface
         }
 
         return new Validation\Result();
+    }
+
+    public function normalisePhpValue(mixed $value): mixed
+    {
+        if (null === $value && $this->hasDefaultValue()) {
+            return $this->getDefaultValue();
+        }
+
+        return $value;
     }
 
     private function checkElementAgainstConstraints(PathInterface $path, mixed $value): ?string

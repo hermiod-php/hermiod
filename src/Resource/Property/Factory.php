@@ -182,11 +182,10 @@ final readonly class Factory implements FactoryInterface
     private function createMixedTypeProperty(\ReflectionProperty $reflection): PropertyInterface
     {
         $name = $reflection->getName();
-        $nullable = $reflection->getType()?->allowsNull() ?? true;
 
         return $reflection->hasDefaultValue()
-            ? MixedProperty::withDefaultValue($name, $nullable, $reflection->getDefaultValue())
-            : new MixedProperty($name, $nullable);
+            ? MixedProperty::withDefaultValue($name, $reflection->getDefaultValue())
+            : new MixedProperty($name);
     }
 
     private function createDateTimeInterfaceProperty(\ReflectionNamedType $type, \ReflectionProperty $reflection): PropertyInterface

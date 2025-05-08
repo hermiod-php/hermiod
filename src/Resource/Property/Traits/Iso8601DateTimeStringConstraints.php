@@ -22,7 +22,7 @@ trait Iso8601DateTimeStringConstraints
                 \sprintf(
                     '%s must be an ISO8601 date-time string but %s given',
                     $path->__toString(),
-                    \gettype($value),
+                    \strtolower(\gettype($value)),
                 )
             );
         }
@@ -32,7 +32,7 @@ trait Iso8601DateTimeStringConstraints
                 \sprintf(
                     "%s must be an valid ISO8601 date-time string but '%s' given",
                     $path->__toString(),
-                    \gettype($value),
+                    \strtolower(\gettype($value)),
                 )
             );
         }

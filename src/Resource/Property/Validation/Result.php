@@ -11,7 +11,7 @@ namespace Hermiod\Resource\Property\Validation;
 final class Result implements ResultInterface
 {
     /**
-     * @var string[]
+     * @var list<string>
      */
     private array $validationErrors = [];
 
@@ -25,16 +25,19 @@ final class Result implements ResultInterface
         return \count($this->validationErrors) === 0;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getValidationErrors(): array
     {
         return $this->validationErrors;
     }
 
-    public function withError(string $error): ResultInterface
+    public function withErrors(string ...$error): ResultInterface
     {
         $copy = clone $this;
 
-        $copy->validationErrors[] = $error;
+        $copy->validationErrors = \array_merge($this->validationErrors, $error);
 
         return $copy;
     }

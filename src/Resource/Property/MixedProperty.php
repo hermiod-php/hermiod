@@ -12,28 +12,29 @@ use Hermiod\Resource\Path\PathInterface;
  */
 final class MixedProperty implements PropertyInterface
 {
-    use Traits\ConstructWithNameAndNullableTrait;
-    use Traits\ConvertToSamePhpValueOrDefault;
+    use Traits\ConvertToSameJsonValue;
 
-    private mixed $default;
+    private mixed $default = null;
 
     private bool $hasDefault = false;
 
-    public static function withDefaultValue(string $name, bool $nullable, mixed $default): self
-    {
-        $property = new self($name, $nullable);
+    public function __construct(
+        private readonly string $name
+    ) {}
 
-        $property->setDefaultValue($default);
+    public static function withDefaultValue(string $name, mixed $default): self
+    {
+        $property = new self($name);
+
+        $property->default = $default;
+        $property->hasDefault = true;
 
         return $property;
     }
 
-    private function setDefaultValue(mixed $value): PropertyInterface
+    public function getPropertyName(): string
     {
-        $this->default = $value;
-        $this->hasDefault = true;
-
-        return $this;
+        return $this->name;
     }
 
     public function getDefaultValue(): mixed
@@ -49,5 +50,14 @@ final class MixedProperty implements PropertyInterface
     public function checkValueAgainstConstraints(PathInterface $path, mixed $value): Validation\ResultInterface
     {
         return new Validation\Result();
+    }
+
+    public function normalisePhpValue(mixed $value): mixed
+    {
+        if (null === $value && $this->hasDefaultValue()) {
+            return $this->getDefaultValue();
+        }
+
+        return $value;
     }
 }

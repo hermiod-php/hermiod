@@ -13,9 +13,9 @@ interface ResultInterface
     public function isValid(): bool;
 
     /**
-     * @return string[]
+     * @return list<string>
      */
     public function getValidationErrors(): array;
 
-    public function withError(string $error): ResultInterface;
+    public function withErrors(string ...$error): ResultInterface;
 }

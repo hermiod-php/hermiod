@@ -15,9 +15,9 @@ use Hermiod\Resource\Property\Exception\InvalidDefaultValueException;
 final class IntegerProperty implements PropertyInterface
 {
     use Traits\ConstructWithNameAndNullableTrait;
-    use Traits\ConvertToSamePhpValueOrDefault;
+    use Traits\ConvertToSameJsonValue;
 
-    private int|null $default;
+    private int|null $default = null;
 
     private bool $hasDefault = false;
 
@@ -73,7 +73,7 @@ final class IntegerProperty implements PropertyInterface
                 \sprintf(
                     '%s must be an integer but %s given',
                     $path->__toString(),
-                    \gettype($value)
+                    \strtolower(\gettype($value)),
                 )
             );
         }
@@ -92,6 +92,19 @@ final class IntegerProperty implements PropertyInterface
         }
 
         return new Validation\Result();
+    }
+
+    public function normalisePhpValue(mixed $value): int|null
+    {
+        if (\is_numeric($value) || \is_bool($value)) {
+            return (int) $value;
+        }
+
+        if (null === $value && $this->nullable) {
+            return null;
+        }
+
+        return $this->hasDefaultValue() ? $this->getDefaultValue() : 0;
     }
 
     private function isPossibleValue(mixed $value): bool

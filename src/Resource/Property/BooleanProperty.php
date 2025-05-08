@@ -14,9 +14,9 @@ use Hermiod\Resource\Property\Exception\InvalidDefaultValueException;
 final class BooleanProperty implements PropertyInterface
 {
     use Traits\ConstructWithNameAndNullableTrait;
-    use Traits\ConvertToSamePhpValueOrDefault;
+    use Traits\ConvertToSameJsonValue;
 
-    private bool|null $default;
+    private bool|null $default = null;
 
     private bool $hasDefault = false;
 
@@ -61,9 +61,26 @@ final class BooleanProperty implements PropertyInterface
             \sprintf(
                 '%s must be a boolean but %s given',
                 $path->__toString(),
-                \gettype($value)
+                \strtolower(\gettype($value)),
             )
         );
+    }
+
+    public function normalisePhpValue(mixed $value): bool|null
+    {
+        if (\is_bool($value) || (null === $value && $this->nullable)) {
+            return $value;
+        }
+
+        if (\is_string($value)) {
+            return $value === 'true' || $value === '1' || $value === '1.0';
+        }
+
+        if (\is_numeric($value)) {
+            return $value === 1 || $value === 1.0;
+        }
+
+        return $this->hasDefaultValue() ? $this->getDefaultValue() : false;
     }
 
     private function isPossibleValue(mixed $value): bool

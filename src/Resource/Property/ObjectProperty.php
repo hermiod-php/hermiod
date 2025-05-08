@@ -15,7 +15,7 @@ use Hermiod\Resource\Path\PathInterface;
 final class ObjectProperty implements PropertyInterface
 {
     use Traits\ConstructWithNameAndNullableTrait;
-    use Traits\ConvertToSamePhpValueOrDefault;
+    use Traits\ConvertToSameJsonValue;
 
     /** @var ObjectConstraintInterface[] */
     private array $valueConstraints = [];
@@ -63,7 +63,7 @@ final class ObjectProperty implements PropertyInterface
                     '%s must be an object%s but %s given',
                     $path->__toString(),
                     $this->nullable ? ' or null' : '',
-                    \gettype($value)
+                    \strtolower(\gettype($value)),
                 )
             );
         }
@@ -93,6 +93,15 @@ final class ObjectProperty implements PropertyInterface
         }
 
         return null;
+    }
+
+    public function normalisePhpValue(mixed $value): mixed
+    {
+        if (null === $value && $this->hasDefaultValue()) {
+            return $this->getDefaultValue();
+        }
+
+        return $value;
     }
 
     private function isPossibleValue(mixed $value): bool

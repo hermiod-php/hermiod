@@ -15,9 +15,9 @@ use Hermiod\Resource\Property\Exception\InvalidDefaultValueException;
 final class FloatProperty implements PropertyInterface
 {
     use Traits\ConstructWithNameAndNullableTrait;
-    use Traits\ConvertToSamePhpValueOrDefault;
+    use Traits\ConvertToSameJsonValue;
 
-    private float|null $default;
+    private float|null $default = null;
 
     private bool $hasDefault = false;
 
@@ -73,7 +73,7 @@ final class FloatProperty implements PropertyInterface
                 \sprintf(
                     '%s must be a float but %s given',
                     $path->__toString(),
-                    \gettype($value)
+                    \strtolower(\gettype($value)),
                 )
             );
         }
@@ -92,6 +92,19 @@ final class FloatProperty implements PropertyInterface
         }
 
         return new Validation\Result();
+    }
+
+    public function normalisePhpValue(mixed $value): float|null
+    {
+        if (\is_numeric($value) || \is_bool($value)) {
+            return (float) $value;
+        }
+
+        if (null === $value && $this->nullable) {
+            return null;
+        }
+
+        return $this->hasDefaultValue() ? $this->getDefaultValue() : 0;
     }
 
     private function isPossibleValue(mixed $value): bool

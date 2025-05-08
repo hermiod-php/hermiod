@@ -39,7 +39,7 @@ final class RamseyUuidProperty implements PropertyInterface
                 \sprintf(
                     '%s must be a UUID string but %s given',
                     $path->__toString(),
-                    \gettype($value),
+                    \strtolower(\gettype($value)),
                 )
             );
         }
