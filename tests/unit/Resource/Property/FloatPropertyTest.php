@@ -9,9 +9,15 @@ use Hermiod\Resource\Path\PathInterface;
 use Hermiod\Resource\Property\Exception\InvalidDefaultValueException;
 use Hermiod\Resource\Property\PropertyInterface;
 use Hermiod\Resource\Property\FloatProperty;
+use Hermiod\Resource\Property\Traits\ConstructWithNameAndNullableTrait;
+use Hermiod\Resource\Property\Traits\ConvertToSameJsonValue;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(FloatProperty::class)]
+#[CoversClass(ConstructWithNameAndNullableTrait::class)]
+#[CoversClass(ConvertToSameJsonValue::class)]
 class FloatPropertyTest extends TestCase
 {
     public function testImplementsPropertyInterface(): void

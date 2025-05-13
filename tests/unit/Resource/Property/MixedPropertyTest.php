@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace Hermiod\Tests\Unit\Resource\Property;
 
 use Hermiod\Resource\Path\PathInterface;
-use Hermiod\Resource\Property\Exception\InvalidDefaultValueException;
 use Hermiod\Resource\Property\PropertyInterface;
 use Hermiod\Resource\Property\MixedProperty;
+use Hermiod\Resource\Property\Traits\ConvertToSameJsonValue;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(MixedProperty::class)]
+#[CoversClass(ConvertToSameJsonValue::class)]
 class MixedPropertyTest extends TestCase
 {
     public function testImplementsPropertyInterface(): void
@@ -46,13 +49,34 @@ class MixedPropertyTest extends TestCase
     }
 
     #[DataProvider('typesProvider')]
-    public function testAllValuesAreValid(mixed $value): void
+    public function testAllValuesAreValidAgainstConstraints(mixed $value): void
     {
         $property = new MixedProperty('foo');
         $path = $this->createMock(PathInterface::class);
 
         $this->assertTrue(
             $property->checkValueAgainstConstraints($path, $value)->isValid()
+        );
+    }
+
+    #[DataProvider('typesProvider')]
+    public function testAllValuesNormaliseToThemselves(mixed $value): void
+    {
+        $property = new MixedProperty('foo');
+
+        $this->assertSame(
+            $value,
+            $property->normalisePhpValue($value),
+        );
+    }
+
+    public function testNullValuesNormaliseToDefault(): void
+    {
+        $property = MixedProperty::withDefaultValue('foo', 'bar');
+
+        $this->assertSame(
+            'bar',
+            $property->normalisePhpValue(null),
         );
     }
 
@@ -74,7 +98,8 @@ class MixedPropertyTest extends TestCase
             [],
             (object)[],
             true,
-            false
+            false,
+            null,
         ];
 
         foreach ($types as $value) {

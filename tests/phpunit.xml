@@ -14,6 +14,7 @@
     displayDetailsOnTestsThatTriggerErrors="true"
     displayDetailsOnTestsThatTriggerNotices="true"
     testdox="true"
+    testdoxSummary="true"
     enforceTimeLimit="true"
 >
 

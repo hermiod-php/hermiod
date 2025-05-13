@@ -9,9 +9,15 @@ use Hermiod\Resource\Path\PathInterface;
 use Hermiod\Resource\Property\Exception\InvalidDefaultValueException;
 use Hermiod\Resource\Property\PropertyInterface;
 use Hermiod\Resource\Property\StringProperty;
+use Hermiod\Resource\Property\Traits\ConstructWithNameAndNullableTrait;
+use Hermiod\Resource\Property\Traits\ConvertToSameJsonValue;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(StringProperty::class)]
+#[CoversClass(ConstructWithNameAndNullableTrait::class)]
+#[CoversClass(ConvertToSameJsonValue::class)]
 class StringPropertyTest extends TestCase
 {
     public function testImplementsPropertyInterface(): void

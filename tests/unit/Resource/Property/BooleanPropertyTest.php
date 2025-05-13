@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace Hermiod\Tests\Unit\Resource\Property;
 
-use Hermiod\Attribute\Constraint\NumberConstraintInterface;
 use Hermiod\Resource\Path\PathInterface;
 use Hermiod\Resource\Property\Exception\InvalidDefaultValueException;
 use Hermiod\Resource\Property\PropertyInterface;
 use Hermiod\Resource\Property\BooleanProperty;
+use Hermiod\Resource\Property\Traits\ConstructWithNameAndNullableTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(BooleanProperty::class)]
+#[CoversClass(ConstructWithNameAndNullableTrait::class)]
 class BooleanPropertyTest extends TestCase
 {
     public function testImplementsPropertyInterface(): void

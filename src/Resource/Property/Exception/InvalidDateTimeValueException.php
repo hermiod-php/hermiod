@@ -14,8 +14,9 @@ final class InvalidDateTimeValueException extends \InvalidArgumentException impl
     {
         return new self(
             \sprintf(
-                "Unable to parse ISO 8601 datetime value from '%s'",
+                "Unable to parse ISO 8601 datetime value from '%s'.%s",
                 $datetime,
+                $previous ? ' ' . $previous->getMessage() : '',
             ),
             previous: $previous,
         );
