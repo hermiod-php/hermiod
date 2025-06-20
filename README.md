@@ -50,7 +50,7 @@ compatible with the PHP types.
 
 Any nullable properties or properties with defaults are treated as _optional_.
 
-If defaults are provided then they will be used when a JSON value is absent.
+If defaults are provided, then they will be used when a JSON value is absent.
 
 ```php
 {
@@ -96,7 +96,7 @@ namespace App;
 
 final class OutOfTheBoxExamples
 {
-    private \App\OtherConcreteClass $otherConcreteClass; // Is created and hydrated just like this class
+    private \App\OtherConcreteClass $sub; // Is created and hydrated just like this class
     
     private \Ramsey\UuidInterface $uuid; // If available will use UUID string constraint and hydrate
     
@@ -126,62 +126,61 @@ Here are examples:
 ```php
 namespace App;
 
-use Hermiod\Attribute as JRM;
+use Hermiod\Attribute\Constraint as Assert;
 
 final class OutOfTheBoxExamples
 {
-    #[JRM\Constraint\NumberGreaterThanOrEquals(value: 1)]
+    #[Assert\NumberGreaterThanOrEquals(value: 1)]
     private int $integer; // Int must be greater than or equal to 1
     
-    #[JRM\Constraint\NumberGreaterThan(value: 0.01)]
-    #[JRM\Constraint\NumberLessThanOrEqual(value: 1)]
+    #[Assert\NumberGreaterThan(value: 0.01)]
+    #[Assert\NumberLessThanOrEqual(value: 1)]
     private float $float; // Float greater than 0.01 and less than or equal to 1
     
-    #[JRM\Constraint\NumberInList(1, 5, 1.66)]
+    #[Assert\NumberInList(1, 5, 1.66)]
     private float $limitedNumber; // Must be one of 1, 2, or 1.66
     
-    #[JRM\Constraint\StringIsEmail()]
+    #[Assert\StringIsEmail()]
     private string $email; // Must be a valid email address
     
-    #[JRM\Constraint\StringIsUuid()]
+    #[Assert\StringIsUuid()]
     private string $uuid; // Must be a valid UUID
     
-    #[JRM\Constraint\StringInList('foo', 'bar', 'baz')]
+    #[Assert\StringInList('foo', 'bar', 'baz')]
     private string $limitedString; // Must be one of "foo", "bar", "baz"
     
-    #[JRM\Constraint\StringMatchesRegex(regex: '/^Foo.+/')]
-    #[JRM\Constraint\StringLengthGreaterThan(length: 8)]
+    #[Assert\StringMatchesRegex(regex: '/^Foo.+/')]
+    #[Assert\StringLengthGreaterThan(length: 8)]
     private string $startsWithFoo; // Must start with "Foo"
     
-    #[JRM\Constraint\StringLengthGreaterThanOrEqual(length: 1)]
-    #[JRM\Constraint\StringLengthLessThan(length: 3)]
+    #[Assert\StringLengthGreaterThanOrEqual(length: 1)]
+    #[Assert\StringLengthLessThan(length: 3)]
     private string $oneOrTwoChars; // More that or equal to 1 char, fewer than 3 chars
     
-    #[JRM\Constraint\ArrayValueIsString()]
-    #[JRM\Constraint\MapValueStringMatchesRegex(regex: '/^Foo.+/')]
+    #[Assert\ArrayValueIsString()]
+    #[Assert\MapValueStringMatchesRegex(regex: '/^Foo.+/')]
     private array $arrayOfStrings;   // Array must contain only strings which start with "Foo"
     
-    #[JRM\Constraint\ArrayValueIsInteger()]
-    #[JRM\Constraint\ArrayValueNumberLessThanOrEqual(value: -1)]
+    #[Assert\ArrayValueIsInteger()]
+    #[Assert\ArrayValueNumberLessThanOrEqual(value: -1)]
     private array $arrayOfIntegers; // Only integers less than -1
     
-    #[JRM\Constraint\ArrayValueIsFloat()]
-    #[JRM\Constraint\ArrayValueNumberLessThan(value: 100)]
+    #[Assert\ArrayValueIsFloat()]
+    #[Assert\ArrayValueNumberLessThan(value: 100)]
     private array $arrayOfFloats; // Only floats less than 100
     
-    #[JRM\Constraint\ArrayValueIsArray()]
+    #[Assert\ArrayValueIsArray()]
     private array $arrayOfArrays; // Values must be arrays, but nested validation is not supported
     
-    #[JRM\Constraint\ArrayValueIsObject()]
+    #[Assert\ArrayValueIsObject()]
     private array $arrayOfObjects; // Values must be objects, but nested validation is not supported
     
-    #[JRM\Constraint\ObjectValueIsString()]
-    #[JRM\Constraint\ObjectValueStringMatchesRegex(regex: '/^Foo.+/')]
+    #[Assert\ObjectValueIsString()]
+    #[Assert\ObjectValueStringMatchesRegex(regex: '/^Foo.+/')]
     private object $objectOfStrings;  // Any key with values starting with "Foo" e.g. { 6: "Food", "bar": "Foolish" }
     
-    #[JRM\Constraint\ObjectKeyStringMatchesRegex(regex: '/^Foo.+/')]
+    #[Assert\ObjectKeyStringMatchesRegex(regex: '/^Foo.+/')]
     private object $objectWithStringKeys;  // Any value with key starting with "Foo" e.g. { "Food": 56, "Foolish": "Hello" }
-    
     
     private bool $boolean;    // Bool
     private mixed $mixed;     // Any of the above or null
@@ -193,27 +192,26 @@ final class OutOfTheBoxExamples
 ### Interfaces
 
 When using interfaces for objects, Hermiod will need to know how to create some concrete class for the interface
-at runtime. This can be specified in two ways.
+at runtime.
 
-An interface can be mapped to a concretion in the Transposer directly.
+An interface can be mapped to a concretion in the ResourceManager directly.
 
 ```php
-$transposer = \Hemiod\Transposer::create()->withInterfaceResolver(
+$manager = \Hemiod\ResourceManager::create();
+
+$manager = $manager->withInterfaceResolver(
     \App\SomeTypeInterface::class,
-    \App\SomeConcrete::class
+    fn () => \App\SomeConcrete::class,
 );
-```
 
-The map can also be specified on the property itself using the `Hermiod\Resource\Attribute\Property\Resolver` attribute.
-
-```php
-namespace App;
-
-use Hermiod\Resource\Attribute as JRM;
-
-final class Example
-{
-    #[JRM\Property\Resolver(class: \App\RecursiveMaker::class)]
-    private \App\MakerInterface $plonker;
-}
+$manager = $manager->withInterfaceResolver(
+    \App\SomeOtherInterface::class,
+    function (\Hemiod\Json\FramentInterface $data): string {
+        return match ($data->get('$.something.some-key')) {
+            'foo' => \App\SomeOtherFoo::class,
+            'bar' => \App\SomeOtherBar::class,
+            default => \App\SomeUnknownThing::class,
+        };
+    },
+);
 ```
