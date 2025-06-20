@@ -7,7 +7,7 @@ namespace Hermiod\Attribute\Constraint;
 use Hermiod\Attribute\Constraint\Traits\MapValueStringIsEmail;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-final class ObjectValueStringIsEmail implements ObjectConstraintInterface
+final class ObjectValueStringIsEmail implements ObjectValueConstraintInterface
 {
     use MapValueStringIsEmail;
 }

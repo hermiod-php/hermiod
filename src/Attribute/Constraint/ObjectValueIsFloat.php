@@ -7,7 +7,7 @@ namespace Hermiod\Attribute\Constraint;
 use Hermiod\Attribute\Constraint\Traits\MapValueIsFloat;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-final class ObjectValueIsFloat implements ObjectConstraintInterface
+final class ObjectValueIsFloat implements ObjectValueConstraintInterface
 {
     use MapValueIsFloat;
 }

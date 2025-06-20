@@ -12,6 +12,8 @@ use Hermiod\Resource\Property\Validation\ResultInterface;
 /**
  * @no-named-arguments No backwards compatibility guaranteed
  * @internal No backwards compatibility guaranteed
+ *
+ * TODO: Add support for other date extensions like Laravel Carbon and Symfony DatePoint
  */
 final class DateTimeInterfaceProperty implements PropertyInterface
 {
@@ -55,10 +57,6 @@ final class DateTimeInterfaceProperty implements PropertyInterface
             return $this->error($path, $value);
         }
 
-        if (\strlen($value) === 4 && !\is_numeric($value)) {
-            return $this->error($path, $value);
-        }
-
         if (!\preg_match(self::ISO_8601_DATE_TIME_STRING, $value)) {
             return $this->error($path, $value);
         }
@@ -73,9 +71,9 @@ final class DateTimeInterfaceProperty implements PropertyInterface
 
     public function normaliseJsonValue(mixed $value): ?string
     {
-        return $this->format(
-            $this->normalise($value)
-        );
+        $normalised = $this->normalise($value);
+
+        return $normalised ? $this->format($normalised) : null;
     }
 
     private function normalise(mixed $value): ?\DateTimeInterface
@@ -92,7 +90,13 @@ final class DateTimeInterfaceProperty implements PropertyInterface
             throw InvalidDateTimeTypeException::new($value);
         }
 
-        if (\strlen($value) === 4 && \is_numeric($value)) {
+        $length = \strlen($value);
+
+        if ($length < 4) {
+            throw InvalidDateTimeValueException::new($value);
+        }
+
+        if ($length === 4 && \is_numeric($value)) {
             $value = \sprintf('%d-01-01T00:00:00', $value);
         }
 
@@ -105,9 +109,9 @@ final class DateTimeInterfaceProperty implements PropertyInterface
 
     private function format(\DateTimeInterface $date): string
     {
-        $format = (int)$date->format('v') > 0
-            ? self::ISO_8601_FORMAT_WITH_MILLISECONDS
-            : \DateTimeInterface::ATOM;
+        $format = $date->format('v') === '000'
+            ? \DateTimeInterface::ATOM
+            : self::ISO_8601_FORMAT_WITH_MILLISECONDS;
 
         return $date->format($format);
     }
@@ -116,9 +120,9 @@ final class DateTimeInterfaceProperty implements PropertyInterface
     {
         return new Validation\Result(
             \sprintf(
-                "%s must be an valid ISO8601 date-time string but '%s' given",
+                '%s must be an valid ISO8601 date-time string but %s given',
                 $path->__toString(),
-                \strtolower(\gettype($value)),
+                \is_string($value) ? \sprintf("'%s'", $value) : \get_debug_type($value),
             )
         );
     }

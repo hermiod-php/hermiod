@@ -7,7 +7,7 @@ namespace Hermiod\Resource\Property;
 use Hermiod\Attribute\Constraint\ArrayConstraintInterface;
 use Hermiod\Attribute\Constraint\ConstraintInterface;
 use Hermiod\Attribute\Constraint\NumberConstraintInterface;
-use Hermiod\Attribute\Constraint\ObjectConstraintInterface;
+use Hermiod\Attribute\Constraint\ObjectValueConstraintInterface;
 use Hermiod\Attribute\Constraint\ObjectKeyConstraintInterface;
 use Hermiod\Attribute\Constraint\StringConstraintInterface;
 use Hermiod\Resource\Property\Exception\UnsupportedPropertyTypeException;
@@ -27,10 +27,6 @@ final readonly class Factory implements FactoryInterface
     {
         $type = $property->getType();
 
-        if (null === $type) {
-            return $this->createMixedTypeProperty($property);
-        }
-
         if ($type instanceof \ReflectionIntersectionType) {
             return $this->createIntersectionProperty($property);
         }
@@ -42,7 +38,7 @@ final readonly class Factory implements FactoryInterface
         if ($type instanceof \ReflectionNamedType) {
             return $type->isBuiltin()
                 ? $this->createBuiltinProperty($type, $property)
-                : $this->createUserlandClassProperty($type, $property);
+                : $this->createClassProperty($type, $property);
         }
 
         return $this->createMixedTypeProperty($property);
@@ -51,22 +47,14 @@ final readonly class Factory implements FactoryInterface
     private function createBuiltInProperty(\ReflectionNamedType $type, \ReflectionProperty $reflection): PropertyInterface
     {
         return match ($type->getName()) {
-            'array' => $this->createArrayTypeProperty($reflection),
-            'bool' => $this->createBooleanTypeProperty($reflection),
-            'float' => $this->createFloatTypeProperty($reflection),
-            'int' => $this->createIntegerTypeProperty($reflection),
-            'object' => $this->createObjectTypeProperty($reflection),
-            'string' => $this->createStringTypeProperty($reflection),
+            'array' => $this->createArrayTypeProperty($type, $reflection),
+            'bool' => $this->createBooleanTypeProperty($type, $reflection),
+            'float' => $this->createFloatTypeProperty($type, $reflection),
+            'int' => $this->createIntegerTypeProperty($type, $reflection),
+            'object' => $this->createObjectTypeProperty($type, $reflection),
+            'string' => $this->createStringTypeProperty($type, $reflection),
             'mixed' => $this->createMixedTypeProperty($reflection),
-            default => throw UnsupportedPropertyTypeException::new($type->getName()),
-        };
-    }
-
-    private function createUserlandClassProperty(\ReflectionNamedType $type, \ReflectionProperty $reflection): PropertyInterface
-    {
-        return match ($type->getName()) {
-            \DateTime::class, \DateTimeInterface::class, \DateTimeImmutable::class => $this->createDateTimeInterfaceProperty($type, $reflection),
-            default => $this->createClassProperty($type, $reflection),
+            default => throw UnsupportedPropertyTypeException::noFactoryFor($type->getName()),
         };
     }
 
@@ -80,15 +68,14 @@ final readonly class Factory implements FactoryInterface
         return new StringProperty('Foo', false);
     }
 
-    private function createArrayTypeProperty(\ReflectionProperty $reflection): PropertyInterface
+    private function createArrayTypeProperty(\ReflectionNamedType $type, \ReflectionProperty $reflection): PropertyInterface
     {
         $name = $reflection->getName();
-        $nullable = $reflection->getType()?->allowsNull() ?? true;
         $default = $reflection->getDefaultValue();
 
         $property = $reflection->hasDefaultValue()
-            ? ArrayProperty::withDefaultValue($name, $nullable, \is_array($default) ? $default : null)
-            : new ArrayProperty($name, $nullable);
+            ? ArrayProperty::withDefaultValue($name, $type->allowsNull(), \is_array($default) ? $default : [])
+            : new ArrayProperty($name, $type->allowsNull());
 
         foreach ($this->loadConstraintAttributes($reflection, ArrayConstraintInterface::class) as $constraint) {
             $property = $property->withConstraint($constraint);
@@ -97,46 +84,43 @@ final readonly class Factory implements FactoryInterface
         return $property;
     }
 
-    private function createObjectTypeProperty(\ReflectionProperty $reflection): PropertyInterface
+    private function createObjectTypeProperty(\ReflectionNamedType $type, \ReflectionProperty $reflection): PropertyInterface
     {
         $name = $reflection->getName();
-        $nullable = $reflection->getType()?->allowsNull() ?? true;
 
-        $property = new ObjectProperty($name, $nullable);
+        $property = new ObjectProperty($name, $type->allowsNull());
 
         foreach ($this->loadConstraintAttributes($reflection, ObjectKeyConstraintInterface::class) as $constraint) {
             $property = $property->withKeyConstraint($constraint);
         }
 
-        foreach ($this->loadConstraintAttributes($reflection, ObjectConstraintInterface::class) as $constraint) {
+        foreach ($this->loadConstraintAttributes($reflection, ObjectValueConstraintInterface::class) as $constraint) {
             $property = $property->withValueConstraint($constraint);
         }
 
         return $property;
     }
 
-    private function createBooleanTypeProperty(\ReflectionProperty $reflection): PropertyInterface
+    private function createBooleanTypeProperty(\ReflectionNamedType $type, \ReflectionProperty $reflection): PropertyInterface
     {
         $name = $reflection->getName();
-        $nullable = $reflection->getType()?->allowsNull() ?? true;
         $default = $reflection->getDefaultValue();
 
         $property = $reflection->hasDefaultValue()
-            ? BooleanProperty::withDefaultValue($name, $nullable, \is_bool($default) ? $default : null)
-            : new BooleanProperty($name, $nullable);
+            ? BooleanProperty::withDefaultValue($name, $type->allowsNull(), \is_bool($default) ? $default : false)
+            : new BooleanProperty($name, $type->allowsNull());
 
         return $property;
     }
 
-    private function createIntegerTypeProperty(\ReflectionProperty $reflection): PropertyInterface
+    private function createIntegerTypeProperty(\ReflectionNamedType $type, \ReflectionProperty $reflection): PropertyInterface
     {
         $name = $reflection->getName();
-        $nullable = $reflection->getType()?->allowsNull() ?? true;
         $default = $reflection->getDefaultValue();
 
         $property = $reflection->hasDefaultValue()
-            ? IntegerProperty::withDefaultValue($name, $nullable, \is_int($default) ? $default : null)
-            : new IntegerProperty($name, $nullable);
+            ? IntegerProperty::withDefaultValue($name, $type->allowsNull(), \is_int($default) ? $default : 0)
+            : new IntegerProperty($name, $type->allowsNull());
 
         foreach ($this->loadConstraintAttributes($reflection, NumberConstraintInterface::class) as $constraint) {
             $property = $property->withConstraint($constraint);
@@ -145,15 +129,14 @@ final readonly class Factory implements FactoryInterface
         return $property;
     }
 
-    private function createFloatTypeProperty(\ReflectionProperty $reflection): PropertyInterface
+    private function createFloatTypeProperty(\ReflectionNamedType $type, \ReflectionProperty $reflection): PropertyInterface
     {
         $name = $reflection->getName();
-        $nullable = $reflection->getType()?->allowsNull() ?? true;
         $default = $reflection->getDefaultValue();
 
         $property = $reflection->hasDefaultValue()
-            ? FloatProperty::withDefaultValue($name, $nullable, \is_float($default) || \is_int($default) ? $default : null)
-            : new FloatProperty($name, $nullable);
+            ? FloatProperty::withDefaultValue($name, $type->allowsNull(), \is_float($default) || \is_int($default) ? $default : 0.0)
+            : new FloatProperty($name, $type->allowsNull());
 
         foreach ($this->loadConstraintAttributes($reflection, NumberConstraintInterface::class) as $constraint) {
             $property = $property->withConstraint($constraint);
@@ -162,15 +145,14 @@ final readonly class Factory implements FactoryInterface
         return $property;
     }
 
-    private function createStringTypeProperty(\ReflectionProperty $reflection): PropertyInterface
+    private function createStringTypeProperty(\ReflectionNamedType $type, \ReflectionProperty $reflection): PropertyInterface
     {
         $name = $reflection->getName();
-        $nullable = $reflection->getType()?->allowsNull() ?? true;
         $default = $reflection->getDefaultValue();
 
         $property = $reflection->hasDefaultValue()
-            ? StringProperty::withDefaultValue($name, $nullable, \is_string($default) ? $default : null)
-            : new StringProperty($name, $nullable);
+            ? StringProperty::withDefaultValue($name, $type->allowsNull(), \is_string($default) ? $default : '')
+            : new StringProperty($name, $type->allowsNull());
 
         foreach ($this->loadConstraintAttributes($reflection, StringConstraintInterface::class) as $constraint) {
             $property = $property->withConstraint($constraint);
@@ -183,32 +165,44 @@ final readonly class Factory implements FactoryInterface
     {
         $name = $reflection->getName();
 
-        return $reflection->hasDefaultValue()
-            ? MixedProperty::withDefaultValue($name, $reflection->getDefaultValue())
-            : new MixedProperty($name);
+        if ($reflection->hasDefaultValue()) {
+            return MixedProperty::withDefaultValue($name, $reflection->getDefaultValue());
+        }
+
+        return new MixedProperty($name);
     }
 
+    /**
+     * TODO: Add support for other date extensions like Laravel Carbon and Symfony DatePoint
+     */
     private function createDateTimeInterfaceProperty(\ReflectionNamedType $type, \ReflectionProperty $reflection): PropertyInterface
     {
         $name = $reflection->getName();
-        $nullable = $type->allowsNull();
 
-        return $reflection->hasDefaultValue()
-            ? DateTimeInterfaceProperty::withDefaultNullValue($name, $nullable)
-            : new DateTimeInterfaceProperty($name, $nullable);
+        if ($reflection->hasDefaultValue()) {
+            return DateTimeInterfaceProperty::withDefaultNullValue($name);
+        }
+
+        return new DateTimeInterfaceProperty($name, $type->allowsNull());
     }
 
     private function createClassProperty(\ReflectionNamedType $type, \ReflectionProperty $reflection): PropertyInterface
     {
-        $name = $reflection->getName();
-        $nullable = $type->allowsNull();
-
         /** @var class-string $class */
         $class = $type->getName();
 
-        return $reflection->hasDefaultValue()
-            ? ClassProperty::withDefaultNullValue($name, $class, $nullable, $this->resources)
-            : new ClassProperty($name, $class, $nullable, $this->resources);
+        if (\is_a($class, \DateTimeInterface::class, true)) {
+            return $this->createDateTimeInterfaceProperty($type, $reflection);
+        }
+
+        $name = $reflection->getName();
+        $nullable = $type->allowsNull();
+
+        if ($reflection->hasDefaultValue()) {
+            return ClassProperty::withDefaultNullValue($name, $class, $nullable, $this->resources);
+        }
+
+        return new ClassProperty($name, $class, $nullable, $this->resources);
     }
 
     /**
@@ -226,17 +220,13 @@ final readonly class Factory implements FactoryInterface
         $attributes = [];
 
         foreach ($reflection->getAttributes($class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
-            $name = $attribute->getName();
-
-            if (!isset($attributes[$name])) {
-                $attributes[$name] = $this->constraints->createConstraint(
-                    $name,
-                    $attribute->getArguments(),
-                );
-            }
+            $attributes[] = $this->constraints->createConstraint(
+                $attribute->getName(),
+                $attribute->getArguments(),
+            );
         }
 
         /** @var TAttribute[] $attributes */
-        return \array_values($attributes);
+        return $attributes;
     }
 }

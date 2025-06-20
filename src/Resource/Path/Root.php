@@ -28,7 +28,7 @@ final class Root implements PathInterface
     {
         $key = \trim($key);
 
-        if (empty($key)) {
+        if (\strlen($key) === 0) {
             throw EmptyJsonPathObjectKeyException::new($this, $key);
         }
 

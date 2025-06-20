@@ -95,20 +95,20 @@ class TransposerTest extends TestCase
         );
 
         $this->assertArrayContains('$.privateStringWithoutDefaultNotNullable must be a string but null given', $errors);
-        $this->assertArrayContains('$.protectedStringWithoutDefaultNotNullable must be a string but integer given', $errors);
+        $this->assertArrayContains('$.protectedStringWithoutDefaultNotNullable must be a string but int given', $errors);
         $this->assertArrayContains('$.publicStringWithoutDefaultNotNullable must be a string but array given', $errors);
 
-        $this->assertArrayContains('$.privateStringWithDefaultNotNullable must be a string but object given', $errors);
-        $this->assertArrayContains('$.protectedStringWithDefaultNotNullable must be a string but boolean given', $errors);
-        $this->assertArrayContains('$.publicStringWithDefaultNotNullable must be a string but double given', $errors);
+        $this->assertArrayContains('$.privateStringWithDefaultNotNullable must be a string but stdClass given', $errors);
+        $this->assertArrayContains('$.protectedStringWithDefaultNotNullable must be a string but bool given', $errors);
+        $this->assertArrayContains('$.publicStringWithDefaultNotNullable must be a string but float given', $errors);
 
-        $this->assertArrayContains('$.privateStringWithoutDefaultNullable must be a string but boolean given', $errors);
-        $this->assertArrayContains('$.protectedStringWithoutDefaultNullable must be a string but integer given', $errors);
+        $this->assertArrayContains('$.privateStringWithoutDefaultNullable must be a string but bool given', $errors);
+        $this->assertArrayContains('$.protectedStringWithoutDefaultNullable must be a string but int given', $errors);
         $this->assertArrayContains('$.publicStringWithoutDefaultNullable must be a string but array given', $errors);
 
-        $this->assertArrayContains('$.privateStringWithDefaultNullable must be a string but integer given', $errors);
-        $this->assertArrayContains('$.protectedStringWithDefaultNullable must be a string but boolean given', $errors);
-        $this->assertArrayContains('$.publicStringWithDefaultNullable must be a string but integer given', $errors);
+        $this->assertArrayContains('$.privateStringWithDefaultNullable must be a string but int given', $errors);
+        $this->assertArrayContains('$.protectedStringWithDefaultNullable must be a string but bool given', $errors);
+        $this->assertArrayContains('$.publicStringWithDefaultNullable must be a string but int given', $errors);
 
         $this->assertArrayContains("$.stringWithAttrRegex must must match regex '/foo/' but ' ' given", $errors);
         $this->assertArrayContains("$.stringWithAttrUuid must be a UUID string but 'not-a-uuid' given", $errors);

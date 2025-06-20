@@ -73,7 +73,7 @@ final class FloatProperty implements PropertyInterface
                 \sprintf(
                     '%s must be a float but %s given',
                     $path->__toString(),
-                    \strtolower(\gettype($value)),
+                    \get_debug_type($value),
                 )
             );
         }

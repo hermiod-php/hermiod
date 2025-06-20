@@ -64,7 +64,7 @@ final class StringProperty implements PropertyInterface
                 \sprintf(
                     '%s must be a string but %s given',
                     $path->__toString(),
-                    \strtolower(\gettype($value)),
+                    \get_debug_type($value),
                 )
             );
         }

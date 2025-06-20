@@ -29,7 +29,7 @@ final class StringInList implements StringConstraintInterface
     public function getMismatchExplanation(PathInterface $path, string $value): string
     {
         return \sprintf(
-            "%s must be one of [ '%s' ] but %s given",
+            "%s must be one of [ '%s' ] but '%s' given",
             $path->__toString(),
             \implode("', '", $this->values),
             $value,

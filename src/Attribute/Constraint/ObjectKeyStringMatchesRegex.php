@@ -29,7 +29,7 @@ final class ObjectKeyStringMatchesRegex implements ObjectKeyConstraintInterface
             'All keys of %s must match the regex %s but "%s" given',
             $path->__toString(),
             $this->regex,
-            $key
+            $key,
         );
     }
 }

@@ -7,7 +7,7 @@ namespace Hermiod\Attribute\Constraint;
 use Hermiod\Attribute\Constraint\Traits\MapValueIsInteger;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-final class ObjectValueIsInteger implements ObjectConstraintInterface
+final class ObjectValueIsInteger implements ObjectValueConstraintInterface
 {
     use MapValueIsInteger;
 }

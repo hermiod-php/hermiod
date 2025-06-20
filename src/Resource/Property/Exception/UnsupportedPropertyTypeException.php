@@ -10,7 +10,7 @@ namespace Hermiod\Resource\Property\Exception;
  */
 final class UnsupportedPropertyTypeException extends \InvalidArgumentException implements Exception
 {
-    public static function new(string $type): self
+    public static function noFactoryFor(string $type): self
     {
         return new self(
             \sprintf(

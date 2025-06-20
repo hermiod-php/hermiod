@@ -8,7 +8,7 @@ namespace Hermiod\Resource\Path;
  * @no-named-arguments No backwards compatibility guaranteed
  * @internal No backwards compatibility guaranteed
  */
-interface PathInterface
+interface PathInterface extends \Stringable
 {
     public function __toString(): string;
 

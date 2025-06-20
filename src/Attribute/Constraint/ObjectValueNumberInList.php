@@ -7,7 +7,7 @@ namespace Hermiod\Attribute\Constraint;
 use Hermiod\Attribute\Constraint\Traits\MapValueNumberInList;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-final class ObjectValueNumberInList implements ObjectConstraintInterface
+final class ObjectValueNumberInList implements ObjectValueConstraintInterface
 {
     use MapValueNumberInList;
 }

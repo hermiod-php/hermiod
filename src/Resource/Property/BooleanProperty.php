@@ -61,7 +61,7 @@ final class BooleanProperty implements PropertyInterface
             \sprintf(
                 '%s must be a boolean but %s given',
                 $path->__toString(),
-                \strtolower(\gettype($value)),
+                \get_debug_type($value),
             )
         );
     }

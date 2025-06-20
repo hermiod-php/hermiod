@@ -7,7 +7,7 @@ namespace Hermiod\Attribute\Constraint;
 use Hermiod\Attribute\Constraint\Traits\MapValueStringIsUuid;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-final class ObjectValueStringIsUuid implements ObjectConstraintInterface
+final class ObjectValueStringIsUuid implements ObjectValueConstraintInterface
 {
     use MapValueStringIsUuid;
 }

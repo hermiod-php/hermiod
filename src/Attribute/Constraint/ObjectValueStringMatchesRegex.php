@@ -7,7 +7,7 @@ namespace Hermiod\Attribute\Constraint;
 use Hermiod\Attribute\Constraint\Traits\MapValueStringMatchesRegex;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-final class ObjectValueStringMatchesRegex implements ObjectConstraintInterface
+final class ObjectValueStringMatchesRegex implements ObjectValueConstraintInterface
 {
     use MapValueStringMatchesRegex;
 }

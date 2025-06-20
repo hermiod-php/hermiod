@@ -32,7 +32,7 @@ final class NumberInList implements NumberConstraintInterface
             '%s must be one of [ %s ] but %s given',
             $path->__toString(),
             \implode(', ', $this->values),
-            \gettype($value),
+            $value,
         );
     }
 }

@@ -7,7 +7,7 @@ namespace Hermiod\Attribute\Constraint;
 use Hermiod\Attribute\Constraint\Traits\MapValueNumberGreaterThanOrEqual;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-final class ObjectValueNumberGreaterThanOrEqual implements ObjectConstraintInterface
+final class ObjectValueNumberGreaterThanOrEqual implements ObjectValueConstraintInterface
 {
     use MapValueNumberGreaterThanOrEqual;
 }

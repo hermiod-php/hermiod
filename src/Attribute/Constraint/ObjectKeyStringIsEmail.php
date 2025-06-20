@@ -23,7 +23,7 @@ final class ObjectKeyStringIsEmail implements ObjectKeyConstraintInterface
         return \sprintf(
             'All keys of %s must be valid email addresses but "%s" given',
             $path->__toString(),
-            $key
+            $key,
         );
     }
 }

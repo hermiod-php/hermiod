@@ -23,7 +23,7 @@ final class ObjectKeyStringIsUuid implements ObjectKeyConstraintInterface
         return \sprintf(
             'All keys of %s must be valid UUIDs but "%s" given',
             $path->__toString(),
-            $key
+            $key,
         );
     }
 }

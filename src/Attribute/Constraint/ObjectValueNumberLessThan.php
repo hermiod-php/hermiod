@@ -7,7 +7,7 @@ namespace Hermiod\Attribute\Constraint;
 use Hermiod\Attribute\Constraint\Traits\MapValueNumberLessThan;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-final class ObjectValueNumberLessThan implements ObjectConstraintInterface
+final class ObjectValueNumberLessThan implements ObjectValueConstraintInterface
 {
     use MapValueNumberLessThan;
 }

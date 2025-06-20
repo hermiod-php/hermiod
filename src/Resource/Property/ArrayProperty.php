@@ -20,7 +20,7 @@ final class ArrayProperty implements PropertyInterface
     /**
      * @var array<int|string, mixed>|null
      */
-    private array|null $default;
+    private array|null $default = null;
 
     private bool $hasDefault = false;
 
@@ -88,7 +88,7 @@ final class ArrayProperty implements PropertyInterface
                     '%s must be an array%s but %s given',
                     $path->__toString(),
                     $this->nullable ? ' or null' : '',
-                    \strtolower(\gettype($value)),
+                    \get_debug_type($value),
                 )
             );
         }
@@ -97,36 +97,52 @@ final class ArrayProperty implements PropertyInterface
             return new Validation\Result();
         }
 
-        /** @var array<int, mixed> $value */
+        /** @var array<int|string, mixed> $value */
+        $list = \array_is_list($value);
+        $errors = [];
+
         foreach ($value as $key => $item) {
-            $result = $this->checkElementAgainstConstraints($path->withArrayKey($key), $item);
+            $results = $this->checkElementAgainstConstraints(
+                $list ? $path->withArrayKey((int) $key) : $path->withObjectKey((string) $key),
+                $item,
+            );
 
-            if ($result !== null) {
-                return new Validation\Result($result);
-            }
+            $errors = \array_merge($errors, $results);
         }
 
-        return new Validation\Result();
+        return new Validation\Result(...$errors);
     }
 
-    public function normalisePhpValue(mixed $value): mixed
+    /**
+     * @return array<mixed, mixed>
+     */
+    public function normalisePhpValue(mixed $value): ?array
     {
-        if (null === $value && $this->hasDefaultValue()) {
-            return $this->getDefaultValue();
+        if (\is_array($value)) {
+            return $value;
         }
 
-        return $value;
+        if (\is_object($value)) {
+            return \get_object_vars($value);
+        }
+
+        return $this->hasDefaultValue() ? $this->getDefaultValue() : [];
     }
 
-    private function checkElementAgainstConstraints(PathInterface $path, mixed $value): ?string
+    /**
+     * @return list<string>
+     */
+    private function checkElementAgainstConstraints(PathInterface $path, mixed $value): array
     {
+        $errors = [];
+
         foreach ($this->constraints as $constraint) {
             if (!$constraint->mapValueMatchesConstraint($value)) {
-                return $constraint->getMismatchExplanation($path, $value);
+                $errors[] = $constraint->getMismatchExplanation($path, $value);
             }
         }
 
-        return null;
+        return $errors;
     }
 
     private function isPossibleValue(mixed $value): bool
