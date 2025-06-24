@@ -6,7 +6,7 @@ namespace Hermiod\Resource\Property;
 
 use Hermiod\Resource\Path\PathInterface;
 use Hermiod\Resource;
-use MongoDB\BSON\Type;
+use Hermiod\Resource\Property\Exception\PropertyClassTypeNotFoundException;
 
 /**
  * @no-named-arguments No backwards compatibility guaranteed
@@ -31,7 +31,12 @@ final class ClassProperty implements PropertyInterface, Resource\ResourceInterfa
      *
      * @return self<Type>
      */
-    public static function withDefaultNullValue(string $name, string $class, bool $nullable, Resource\FactoryInterface $factory): self
+    public static function withDefaultNullValue(
+        string $name,
+        string $class,
+        bool $nullable,
+        Resource\FactoryInterface $factory,
+    ): self
     {
         $property = new self($name, $class, $nullable, $factory);
 
@@ -53,7 +58,10 @@ final class ClassProperty implements PropertyInterface, Resource\ResourceInterfa
         $this->setName($name);
 
         if (!\class_exists($this->class)) {
-            throw new \RuntimeException("Class '$class' does not exist");
+            throw PropertyClassTypeNotFoundException::forTypedClassProperty(
+                $this->name,
+                $this->class,
+            );
         }
     }
 
@@ -67,14 +75,32 @@ final class ClassProperty implements PropertyInterface, Resource\ResourceInterfa
         return $this->hasDefault;
     }
 
-    public function normalisePhpValue(mixed $value): mixed
-    {
-        return $value;
-    }
-
     public function normaliseJsonValue(mixed $value): mixed
     {
-        return $value;
+        if (!\is_object($value)) {
+            return null;
+        }
+
+        if (!$value instanceof $this->class) {
+            return null;
+        }
+
+        if ($value instanceof \JsonSerializable) {
+            return $value->jsonSerialize();
+        }
+
+        $encoded = [];
+        $reflection = new \ReflectionClass($value);
+
+        foreach ($this->getInnerResource()->getProperties() as $property) {
+            $name = $property->getPropertyName();
+
+            $encoded[$name] = $property->normaliseJsonValue(
+                $reflection->getProperty($name)->getValue()
+            );
+        }
+
+        return (object) $encoded;
     }
 
     public function checkValueAgainstConstraints(PathInterface $path, mixed $value): Validation\ResultInterface
@@ -100,6 +126,9 @@ final class ClassProperty implements PropertyInterface, Resource\ResourceInterfa
         return $this->resource ??= $this->factory->createResourceForClass($this->class);
     }
 
+    /**
+     * @return CollectionInterface<PropertyInterface>
+     */
     public function getProperties(): CollectionInterface
     {
         return $this->getInnerResource()->getProperties();

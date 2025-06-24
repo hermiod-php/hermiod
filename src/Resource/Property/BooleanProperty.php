@@ -11,7 +11,7 @@ use Hermiod\Resource\Property\Exception\InvalidDefaultValueException;
  * @no-named-arguments No backwards compatibility guaranteed
  * @internal No backwards compatibility guaranteed
  */
-final class BooleanProperty implements PropertyInterface
+final class BooleanProperty implements PropertyInterface, PrimitiveInterface
 {
     use Traits\ConstructWithNameAndNullableTrait;
     use Traits\ConvertToSameJsonValue;

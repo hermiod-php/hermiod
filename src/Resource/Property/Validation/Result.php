@@ -37,19 +37,7 @@ final class Result implements ResultInterface
     {
         $copy = clone $this;
 
-        $copy->validationErrors = \array_merge($this->validationErrors, $error);
-
-        return $copy;
-    }
-
-    public function withMergedResult(ResultInterface $result): ResultInterface
-    {
-        $copy = clone $this;
-
-        $copy->validationErrors = \array_merge(
-            $copy->validationErrors,
-            $result->getValidationErrors(),
-        );
+        $copy->validationErrors = \array_merge($copy->validationErrors, $error);
 
         return $copy;
     }

@@ -8,7 +8,7 @@ namespace Hermiod\Resource;
  * @no-named-arguments No backwards compatibility guaranteed
  * @internal No backwards compatibility guaranteed
  */
-final class Factory implements FactoryInterface
+final readonly class Factory implements FactoryInterface
 {
     public function __construct(
         private Property\FactoryInterface $properties,

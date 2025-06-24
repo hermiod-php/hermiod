@@ -74,7 +74,7 @@ final readonly class Factory implements FactoryInterface
         $default = $reflection->getDefaultValue();
 
         $property = $reflection->hasDefaultValue()
-            ? ArrayProperty::withDefaultValue($name, $type->allowsNull(), \is_array($default) ? $default : [])
+            ? ArrayProperty::withDefaultValue($name, $type->allowsNull(), \is_array($default) ? $default : null)
             : new ArrayProperty($name, $type->allowsNull());
 
         foreach ($this->loadConstraintAttributes($reflection, ArrayConstraintInterface::class) as $constraint) {
@@ -107,7 +107,7 @@ final readonly class Factory implements FactoryInterface
         $default = $reflection->getDefaultValue();
 
         $property = $reflection->hasDefaultValue()
-            ? BooleanProperty::withDefaultValue($name, $type->allowsNull(), \is_bool($default) ? $default : false)
+            ? BooleanProperty::withDefaultValue($name, $type->allowsNull(), \is_bool($default) ? $default : null)
             : new BooleanProperty($name, $type->allowsNull());
 
         return $property;
@@ -119,7 +119,7 @@ final readonly class Factory implements FactoryInterface
         $default = $reflection->getDefaultValue();
 
         $property = $reflection->hasDefaultValue()
-            ? IntegerProperty::withDefaultValue($name, $type->allowsNull(), \is_int($default) ? $default : 0)
+            ? IntegerProperty::withDefaultValue($name, $type->allowsNull(), \is_int($default) ? $default : null)
             : new IntegerProperty($name, $type->allowsNull());
 
         foreach ($this->loadConstraintAttributes($reflection, NumberConstraintInterface::class) as $constraint) {
@@ -135,7 +135,7 @@ final readonly class Factory implements FactoryInterface
         $default = $reflection->getDefaultValue();
 
         $property = $reflection->hasDefaultValue()
-            ? FloatProperty::withDefaultValue($name, $type->allowsNull(), \is_float($default) || \is_int($default) ? $default : 0.0)
+            ? FloatProperty::withDefaultValue($name, $type->allowsNull(), \is_float($default) || \is_int($default) ? $default : null)
             : new FloatProperty($name, $type->allowsNull());
 
         foreach ($this->loadConstraintAttributes($reflection, NumberConstraintInterface::class) as $constraint) {
@@ -151,7 +151,7 @@ final readonly class Factory implements FactoryInterface
         $default = $reflection->getDefaultValue();
 
         $property = $reflection->hasDefaultValue()
-            ? StringProperty::withDefaultValue($name, $type->allowsNull(), \is_string($default) ? $default : '')
+            ? StringProperty::withDefaultValue($name, $type->allowsNull(), \is_string($default) ? $default : null)
             : new StringProperty($name, $type->allowsNull());
 
         foreach ($this->loadConstraintAttributes($reflection, StringConstraintInterface::class) as $constraint) {

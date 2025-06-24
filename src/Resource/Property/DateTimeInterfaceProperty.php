@@ -15,7 +15,7 @@ use Hermiod\Resource\Property\Validation\ResultInterface;
  *
  * TODO: Add support for other date extensions like Laravel Carbon and Symfony DatePoint
  */
-final class DateTimeInterfaceProperty implements PropertyInterface
+final class DateTimeInterfaceProperty implements PropertyInterface, PrimitiveInterface
 {
     use Traits\ConstructWithNameAndNullableTrait;
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Hermiod\Resource;
 
 use Hermiod\Exception\TooMuchRecursionException;
+use Hermiod\Resource\Property\PrimitiveInterface;
 
 /**
  * @no-named-arguments No backwards compatibility guaranteed
@@ -56,76 +57,29 @@ final class Resource implements ResourceInterface
     {
         $result = new Property\Validation\Result();
 
-        return \is_array($json)
-            ? $this->validateAndTransposeArray($path, $this->getProperties(), $result, $json)
-            : $this->validateAndTransposeObject($path, $this->getProperties(), $result, $json);
-    }
-
-    private function validateAndTransposeObject(
-        Path\PathInterface $path,
-        Property\CollectionInterface $properties,
-        Property\Validation\ResultInterface $result,
-        object $json,
-    ): Property\Validation\ResultInterface
-    {
-        if (++self::$depth > self::$maxRecursion) {
-            throw TooMuchRecursionException::new(self::$maxRecursion);
-        }
-
-        $list = \get_object_vars($json);
-
-        foreach ($list as $key => $data) {
-            $property = $properties->offsetGet($key);
-            $next = $path->withObjectKey($key);
-
-            // TODO: Allow for optional key overloading
-            if (!$property) {
-                $result = $result->withErrors(
-                    \sprintf(
-                        'Property %s is not permitted',
-                        $next->__toString(),
-                    )
-                );
-
-                continue;
-            }
-
-            // Validate the value against the constraints
-            $check = $property->checkValueAgainstConstraints($next, $data);
-
-            if (!$check->isValid()) {
-                $result = $result->withErrors(...$check->getValidationErrors());
-
-                continue;
-            }
-
-            // Transpose valid values if structure is still valid
-            if ($result->isValid()) {
-                unset($json->{$key});
-                $json->{$property->getPropertyName()} = $property->normalisePhpValue($data);
-            }
-        }
-
-        --self::$depth;
-
-        return $result;
+        return $this->recurse(
+            $path,
+            $this->getProperties(),
+            $result,
+            $json,
+        );
     }
 
     /**
-     * @param array<mixed, mixed> $json
+     * @param object|array<mixed, mixed> $json
      */
-    private function validateAndTransposeArray(
+    private function recurse(
         Path\PathInterface $path,
         Property\CollectionInterface $properties,
         Property\Validation\ResultInterface $result,
-        array &$json,
+        object|array &$json,
     ): Property\Validation\ResultInterface
     {
         if (++self::$depth > self::$maxRecursion) {
             throw TooMuchRecursionException::new(self::$maxRecursion);
         }
 
-        $list = $json;
+        $list = \is_object($json) ? \get_object_vars($json) : $json;
 
         foreach ($list as $key => $data) {
             $property = $properties->offsetGet($key);
@@ -135,7 +89,7 @@ final class Resource implements ResourceInterface
             if (!$property) {
                 $result = $result->withErrors(
                     \sprintf(
-                        'Property %s is not permitted',
+                        "Property '%s' is not permitted",
                         $next->__toString(),
                     )
                 );
@@ -152,10 +106,28 @@ final class Resource implements ResourceInterface
                 continue;
             }
 
-            // Transpose valid values if structure is still valid
-            if ($result->isValid()) {
+            if ($property instanceof PrimitiveInterface) {
+                if (\is_object($json)) {
+                    unset($json->{$key});
+                    $json->{$property->getPropertyName()} = $property->normalisePhpValue($data);
+
+                    continue;
+                }
+
                 unset($json[$key]);
                 $json[$property->getPropertyName()] = $property->normalisePhpValue($data);
+
+                continue;
+            }
+
+            if (!\is_array($data) && !\is_object($data)) {
+                continue;
+            }
+
+            if ($property instanceof ResourceInterface) {
+                $result = $result->withErrors(
+                    ...$property->validateAndTranspose($next, $data)->getValidationErrors()
+                );
             }
         }
 

@@ -50,7 +50,7 @@ class ResourceSuccessTest extends TestCase
         $this->assertInstanceOf(
             $class,
             $property,
-            \sprintf('Property %s::%s was not parsed into a %s', $fake, $name, $class)
+            \sprintf('Property %s->%s was not parsed into a %s', $fake, $name, $class)
         );
 
         $this->assertSame($name, $property->getPropertyName());

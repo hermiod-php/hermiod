@@ -10,7 +10,7 @@ use Hermiod\Resource\Path\PathInterface;
  * @no-named-arguments No backwards compatibility guaranteed
  * @internal No backwards compatibility guaranteed
  */
-final class MixedProperty implements PropertyInterface
+final class MixedProperty implements PropertyInterface, PrimitiveInterface
 {
     use Traits\ConvertToSameJsonValue;
 

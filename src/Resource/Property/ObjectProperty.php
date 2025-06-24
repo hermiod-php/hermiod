@@ -12,7 +12,7 @@ use Hermiod\Resource\Path\PathInterface;
  * @no-named-arguments No backwards compatibility guaranteed
  * @internal No backwards compatibility guaranteed
  */
-final class ObjectProperty implements PropertyInterface
+final class ObjectProperty implements PropertyInterface, PrimitiveInterface
 {
     use Traits\ConstructWithNameAndNullableTrait;
     use Traits\ConvertToSameJsonValue;

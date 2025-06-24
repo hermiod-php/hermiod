@@ -511,6 +511,7 @@ final class FactoryTest extends TestCase
         $mock->method('getName')->willReturn($name);
         $mock->method('getType')->willReturn($type);
         $mock->method('hasDefaultValue')->willReturn($hasDefault);
+        $mock->method('hasDefaultValue')->willReturn($hasDefault);
 
         if ($hasDefault) {
             $mock->method('getDefaultValue')->willReturn($defaultValue);
@@ -522,7 +523,7 @@ final class FactoryTest extends TestCase
     private function createReflectionNamedTypeMock(
         string $name,
         bool $isBuiltIn = true,
-        bool $allowsNull = false,
+        bool $allowsNull = true,
     ): \ReflectionNamedType & MockObject
     {
         $mock = $this->createMock(\ReflectionNamedType::class);

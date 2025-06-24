@@ -10,8 +10,6 @@ namespace Hermiod\Resource;
  */
 final class ProxyCallbackFactory implements FactoryInterface
 {
-    private FactoryInterface $factory;
-
     public function __construct(
         private readonly \Closure $resolver
     ) {}
@@ -23,16 +21,7 @@ final class ProxyCallbackFactory implements FactoryInterface
 
     private function getFactory(): FactoryInterface
     {
-        if (isset($this->factory)) {
-            return $this->factory;
-        }
-
-        $factory = $this->resolver->__invoke();
-
-        if (!$factory instanceof FactoryInterface) {
-            throw new \RuntimeException();
-        }
-
-        return $this->factory = $factory;
+        /** @phpstan-ignore return.type */
+        return $this->resolver->__invoke();
     }
 }

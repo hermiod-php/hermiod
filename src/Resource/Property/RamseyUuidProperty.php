@@ -16,7 +16,7 @@ use Ramsey\Uuid\UuidInterface;
  * @no-named-arguments No backwards compatibility guaranteed
  * @internal No backwards compatibility guaranteed
  */
-final class RamseyUuidProperty implements PropertyInterface
+final class RamseyUuidProperty implements PropertyInterface, PrimitiveInterface
 {
     use Traits\ConstructWithNameAndNullableTrait;
 

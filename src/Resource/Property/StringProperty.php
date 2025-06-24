@@ -12,7 +12,7 @@ use Hermiod\Resource\Property\Exception\InvalidDefaultValueException;
  * @no-named-arguments No backwards compatibility guaranteed
  * @internal No backwards compatibility guaranteed
  */
-final class StringProperty implements PropertyInterface
+final class StringProperty implements PropertyInterface, PrimitiveInterface
 {
     use Traits\ConstructWithNameAndNullableTrait;
     use Traits\ConvertToSameJsonValue;
