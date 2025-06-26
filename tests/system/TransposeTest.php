@@ -6,14 +6,14 @@ namespace Hermiod\Tests\System;
 
 use Hermiod\Exception\TooMuchRecursionException;
 use Hermiod\Resource\Resource;
-use Hermiod\ResourceManager;
+use Hermiod\Converter;
 use Hermiod\Tests\System\Fakes\RecursiveTestClass;
 use Hermiod\Tests\Integration\Fakes\StringPropertiesFake;
 use PHPUnit\Framework\Attributes\Medium;
 use PHPUnit\Framework\TestCase;
 
 #[Medium]
-class TransposerTest extends TestCase
+class TransposeTest extends TestCase
 {
     public function testSuccessfulHydrate(): void
     {
@@ -45,9 +45,9 @@ class TransposerTest extends TestCase
             'stringWithAttrEmailAndRegex' => 'bar@foo.com',
         ];
 
-        $transposer = ResourceManager::create()->getResource(StringPropertiesFake::class);
+        $transposer = Converter::create();
 
-        $class = $transposer->unserialize($json)->getInstance();
+        $class = $transposer->toClass(StringPropertiesFake::class, $json);
 
         $this->assertInstanceOf(StringPropertiesFake::class, $class);
         $this->assertSame($json, $class->list());
@@ -83,9 +83,9 @@ class TransposerTest extends TestCase
             'stringWithAttrEmailAndRegex' => 'holy@mackrel...foo',
         ];
 
-        $transposer = ResourceManager::create()->getResource(StringPropertiesFake::class);
+        $transposer = Converter::create();
 
-        $result = $transposer->unserialize($json);
+        $result = $transposer->tryToClass(StringPropertiesFake::class, $json);
 
         $this->assertFalse($result->isValid());
 
@@ -137,14 +137,14 @@ class TransposerTest extends TestCase
         $reflection = new \ReflectionClass(Resource::class);
         $reflection->setStaticPropertyValue('maxRecursion', 25);
 
-        $transposer = ResourceManager::create()->getResource(RecursiveTestClass::class);
+        $transposer = Converter::create();
 
         $this->expectException(TooMuchRecursionException::class);
         $this->expectExceptionMessage('Exceeded the maximum object depth of 25 nested objects');
 
         $json = [];
 
-        $transposer->unserialize($generate($json, 0))->getInstance();
+        $transposer->tryToClass(RecursiveTestClass::class, $generate($json, 0))->getInstance();
     }
 
     private function assertArrayContains(string $needle, array $haystack): void

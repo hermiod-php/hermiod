@@ -9,13 +9,8 @@ final class Property implements PropertyInterface
 {
     public function __construct(
         private ?string $name = null,
-        private ?string $concrete = null,
     )
     {
-        if ($this->concrete !== null && !\class_exists($this->concrete)) {
-            throw new \Exception();
-        }
-
         if ($this->name === null) {
             return;
         }
@@ -30,10 +25,5 @@ final class Property implements PropertyInterface
     public function getNameOverride(): ?string
     {
         return $this->name;
-    }
-
-    public function getConcrete(): ?string
-    {
-        return $this->concrete;
     }
 }

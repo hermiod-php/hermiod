@@ -89,6 +89,10 @@ final class ClassProperty implements PropertyInterface, Resource\ResourceInterfa
             return $value->jsonSerialize();
         }
 
+        if (!$this->canAutomaicallySerialise()) {
+            return null;
+        }
+
         $encoded = [];
         $reflection = new \ReflectionClass($value);
 
@@ -137,5 +141,10 @@ final class ClassProperty implements PropertyInterface, Resource\ResourceInterfa
     public function validateAndTranspose(PathInterface $path, object|array &$json): Validation\ResultInterface
     {
         return $this->getInnerResource()->validateAndTranspose($path, $json);
+    }
+
+    public function canAutomaicallySerialise(): bool
+    {
+        return $this->getInnerResource()->canAutomaicallySerialise();
     }
 }

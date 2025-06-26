@@ -8,7 +8,6 @@ use Hermiod\Resource\Hydrator\HydratorInterface;
 use Hermiod\Resource\Path\Root;
 use Hermiod\Resource\Property;
 use Hermiod\Resource\ResourceInterface;
-use Hermiod\Result\Exception\InvalidJsonPayloadException;
 
 /**
  * @template Type of object
@@ -49,20 +48,15 @@ final class Result implements ResultInterface
 
     /**
      * @return Type|object
-     *
-     * @throws \Exception
      */
-    public function getInstance(): object
+    public function getInstance(): ?object
     {
         if (isset($this->instance) && ($instance = $this->instance->get())) {
             return $instance;
         }
 
         if (!$this->isValid()) {
-            throw InvalidJsonPayloadException::new(
-                $this->hydrator->getTargetClassname(),
-                $this->getValidationResult()->getValidationErrors(),
-            );
+            return null;
         }
 
         /** @var Type $instance */

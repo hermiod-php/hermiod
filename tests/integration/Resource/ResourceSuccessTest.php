@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Hermiod\Tests\Integration\Resource;
 
+use Hermiod\Attribute\Resource as Options;
 use Hermiod\Resource\Constraint\CachedFactory as ConstraintFactory;
 use Hermiod\Resource\Factory as ResourceFactory;
 use Hermiod\Resource\ProxyCallbackFactory as LazyResourceFactory;
@@ -41,6 +42,7 @@ class ResourceSuccessTest extends TestCase
         $resource = new Resource(
             $fake,
             $properties,
+            new Options(),
         );
 
         $properties = $resource->getProperties();

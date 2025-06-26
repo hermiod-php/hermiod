@@ -6,6 +6,7 @@ namespace Hermiod\Resource;
 
 use Hermiod\Exception\TooMuchRecursionException;
 use Hermiod\Resource\Property\PrimitiveInterface;
+use Hermiod\Attribute\ResourceInterface as Options;
 
 /**
  * @no-named-arguments No backwards compatibility guaranteed
@@ -21,12 +22,15 @@ final class Resource implements ResourceInterface
 
     private Property\CollectionInterface $properties;
 
+    private int $filter;
+
     /**
      * @param class-string<Type> $classname
      */
     public function __construct(
         private readonly string $classname,
         private readonly Property\FactoryInterface $factory,
+        private readonly Options $options,
     )
     {
         if (!\class_exists($classname)) {
@@ -44,7 +48,7 @@ final class Resource implements ResourceInterface
 
         $properties = [];
 
-        foreach ($reflection->getProperties() as $property) {
+        foreach ($reflection->getProperties($this->options->getReflectionPropertyFilter()) as $property) {
             $properties[] = $this->factory->createPropertyFromReflectionProperty(
                 $property
             );
@@ -55,12 +59,10 @@ final class Resource implements ResourceInterface
 
     public function validateAndTranspose(Path\PathInterface $path, object|array &$json): Property\Validation\ResultInterface
     {
-        $result = new Property\Validation\Result();
-
         return $this->recurse(
             $path,
             $this->getProperties(),
-            $result,
+            new Property\Validation\Result(),
             $json,
         );
     }
@@ -134,5 +136,10 @@ final class Resource implements ResourceInterface
         --self::$depth;
 
         return $result;
+    }
+
+    public function canAutomaicallySerialise(): bool
+    {
+        return $this->options->canAutoSerialize();
     }
 }

@@ -1,8 +1,10 @@
 # Hermiod
 
-![version](https://img.shields.io/badge/version-1.0.0-green?labelColor=blue&style=flat)
-![PHP](https://img.shields.io/badge/PHP-8.2.*_8.3.*_8.4.*-orange?labelColor=blue&style=flat)
-![coverage](https://img.shields.io/badge/coverage-100%25-green?labelColor=blue&style=flat)
+[![SWUbanner](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg)](https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md)
+
+![version](https://img.shields.io/badge/version-1.0.0-blue?labelColor=grey&style=flat)
+![PHP](https://img.shields.io/badge/PHP-8.2.*_8.3.*_8.4.*-blue?labelColor=grey&style=flat)
+![coverage](https://img.shields.io/badge/coverage-100%25-green?labelColor=grey&style=flat)
 
 ## About
 
@@ -14,13 +16,13 @@ PHP is a rich and expressive language with many features to express objects, pro
 JSON is a similarly rich ruleset with objects, properties, and types. Tools like JsonSchema allow us to validate JSON
 and infer nullability and defaults.
 
-Hermiod bridge all of these things allowing developers to define JSON payload (for example; for HTTP request bodies) using PHP native types.
-Hermiod can than validate the JSON against that PHP object, produce simple, serilaisable errors, and create
+Hermiod bridges all of these things allowing developers to define JSON payload (for example; for HTTP request bodies) using PHP native types.
+Hermiod can then validate the JSON against that PHP object, produce simple, serializable errors, and create
 the fully hydrated class object graph from the supplied data.
 
 ## Basic usage
 
-As a developer we should be free to use rich domain logic and the full range of PHP features in our application.
+As a developer, we should be free to use rich domain logic and the full range of PHP features in our application.
 
 ```php
 namespace App;
@@ -63,26 +65,53 @@ If defaults are provided, then they will be used when a JSON value is absent.
 }
 ```
 
-The transposer will let us validate the JSON against the PHP object properties and types.
+The converter will let us validate the JSON against the PHP object properties and types.
 If validation fails, we can list the errors and even json-encode them directly to produce user-friendly
 API responses.
 
+The simplest method to decode to an object is via `toClass(array|object|string $json, string $class)`
+
+This will throw `\Hermiod\Exception\ConversionException` when issues with the JSON are detected, and this exception
+contains the errors which can be converted to JSON.
+
 ```php
-$manager = \Hermiod\ResourceManager::create();
-$resource = $manager->getResource(\App\Customer::class);
+$converter = \Hermiod\Converter::create();
 
-$result = $resource->unserialize($json);
-
-if (!$result->isValid()) {
-    return \json_encode(
-        $result->getErrors()
-    );
+try {
+    $customer = $converter->toClass(\App\Customer::class, $json);
+} catch (\Hermiod\Exception\ConversionException $exception) {
+    return \json_encode($exception->getErrors());
 }
-
-$instance = $result->getInstance(); // App\Customer with all of the data set
 ```
 
-If you want to covert your object back to JSON you can do so with PHP's `\JsonSerializable` interface.
+Alternatively, if you wish to delay object instantiation until after validation you can use 
+`tryToClass(array|object|string $json, string $class)` which will return an intermediate result which shows the
+validity of the parse cycle. You can then get the object on-demand if it is instantiable. 
+
+```php
+$converter = \Hermiod\Converter::create();
+
+$result = $converter->tryToClass(\App\Customer::class, $json);
+
+if (!$result->isValid()) {
+    return \json_encode($result->getErrors());
+}
+
+$customer = $result->getInstance(); // App\Customer
+```
+
+If you want to convert your object back to JSON then Hermiod can do this as well. If any of your classes implement
+`\JsonSerialiable` then this will be used in preference over Hermiod's own introspection methods.
+
+```php
+$converter = \Hermiod\Converter::create();
+
+$customer = new \App\Customer():
+
+return \json_encode(
+    $converter->toJson($customer)
+);
+```
 
 ## Advanced usage
 
@@ -96,9 +125,10 @@ namespace App;
 
 final class OutOfTheBoxExamples
 {
-    private \App\OtherConcreteClass $sub; // Is created and hydrated just like this class
+    private \App\OtherConcreteClass $sub;          // Is created and hydrated just like this class
     
-    private \Ramsey\UuidInterface $uuid; // If available will use UUID string constraint and hydrate
+    private \Ramsey\Uuid\Uuid $uuid1;              // If available will use UUID string constraint and hydrate
+    private \Ramsey\Uuid\UuidInterface $uuid2;     // If available will use UUID string constraint and hydrate
     
     private \DateTimeImmutable $dateTimeImmutable; // Supports ISO 8601 compatible string
     private \DateTime $dateTime;                   // Supports ISO 8601 compatible string
@@ -108,7 +138,7 @@ final class OutOfTheBoxExamples
     private int $integer;     // Integer values only
     private float $float;     // Integer or float
     private string $string;   // Strings only
-    private array $array;     // List-type array only [ "foo", "bar", 25, 42 ]
+    private array $array;     // List-type array e.g. [ "foo", "bar", true, 42 ] or hashmap e.g. { "foo": 42 }
     private object $object;   // Any JSON object hashmap e.g. { "foo": 42 } converted to object with public properties
     private bool $boolean;    // Bool
     private mixed $mixed;     // Any of the above or null

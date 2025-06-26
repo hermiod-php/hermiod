@@ -8,7 +8,6 @@ use Hermiod\Resource\Hydrator\HydratorInterface;
 use Hermiod\Resource\Property\Validation\ResultInterface as ValidationResultInterface;
 use Hermiod\Resource\ResourceInterface;
 use Hermiod\Result\Error\CollectionInterface;
-use Hermiod\Result\Exception\InvalidJsonPayloadException;
 use Hermiod\Result\Result;
 use Hermiod\Result\ResultInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -61,16 +60,14 @@ final class ResultTest extends TestCase
         );
     }
 
-    public function testInstanceThrowsOnInvalid(): void
+    public function testInstanceIsNullOnInvalid(): void
     {
         $json = [];
         $validation = $this->mockValidation(false);
         $reflector = $this->mockReflector($validation);
         $result = new Result($reflector, $this->mockHydrator(), $json);
 
-        $this->expectException(InvalidJsonPayloadException::class);
-
-        $result->getInstance();
+        $this->assertNull($result->getInstance());
     }
 
     public function testInstanceReturnsHydratedObject(): void

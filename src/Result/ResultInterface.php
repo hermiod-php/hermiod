@@ -15,8 +15,6 @@ interface ResultInterface
 
     /**
      * @return TClass
-     *
-     * @throws \Exception
      */
-    public function getInstance(): object;
+    public function getInstance(): ?object;
 }

@@ -16,6 +16,8 @@ interface ResourceInterface
 {
     public function getProperties(): Property\CollectionInterface;
 
+    public function canAutomaicallySerialise(): bool;
+
     /**
      * @param PathInterface $path
      * @param object|array<mixed> $json
