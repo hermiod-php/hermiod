@@ -13,32 +13,27 @@ use Hermiod\Resource\Property\Exception\PropertyClassTypeNotFoundException;
  * @internal No backwards compatibility guaranteed
  *
  * @template Type of object
- * @template-implements Resource\ResourceInterface<Type>
+ * @template-implements Resource\RuntimeResolverInterface<Type>
  */
-final class ClassProperty implements PropertyInterface, Resource\ResourceInterface
+final class InterfaceProperty implements PropertyInterface, Resource\RuntimeResolverInterface
 {
     use Traits\GetPropertyNameTrait;
-
-    /**
-     * @var Resource\ResourceInterface<Type> & Resource\PropertyBagInterface
-     */
-    private Resource\ResourceInterface $resource;
 
     private bool $hasDefault = false;
 
     /**
-     * @param class-string<Type> $class
+     * @param class-string<Type> $interface
      *
      * @return self<Type>
      */
     public static function withDefaultNullValue(
         string $name,
-        string $class,
+        string $interface,
         bool $nullable,
-        Resource\FactoryInterface $factory,
+        Resource\Property\FactoryInterface $factory,
     ): self
     {
-        $property = new self($name, $class, $nullable, $factory);
+        $property = new self($name, $interface, $nullable, $factory);
 
         $property->hasDefault = true;
 
@@ -46,28 +41,23 @@ final class ClassProperty implements PropertyInterface, Resource\ResourceInterfa
     }
 
     /**
-     * @param class-string<Type> $class
+     * @param class-string<Type> $interface
      */
     public function __construct(
         string $name,
-        private readonly string $class,
+        private readonly string $interface,
         private readonly bool $nullable,
-        private readonly Resource\FactoryInterface $factory,
+        private readonly Resource\Property\FactoryInterface $factory,
     )
     {
         $this->setName($name);
 
-        if (!\class_exists($this->class)) {
+        if (!\interface_exists($this->interface)) {
             throw PropertyClassTypeNotFoundException::forTypedClassProperty(
                 $this->name,
-                $this->class,
+                $this->interface,
             );
         }
-    }
-
-    public function getClassName(): string
-    {
-        return $this->class;
     }
 
     public function isNullable(): bool
@@ -91,7 +81,7 @@ final class ClassProperty implements PropertyInterface, Resource\ResourceInterfa
             return null;
         }
 
-        if (!$value instanceof $this->class) {
+        if (!$value instanceof $this->interface) {
             return null;
         }
 
@@ -99,14 +89,21 @@ final class ClassProperty implements PropertyInterface, Resource\ResourceInterfa
             return $value->jsonSerialize();
         }
 
-        if (!$this->canAutomaticallySerialise()) {
+        $concretion = $this->factory->createClassProperty(
+            $this->name,
+            \get_class($value),
+            $this->nullable,
+            $this->hasDefault,
+        );
+
+        if (!$concretion->canAutomaticallySerialise()) {
             return null;
         }
 
-        $encoded = [];
         $reflection = new \ReflectionClass($value);
+        $encoded = [];
 
-        foreach ($this->getInnerResource()->getProperties() as $property) {
+        foreach ($concretion->getProperties() as $property) {
             $name = $property->getPropertyName();
 
             $encoded[$name] = $property->normaliseJsonValue(
@@ -124,7 +121,7 @@ final class ClassProperty implements PropertyInterface, Resource\ResourceInterfa
         }
 
         if (\is_array($value) || \is_object($value)) {
-            return $this->validateAndTranspose($path, $value);
+            return $this->getConcreteResource((array)$value)->validateAndTranspose($path, $value);
         }
 
         return new Validation\Result(
@@ -132,26 +129,17 @@ final class ClassProperty implements PropertyInterface, Resource\ResourceInterfa
         );
     }
 
-    public function validateAndTranspose(PathInterface $path, object|array &$json): Validation\ResultInterface
-    {
-        return $this->getInnerResource()->validateAndTranspose($path, $json);
-    }
-
-    public function canAutomaticallySerialise(): bool
-    {
-        return $this->getInnerResource()->canAutomaticallySerialise();
-    }
-
-    public function getProperties(): CollectionInterface
-    {
-        return $this->getInnerResource()->getProperties();
-    }
-
     /**
-     * @return Resource\ResourceInterface<Type> & Resource\PropertyBagInterface
+     * @inheritdoc
      */
-    private function getInnerResource(): Resource\ResourceInterface & Resource\PropertyBagInterface
+    public function getConcreteResource(array $fragment): Resource\ResourceInterface
     {
-        return $this->resource ??= $this->factory->createResourceForClass($this->class);
+        return $this->factory->createClassPropertyForInterfaceGivenFragment(
+            $this->name,
+            $this->interface,
+            $this->nullable,
+            $this->hasDefault,
+            $fragment,
+        );
     }
 }

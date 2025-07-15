@@ -15,24 +15,12 @@ final class LaminasHydratorTest extends TestCase
 {
     public function testImplementsHydratorInterface(): void
     {
-        $hydrator = new LaminasHydrator(\stdClass::class, $this->mockLaminasHydrator());
+        $hydrator = new LaminasHydrator($this->mockLaminasHydrator());
 
         $this->assertInstanceOf(
             HydratorInterface::class,
             $hydrator,
             'LaminasHydrator should implement HydratorInterface'
-        );
-    }
-
-    public function testGetTargetClassname(): void
-    {
-        $className = \stdClass::class;
-        $hydrator = new LaminasHydrator($className, $this->mockLaminasHydrator());
-
-        $this->assertSame(
-            $className,
-            $hydrator->getTargetClassname(),
-            'getTargetClassname() should return the provided class name'
         );
     }
 
@@ -47,11 +35,11 @@ final class LaminasHydratorTest extends TestCase
             ->with($data, $this->isInstanceOf(\stdClass::class))
             ->willReturn($object);
 
-        $hydrator = new LaminasHydrator(\stdClass::class, $laminasHydrator);
+        $hydrator = new LaminasHydrator($laminasHydrator);
 
         $this->assertSame(
             $object,
-            $hydrator->hydrate($data),
+            $hydrator->hydrate(\stdClass::class, $data),
             'hydrate() should call Laminas Hydrator and return the hydrated object'
         );
     }

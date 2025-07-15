@@ -12,7 +12,7 @@ final class CamelCase extends AbstractStrategy
             \implode(
                 '',
                 \array_map(
-                    static fn (string $word) => \ucfirst($word),
+                    'ucfirst',
                     $this->splitWords($name)
                 )
             )

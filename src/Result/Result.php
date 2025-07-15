@@ -25,7 +25,7 @@ final class Result implements ResultInterface
 
     /**
      * @param ResourceInterface<Type> $resource
-     * @param HydratorInterface<Type> $hydrator
+     * @param HydratorInterface $hydrator
      * @param object|array<mixed> $json
      */
     public function __construct(
@@ -55,12 +55,17 @@ final class Result implements ResultInterface
             return $instance;
         }
 
-        if (!$this->isValid()) {
+        $result = $this->getValidationResult();
+
+        if (!$result->isValid()) {
             return null;
         }
 
+        $result->hydrate($this->hydrator);
+
         /** @var Type $instance */
         $instance = $this->hydrator->hydrate(
+            $this->resource->getClassName(),
             $this->json,
         );
 

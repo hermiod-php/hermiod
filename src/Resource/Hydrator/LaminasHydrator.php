@@ -6,7 +6,6 @@ namespace Hermiod\Resource\Hydrator;
 
 /**
  * @template Type of object
- * @template-implements HydratorInterface<Type>
  *
  * @no-named-arguments No backwards compatibility guaranteed
  * @internal No backwards compatibility guaranteed
@@ -14,35 +13,30 @@ namespace Hermiod\Resource\Hydrator;
 final class LaminasHydrator implements HydratorInterface
 {
     /**
-     * @var \ReflectionClass<Type>
+     * @var array<class-string, \ReflectionClass<Type>>
      */
-    private \ReflectionClass $reflection;
+    private array $reflections = [];
 
     /**
-     * @param class-string<Type> $className
      * @param \Laminas\Hydrator\HydratorInterface $hydrator
      */
     public function __construct(
-        private string $className,
         private \Laminas\Hydrator\HydratorInterface $hydrator,
-    )
-    {
-        $this->reflection = new \ReflectionClass($className);
-    }
+    ) {}
 
     /**
-     * @inheritDoc
+     * @param class-string<Type> $class
+     * @param array<mixed>|object $data
+     *
+     * @return Type & object
      */
-    public function hydrate(array|object $data): object
+    public function hydrate(string $class, array|object $data): object
     {
+        $reflection = $this->reflections[$class] ??= new \ReflectionClass($class);
+
         return $this->hydrator->hydrate(
             (array)$data,
-            $this->reflection->newInstanceWithoutConstructor(),
+            $reflection->newInstanceWithoutConstructor(),
         );
-    }
-
-    public function getTargetClassname(): string
-    {
-        return $this->className;
     }
 }

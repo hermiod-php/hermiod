@@ -11,7 +11,7 @@ final class TrainCase extends AbstractStrategy
         return \implode(
             '-',
             \array_map(
-                static fn (string $word) => \ucfirst($word),
+                'ucfirst',
                 $this->splitWords($name)
             )
         );

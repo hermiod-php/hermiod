@@ -19,4 +19,9 @@ trait ConstructWithNameAndNullableTrait
     {
         $this->setName($name);
     }
+
+    public function isNullable(): bool
+    {
+        return $this->nullable;
+    }
 }

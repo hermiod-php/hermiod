@@ -12,15 +12,20 @@ use Hermiod\Resource\Path\PathInterface;
  *
  * @template Type of object
  */
-interface ResourceInterface
+interface ResourceInterface extends PropertyBagInterface
 {
-    public function getProperties(): Property\CollectionInterface;
+    public function canAutomaticallySerialise(): bool;
 
-    public function canAutomaicallySerialise(): bool;
+    /**
+     * @return class-string
+     *
+     * @throws \RuntimeException
+     */
+    public function getClassName(): string;
 
     /**
      * @param PathInterface $path
-     * @param object|array<mixed> $json
+     * @param object|array<mixed, mixed> $json
      */
     public function validateAndTranspose(PathInterface $path, object|array &$json): Property\Validation\ResultInterface;
 }

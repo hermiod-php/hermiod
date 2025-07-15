@@ -22,6 +22,7 @@ use Hermiod\Resource\Property\IntegerProperty;
 use Hermiod\Resource\Property\MixedProperty;
 use Hermiod\Resource\Property\ObjectProperty;
 use Hermiod\Resource\Property\PropertyInterface;
+use Hermiod\Resource\Property\Resolver\ResolverInterface;
 use Hermiod\Resource\Property\StringProperty;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -36,6 +37,8 @@ final class FactoryTest extends TestCase
 
     private ResourceFactory & MockObject $resources;
 
+    private ResolverInterface & MockObject $resolver;
+
     private Factory $factory;
 
     protected function setUp(): void
@@ -44,8 +47,9 @@ final class FactoryTest extends TestCase
 
         $this->constraints = $this->createConstraintFactoryMock();
         $this->resources = $this->createResourceFactoryMock();
-        
-        $this->factory = new Factory($this->constraints, $this->resources);
+        $this->resolver = $this->createResolverMock();
+
+        $this->factory = new Factory($this->constraints, $this->resources, $this->resolver);
     }
 
     public function testCreatePropertyFromReflectionPropertyThrowsExceptionForUnsupportedBuiltinType(): void
@@ -148,7 +152,7 @@ final class FactoryTest extends TestCase
 
     public function testCreatePropertyFromReflectionPropertyForClassPropertySetsClassName(): void
     {
-        $type = $this->createReflectionNamedTypeMock(\stdClass::class, false);
+        $type = $this->createReflectionNamedTypeMock(\get_class(self::createCustomClass()), false);
         $reflection = $this->createReflectionPropertyMock('prop', $type);
 
         $property = $this->factory->createPropertyFromReflectionProperty($reflection);
@@ -478,8 +482,8 @@ final class FactoryTest extends TestCase
         yield 'DateTime, nullable' => [\DateTime::class, DateTimeInterfaceProperty::class, true];
         yield 'DateTimeImmutable, not-nullable' => [\DateTimeImmutable::class, DateTimeInterfaceProperty::class, false];
         yield 'DateTimeImmutable, nullable' => [\DateTimeImmutable::class, DateTimeInterfaceProperty::class, true];
-        yield 'CustomClass, not-nullable' => [\stdClass::class, ClassProperty::class, false];
-        yield 'CustomClass, nullable' => [\stdClass::class, ClassProperty::class, true];
+        yield 'CustomClass, not-nullable' => [\get_class(self::createCustomClass()), ClassProperty::class, false];
+        yield 'CustomClass, nullable' => [\get_class(self::createCustomClass()), ClassProperty::class, true];
     }
 
     public static function classTypesWithDefaultProvider(): \Generator
@@ -487,7 +491,7 @@ final class FactoryTest extends TestCase
         yield 'DateTimeInterface, nullable, with-default-null' => [\DateTimeInterface::class, DateTimeInterfaceProperty::class, true];
         yield 'DateTime, nullable, with-default-null' => [\DateTime::class, DateTimeInterfaceProperty::class, true];
         yield 'DateTimeImmutable, nullable, with-default-null' => [\DateTimeImmutable::class, DateTimeInterfaceProperty::class, true];
-        yield 'CustomClass, nullable, with-default-null' => [\stdClass::class, ClassProperty::class, true];
+        yield 'CustomClass, nullable, with-default-null' => [\get_class(self::createCustomClass()), ClassProperty::class, true];
     }
 
     private function createConstraintFactoryMock(): ConstraintFactory & MockObject
@@ -498,6 +502,11 @@ final class FactoryTest extends TestCase
     private function createResourceFactoryMock(): ResourceFactory & MockObject
     {
         return $this->createMock(ResourceFactory::class);
+    }
+
+    private function createResolverMock(): ResolverInterface & MockObject
+    {
+        return $this->createMock(ResolverInterface::class);
     }
 
     private function createReflectionPropertyMock(
@@ -569,5 +578,10 @@ final class FactoryTest extends TestCase
             ->willReturn($arguments);
 
         return $mock;
+    }
+
+    private static function createCustomClass(): object
+    {
+        return new class {};
     }
 }

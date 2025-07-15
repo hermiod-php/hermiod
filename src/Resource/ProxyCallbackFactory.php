@@ -14,14 +14,30 @@ final class ProxyCallbackFactory implements FactoryInterface
         private readonly \Closure $resolver
     ) {}
 
-    public function createResourceForClass(string $class): ResourceInterface
+    public function createResourceForClass(string $class): ResourceInterface & PropertyBagInterface
     {
         return $this->getFactory()->createResourceForClass($class);
     }
 
+    public function getPropertyFactory(): Property\FactoryInterface
+    {
+        return $this->getFactory()->getPropertyFactory();
+    }
+
+    public function withNamingStrategy(Name\StrategyInterface $strategy): FactoryInterface
+    {
+        return new self(
+            fn () => $this->getFactory()->withNamingStrategy($strategy),
+        );
+    }
+
     private function getFactory(): FactoryInterface
     {
-        /** @phpstan-ignore return.type */
+        /**
+         * We want this to \TypeError if the callback returns an incorrect type
+         *
+         * @phpstan-ignore return.type
+         */
         return $this->resolver->__invoke();
     }
 }

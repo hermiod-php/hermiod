@@ -16,7 +16,7 @@ final class LaminasHydratorFactoryTest extends TestCase
     {
         $factory = new LaminasHydratorFactory();
 
-        $hydrator = $factory->createHydratorForClass(\stdClass::class);
+        $hydrator = $factory->createHydrator();
 
         $this->assertInstanceOf(
             LaminasHydrator::class,
@@ -25,17 +25,17 @@ final class LaminasHydratorFactoryTest extends TestCase
         );
     }
 
-    public function testHydratorCaching(): void
+    public function testHydratorUniqueness(): void
     {
         $factory = new LaminasHydratorFactory();
 
-        $hydrator1 = $factory->createHydratorForClass(\stdClass::class);
-        $hydrator2 = $factory->createHydratorForClass(\stdClass::class);
+        $hydrator1 = $factory->createHydrator();
+        $hydrator2 = $factory->createHydrator();
 
-        $this->assertSame(
+        $this->assertNotSame(
             $hydrator1,
             $hydrator2,
-            'createHydratorForClass() should return the same instance for the same class'
+            'createHydratorForClass() should not return the same instance twice'
         );
     }
 }

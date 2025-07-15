@@ -33,7 +33,7 @@ final readonly class Unserializer implements UnserializerInterface
     public function unserialize(string|object|array $json): ResultInterface
     {
         $resource = $this->reflections->createResourceForClass($this->class);
-        $hydrator = $this->hydrators->createHydratorForClass($this->class);
+        $hydrator = $this->hydrators->createHydrator();
 
         if (\is_string($json)) {
             $json = \json_decode($json, true, flags: JSON_THROW_ON_ERROR);

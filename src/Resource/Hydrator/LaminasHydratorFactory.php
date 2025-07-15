@@ -9,25 +9,12 @@ use Laminas\Hydrator\ReflectionHydrator;
 /**
  * @no-named-arguments No backwards compatibility guaranteed
  * @internal No backwards compatibility guaranteed
- *
- * @template Type of object
  */
 final class LaminasHydratorFactory implements FactoryInterface
 {
-    /**
-     * @var HydratorInterface<Type>[]
-     */
-    private array $hydrators = [];
-
-    /**
-     * @param class-string<Type> $class
-     *
-     * @return HydratorInterface<Type>
-     */
-    public function createHydratorForClass(string $class): HydratorInterface
+    public function createHydrator(): HydratorInterface
     {
-        return $this->hydrators[$class] ??= new LaminasHydrator(
-            $class,
+        return new LaminasHydrator(
             new ReflectionHydrator()
         );
     }

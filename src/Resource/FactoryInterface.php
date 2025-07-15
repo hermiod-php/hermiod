@@ -15,7 +15,11 @@ interface FactoryInterface
      *
      * @param class-string<Type> $class
      *
-     * @return ResourceInterface<Type>
+     * @return ResourceInterface<Type> & PropertyBagInterface
      */
-    public function createResourceForClass(string $class): ResourceInterface;
+    public function createResourceForClass(string $class): ResourceInterface & PropertyBagInterface;
+
+    public function getPropertyFactory(): Property\FactoryInterface;
+
+    public function withNamingStrategy(Name\StrategyInterface $strategy): FactoryInterface;
 }

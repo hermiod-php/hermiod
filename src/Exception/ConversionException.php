@@ -18,7 +18,7 @@ final class ConversionException extends \DomainException implements Exception
     {
         $exception = new self(
             \sprintf(
-                'Invalid %s in JSON stucture',
+                'Invalid %s in JSON structure',
                 \count($errors) === 1 ? 'property' : 'properties',
             )
         );

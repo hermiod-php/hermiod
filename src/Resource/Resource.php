@@ -7,6 +7,7 @@ namespace Hermiod\Resource;
 use Hermiod\Exception\TooMuchRecursionException;
 use Hermiod\Resource\Property\PrimitiveInterface;
 use Hermiod\Attribute\ResourceInterface as Options;
+use Hermiod\Json;
 
 /**
  * @no-named-arguments No backwards compatibility guaranteed
@@ -22,20 +23,24 @@ final class Resource implements ResourceInterface
 
     private Property\CollectionInterface $properties;
 
-    private int $filter;
-
     /**
      * @param class-string<Type> $classname
      */
     public function __construct(
         private readonly string $classname,
         private readonly Property\FactoryInterface $factory,
+        private readonly Name\StrategyInterface $naming,
         private readonly Options $options,
     )
     {
         if (!\class_exists($classname)) {
             throw new \InvalidArgumentException("Class $classname does not exist");
         }
+    }
+
+    public function getClassName(): string
+    {
+        return $this->classname;
     }
 
     public function getProperties(): Property\CollectionInterface
@@ -63,74 +68,23 @@ final class Resource implements ResourceInterface
             $path,
             $this->getProperties(),
             new Property\Validation\Result(),
-            $json,
+            \is_object($json) ? new Json\ObjectFragment($json) : new Json\ArrayFragment($json),
         );
     }
 
-    /**
-     * @param object|array<mixed, mixed> $json
-     */
     private function recurse(
         Path\PathInterface $path,
         Property\CollectionInterface $properties,
         Property\Validation\ResultInterface $result,
-        object|array &$json,
+        Json\FragmentInterface $json,
     ): Property\Validation\ResultInterface
     {
         if (++self::$depth > self::$maxRecursion) {
             throw TooMuchRecursionException::new(self::$maxRecursion);
         }
 
-        $list = \is_object($json) ? \get_object_vars($json) : $json;
-
-        foreach ($list as $key => $data) {
-            $property = $properties->offsetGet($key);
-            $next = $path->withObjectKey($key);
-
-            // TODO: Allow for optional key overloading
-            if (!$property) {
-                $result = $result->withErrors(
-                    \sprintf(
-                        "Property '%s' is not permitted",
-                        $next->__toString(),
-                    )
-                );
-
-                continue;
-            }
-
-            // Validate the value against the constraints
-            $check = $property->checkValueAgainstConstraints($next, $data);
-
-            if (!$check->isValid()) {
-                $result = $result->withErrors(...$check->getValidationErrors());
-
-                continue;
-            }
-
-            if ($property instanceof PrimitiveInterface) {
-                if (\is_object($json)) {
-                    unset($json->{$key});
-                    $json->{$property->getPropertyName()} = $property->normalisePhpValue($data);
-
-                    continue;
-                }
-
-                unset($json[$key]);
-                $json[$property->getPropertyName()] = $property->normalisePhpValue($data);
-
-                continue;
-            }
-
-            if (!\is_array($data) && !\is_object($data)) {
-                continue;
-            }
-
-            if ($property instanceof ResourceInterface) {
-                $result = $result->withErrors(
-                    ...$property->validateAndTranspose($next, $data)->getValidationErrors()
-                );
-            }
+        foreach ($properties as $property) {
+            $result = $this->process($path, $property, $result, $json);
         }
 
         --self::$depth;
@@ -138,8 +92,81 @@ final class Resource implements ResourceInterface
         return $result;
     }
 
-    public function canAutomaicallySerialise(): bool
+    public function canAutomaticallySerialise(): bool
     {
         return $this->options->canAutoSerialize();
+    }
+
+    private function process(
+        Path\PathInterface $path,
+        Property\PropertyInterface $property,
+        Property\Validation\ResultInterface $result,
+        Json\FragmentInterface $json,
+    ): Property\Validation\ResultInterface
+    {
+        $key = $this->naming->format($property->getPropertyName());
+
+        $next = $path->withObjectKey($key);
+
+        if (!$json->has($key)) {
+            if ($property->hasDefaultValue()) {
+                $json->set($key, $property->getDefaultValue());
+
+                return $result;
+            }
+
+            if ($property->isNullable()) {
+                $json->set($key, null);
+
+                return $result;
+            }
+
+            return $result->withErrors(
+                \sprintf(
+                    "%s is required",
+                    $next->__toString(),
+                )
+            );
+        }
+
+        $data = $json->get($key);
+
+        // Validate the value against the constraints
+        $check = $property->checkValueAgainstConstraints($next, $data);
+
+        if (!$check->isValid()) {
+            return $result->withErrors(...$check->getValidationErrors());
+        }
+
+        if ($property instanceof PrimitiveInterface) {
+            $json->set($key, $property->normalisePhpValue($data));
+
+            return $result;
+        }
+
+        if (!\is_array($data) && !\is_object($data)) {
+            return $result;
+        }
+
+        if ($property instanceof RuntimeResolverInterface) {
+            $property = $property->getConcreteResource((array)$data);
+        }
+
+        if ($property instanceof ResourceInterface) {
+            $result = $result->withHydrationStage(
+                function (Hydrator\HydratorInterface $hydrator) use ($property, $json, $data, $key): void {
+                    $json->set($key, $hydrator->hydrate($property->getClassName(), (array)$data));
+                }
+            );
+
+            return $this->recurse(
+                $next,
+                $property->getProperties(),
+                $result,
+                \is_object($data) ? new Json\ObjectFragment($data) : new Json\ArrayFragment($data),
+            );
+        }
+
+        return $result;
     }
 }

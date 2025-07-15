@@ -18,6 +18,8 @@ interface PropertyInterface
 
     public function hasDefaultValue(): bool;
 
+    public function isNullable(): bool;
+
     public function checkValueAgainstConstraints(PathInterface $path, mixed $value): Validation\ResultInterface;
 
     public function normaliseJsonValue(mixed $value): mixed;

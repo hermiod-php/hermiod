@@ -10,8 +10,6 @@ use Hermiod\Attribute\Resource as Options;
 /**
  * @no-named-arguments No backwards compatibility guaranteed
  * @internal No backwards compatibility guaranteed
- *
- * @template Type of object
  */
 final class Factory implements FactoryInterface
 {
@@ -22,26 +20,44 @@ final class Factory implements FactoryInterface
 
     public function __construct(
         private readonly Property\FactoryInterface $properties,
+        private Name\StrategyInterface $naming,
     ) {}
 
+    public function getPropertyFactory(): Property\FactoryInterface
+    {
+        return $this->properties;
+    }
+
     /**
-     * @param class-string<Type> $class
-     *
-     * @return Resource<Type>
+     * @inheritdoc
      */
-    public function createResourceForClass(string $class): ResourceInterface
+    public function createResourceForClass(string $class): ResourceInterface & PropertyBagInterface
     {
         return new Resource(
             $class,
             $this->properties,
+            $this->naming,
             $this->getOptionsForResourceClass($class),
         );
     }
 
+    public function withNamingStrategy(Name\StrategyInterface $strategy): FactoryInterface
+    {
+        $copy = clone $this;
+
+        $copy->naming = $strategy;
+
+        return $copy;
+    }
+
     /**
+     * @template Type of object
+     *
      * @param class-string<Type> $class
      *
      * @return OptionsInterface
+     *
+     * @throws \ReflectionException
      */
     private function getOptionsForResourceClass(string $class): OptionsInterface
     {

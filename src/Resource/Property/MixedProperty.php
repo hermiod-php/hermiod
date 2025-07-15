@@ -32,6 +32,11 @@ final class MixedProperty implements PropertyInterface, PrimitiveInterface
         return $property;
     }
 
+    public function isNullable(): bool
+    {
+        return true;
+    }
+
     public function getPropertyName(): string
     {
         return $this->name;

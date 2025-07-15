@@ -7,7 +7,9 @@ namespace Hermiod\Tests\Integration\Resource;
 use Hermiod\Attribute\Resource as Options;
 use Hermiod\Resource\Constraint\CachedFactory as ConstraintFactory;
 use Hermiod\Resource\Factory as ResourceFactory;
-use Hermiod\Resource\ProxyCallbackFactory as LazyResourceFactory;
+use Hermiod\Resource\Name\CamelCase;
+use Hermiod\Resource\Property\Resolver\Resolver;
+use Hermiod\Resource\ProxyCallbackFactory;
 use Hermiod\Resource\Property\CollectionInterface;
 use Hermiod\Resource\Property\Factory as PropertyFactory;
 use Hermiod\Resource\Property\PropertyInterface;
@@ -30,18 +32,23 @@ class ResourceSuccessTest extends TestCase
     #[DataProvider('provideDateTimeImmutableFakesPropertiesAndDefaults')]
     public function testCanParseTypedProperties(string $fake, string $name, string $class, bool $expectDefault, mixed $default = null): void
     {
+        $naming = new CamelCase();
+
         $factory = new ResourceFactory(
             $properties = new PropertyFactory(
                 new ConstraintFactory(),
-                new LazyResourceFactory(function () use (&$factory) {
+                new ProxyCallbackFactory(function () use (&$factory) {
                     return $factory;
                 }),
-            )
+                new Resolver(),
+            ),
+            $naming,
         );
 
         $resource = new Resource(
             $fake,
             $properties,
+            $naming,
             new Options(),
         );
 

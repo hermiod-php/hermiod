@@ -29,7 +29,7 @@ final class NumberInList implements NumberConstraintInterface
     public function getMismatchExplanation(PathInterface $path, int|float $value): string
     {
         return \sprintf(
-            '%s must be one of [ %s ] but %s given',
+            '%s must be one of [%s] but %s given',
             $path->__toString(),
             \implode(', ', $this->values),
             $value,

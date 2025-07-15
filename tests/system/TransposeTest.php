@@ -8,7 +8,7 @@ use Hermiod\Exception\TooMuchRecursionException;
 use Hermiod\Resource\Resource;
 use Hermiod\Converter;
 use Hermiod\Tests\System\Fakes\RecursiveTestClass;
-use Hermiod\Tests\Integration\Fakes\StringPropertiesFake;
+use Hermiod\Tests\System\Fakes\StringPropertiesFake;
 use PHPUnit\Framework\Attributes\Medium;
 use PHPUnit\Framework\TestCase;
 

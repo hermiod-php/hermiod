@@ -7,12 +7,11 @@ namespace Hermiod;
 use Hermiod\Exception\ConversionException;
 use Hermiod\Result\ResultInterface;
 
-/**
- * @template Type of object
- */
 interface ConverterInterface
 {
     /**
+     * @template Type of object
+     *
      * @param class-string<Type> $class
      * @param string|object|array<mixed, mixed> $json
      *
@@ -23,6 +22,8 @@ interface ConverterInterface
     public function toClass(string $class, array|object|string $json): object;
 
     /**
+     * @template Type of object
+     *
      * @param class-string<Type> $class
      * @param string|object|array<mixed, mixed> $json
      *
@@ -36,4 +37,14 @@ interface ConverterInterface
      * @return object|null
      */
     public function toJson(object $class): ?object;
+
+    /**
+     * @template Type of object
+     *
+     * @param class-string<Type> $interface
+     * @param class-string | callable(array<mixed, mixed> $fragment): class-string $resolver
+     */
+    public function addInterfaceResolver(string $interface, string|callable $resolver): ConverterInterface;
+
+    public function useNamingStrategy(Resource\Name\StrategyInterface $strategy): ConverterInterface;
 }

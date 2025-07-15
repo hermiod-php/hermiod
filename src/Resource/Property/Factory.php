@@ -7,10 +7,13 @@ namespace Hermiod\Resource\Property;
 use Hermiod\Attribute\Constraint\ArrayConstraintInterface;
 use Hermiod\Attribute\Constraint\ConstraintInterface;
 use Hermiod\Attribute\Constraint\NumberConstraintInterface;
-use Hermiod\Attribute\Constraint\ObjectValueConstraintInterface;
 use Hermiod\Attribute\Constraint\ObjectKeyConstraintInterface;
+use Hermiod\Attribute\Constraint\ObjectValueConstraintInterface;
 use Hermiod\Attribute\Constraint\StringConstraintInterface;
 use Hermiod\Resource\Property\Exception\UnsupportedPropertyTypeException;
+use Hermiod\Resource\Property\Resolver\ResolverInterface;
+use Hermiod\Resource\PropertyBagInterface;
+use Hermiod\Resource\ResourceInterface;
 
 /**
  * @no-named-arguments No backwards compatibility guaranteed
@@ -21,7 +24,13 @@ final readonly class Factory implements FactoryInterface
     public function __construct(
         private \Hermiod\Resource\Constraint\FactoryInterface $constraints,
         private \Hermiod\Resource\FactoryInterface $resources,
+        private ResolverInterface $resolver,
     ) {}
+
+    public function getInterfaceResolver(): ResolverInterface
+    {
+        return $this->resolver;
+    }
 
     public function createPropertyFromReflectionProperty(\ReflectionProperty $property): PropertyInterface
     {
@@ -38,10 +47,67 @@ final readonly class Factory implements FactoryInterface
         if ($type instanceof \ReflectionNamedType) {
             return $type->isBuiltin()
                 ? $this->createBuiltinProperty($type, $property)
-                : $this->createClassProperty($type, $property);
+                : $this->createUserlandTypePropertyFromReflection($type, $property);
         }
 
         return $this->createMixedTypeProperty($property);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function createClassPropertyForInterfaceGivenFragment(
+        string $name,
+        string $interface,
+        bool $nullable,
+        bool $default,
+        array $fragment,
+    ): PropertyInterface & ResourceInterface & PropertyBagInterface
+    {
+        $class = $this->resolver->resolve($interface, $fragment);
+
+        if ($default) {
+            /** @phpstan-ignore return.type */
+            return ClassProperty::withDefaultNullValue($name, $class, $nullable, $this->resources);
+        }
+
+        /** @phpstan-ignore return.type */
+        return new ClassProperty($name, $class, $nullable, $this->resources);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function createClassProperty(
+        string $name,
+        string $class,
+        bool $nullable,
+        bool $default,
+    ): PropertyInterface & ResourceInterface & PropertyBagInterface
+    {
+        if ($default) {
+            /** @phpstan-ignore return.type */
+            return ClassProperty::withDefaultNullValue($name, $class, $nullable, $this->resources);
+        }
+
+        return new ClassProperty($name, $class, $nullable, $this->resources);
+    }
+
+    /**
+     * @param class-string $interface
+     */
+    private function createInterfaceProperty(
+        string $name,
+        string $interface,
+        bool $nullable,
+        bool $default,
+    ): PropertyInterface
+    {
+        if ($default) {
+            return InterfaceProperty::withDefaultNullValue($name, $interface, $nullable, $this);
+        }
+
+        return new InterfaceProperty($name, $interface, $nullable, $this);
     }
 
     private function createBuiltInProperty(\ReflectionNamedType $type, \ReflectionProperty $reflection): PropertyInterface
@@ -186,7 +252,7 @@ final readonly class Factory implements FactoryInterface
         return new DateTimeInterfaceProperty($name, $type->allowsNull());
     }
 
-    private function createClassProperty(\ReflectionNamedType $type, \ReflectionProperty $reflection): PropertyInterface
+    private function createUserlandTypePropertyFromReflection(\ReflectionNamedType $type, \ReflectionProperty $reflection): PropertyInterface
     {
         /** @var class-string $class */
         $class = $type->getName();
@@ -195,14 +261,18 @@ final readonly class Factory implements FactoryInterface
             return $this->createDateTimeInterfaceProperty($type, $reflection);
         }
 
+        if ($class === \stdClass::class) {
+            return $this->createObjectTypeProperty($type, $reflection);
+        }
+
         $name = $reflection->getName();
         $nullable = $type->allowsNull();
 
-        if ($reflection->hasDefaultValue()) {
-            return ClassProperty::withDefaultNullValue($name, $class, $nullable, $this->resources);
+        if (\interface_exists($class)) {
+            return $this->createInterfaceProperty($name, $class, $nullable, $reflection->hasDefaultValue());
         }
 
-        return new ClassProperty($name, $class, $nullable, $this->resources);
+        return $this->createClassProperty($name, $class, $nullable, $reflection->hasDefaultValue());
     }
 
     /**

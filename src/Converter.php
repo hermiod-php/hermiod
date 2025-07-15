@@ -11,12 +11,11 @@ use Hermiod\Result\ResultInterface;
 
 /**
  * @template Type of object
- * @template-implements ConverterInterface<Type>
  */
 final class Converter implements ConverterInterface
 {
     /**
-     * @var array<class-string<Type>, UnserializerInterface<Type>>
+     * @var array<class-string, UnserializerInterface<Type>>
      */
     private array $unserializers = [];
 
@@ -33,6 +32,10 @@ final class Converter implements ConverterInterface
                     new Resource\ProxyCallbackFactory(function () use (&$factory) {
                         return $factory;
                     }),
+                    new Resource\Property\Resolver\Resolver(),
+                ),
+                new Resource\Name\CachedNamingStrategy(
+                    new Resource\Name\CamelCase(),
                 ),
             ),
             new Resource\Hydrator\LaminasHydratorFactory(),
@@ -83,6 +86,31 @@ final class Converter implements ConverterInterface
     public function toJson(object $class): ?object
     {
         return null;
+    }
+
+    /**
+     * @param class-string<Type> $interface
+     * @param class-string | callable(array<mixed, mixed> $fragment): class-string $resolver
+     */
+    public function addInterfaceResolver(string $interface, string|callable $resolver): ConverterInterface
+    {
+        $this->resourceFactory
+            ->getPropertyFactory()
+            ->getInterfaceResolver()
+            ->addResolver($interface, $resolver);
+
+        return $this;
+    }
+
+    public function useNamingStrategy(Resource\Name\StrategyInterface $strategy): ConverterInterface
+    {
+        $this->resourceFactory = $this->resourceFactory->withNamingStrategy(
+            Resource\Name\CachedNamingStrategy::wrap($strategy)
+        );
+
+        $this->unserializers = [];
+
+        return $this;
     }
 
     /**

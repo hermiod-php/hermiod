@@ -11,6 +11,15 @@ final class CachedNamingStrategy implements StrategyInterface
      */
     private array $formatted = [];
 
+    public static function wrap(StrategyInterface $strategy): StrategyInterface
+    {
+        if ($strategy instanceof self) {
+            return $strategy;
+        }
+
+        return new self($strategy);
+    }
+
     public function __construct(
         private readonly StrategyInterface $strategy,
     ) {}
