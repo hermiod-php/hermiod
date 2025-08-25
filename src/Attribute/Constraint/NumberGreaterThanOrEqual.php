@@ -21,10 +21,10 @@ final readonly class NumberGreaterThanOrEqual implements NumberConstraintInterfa
     public function getMismatchExplanation(PathInterface $path, int|float $value): string
     {
         return \sprintf(
-            '%s must be a number greater than or equal to %d but %d given',
+            '%s must be a number greater than or equal to %s but %s given',
             $path->__toString(),
             $this->value,
-            $value
+            $value,
         );
     }
 }

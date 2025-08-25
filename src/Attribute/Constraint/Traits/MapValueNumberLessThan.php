@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Hermiod\Attribute\Constraint\Traits;
 
-use Hermiod\Attribute\Constraint\NumberGreaterThan;
+use Hermiod\Attribute\Constraint\ArrayValueIsFloat;
+use Hermiod\Attribute\Constraint\NumberLessThan;
 
 trait MapValueNumberLessThan
 {
@@ -12,6 +13,7 @@ trait MapValueNumberLessThan
 
     public function __construct(int|float $value)
     {
-        $this->constraint = new NumberGreaterThan($value);
+        $this->validator = new ArrayValueIsFloat();
+        $this->constraint = new NumberLessThan($value);
     }
 }

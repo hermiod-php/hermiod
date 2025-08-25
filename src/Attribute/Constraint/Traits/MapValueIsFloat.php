@@ -16,9 +16,9 @@ trait MapValueIsFloat
     public function getMismatchExplanation(PathInterface $path, mixed $value): string
     {
         return \sprintf(
-            '%s must be a float but %s given',
+            '%s must be an int or a float but %s given',
             $path->__toString(),
-            \gettype($value)
+            \gettype($value),
         );
     }
 }

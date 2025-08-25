@@ -110,7 +110,7 @@ class TransposeTest extends TestCase
         $this->assertArrayContains('$.protectedStringWithDefaultNullable must be a string but bool given', $errors);
         $this->assertArrayContains('$.publicStringWithDefaultNullable must be a string but int given', $errors);
 
-        $this->assertArrayContains("$.stringWithAttrRegex must must match regex '/foo/' but ' ' given", $errors);
+        $this->assertArrayContains("$.stringWithAttrRegex must match regex '/foo/' but ' ' given", $errors);
         $this->assertArrayContains("$.stringWithAttrUuid must be a UUID string but 'not-a-uuid' given", $errors);
         $this->assertArrayContains("$.stringWithAttrUuidAndRegex must be a UUID string but 'not-a-uuid-either' given", $errors);
         $this->assertArrayContains("$.stringWithAttrEmail must be an email address but 'bar@bar' given", $errors);

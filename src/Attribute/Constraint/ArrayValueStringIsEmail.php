@@ -10,9 +10,4 @@ use Hermiod\Attribute\Constraint\Traits\MapValueStringIsEmail;
 final class ArrayValueStringIsEmail implements ArrayConstraintInterface
 {
     use MapValueStringIsEmail;
-
-    public function __construct()
-    {
-        $this->constraint = new StringIsUuid();
-    }
 }

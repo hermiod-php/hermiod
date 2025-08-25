@@ -4,16 +4,21 @@ declare(strict_types=1);
 
 namespace Hermiod\Attribute\Constraint;
 
+use Hermiod\Attribute\Constraint\Traits\ValidateRegex;
 use Hermiod\Resource\Path\PathInterface;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 final class StringMatchesRegex implements StringConstraintInterface
 {
+    use ValidateRegex;
+
     private string $expression;
 
     public function __construct(string $regex)
     {
         $this->expression = $regex;
+
+        $this->validateRegex($regex);
     }
 
     public function valueMatchesConstraint(string $value): bool
@@ -24,7 +29,7 @@ final class StringMatchesRegex implements StringConstraintInterface
     public function getMismatchExplanation(PathInterface $path, string $value): string
     {
         return \sprintf(
-            "%s must must match regex '%s' but '%s' given",
+            "%s must match regex '%s' but '%s' given",
             $path->__toString(),
             $this->expression,
             $value,

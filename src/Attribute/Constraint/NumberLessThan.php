@@ -21,10 +21,10 @@ final readonly class NumberLessThan implements NumberConstraintInterface
     public function getMismatchExplanation(PathInterface $path, int|float $value): string
     {
         return \sprintf(
-            '%s must be a number less than %d but %d given',
+            '%s must be a number less than %s but %s given',
             $path->__toString(),
             $this->value,
-            $value
+            $value,
         );
     }
 }
