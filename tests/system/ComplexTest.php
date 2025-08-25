@@ -6,8 +6,6 @@ namespace Hermiod\Tests\System;
 
 use Hermiod\Converter;
 use Hermiod\ConverterInterface;
-use Hermiod\Tests\System\Fakes\ComplexFake;
-use Hermiod\Tests\System\Fakes\IntegerPropertiesFake;
 use PHPUnit\Framework\Attributes\Medium;
 use PHPUnit\Framework\TestCase;
 
@@ -50,9 +48,9 @@ class ComplexTest extends TestCase
             }
         ';
 
-        $result = self::$converter->toClass(ComplexFake::class, \json_decode($json));
+        $result = self::$converter->toClass(Fakes\ComplexFake::class, \json_decode($json));
 
-        $this->assertInstanceOf(ComplexFake::class, $result);
+        $this->assertInstanceOf(Fakes\ComplexFake::class, $result);
 
         $inner = $result->toArray();
 
@@ -65,7 +63,7 @@ class ComplexTest extends TestCase
         $this->assertInstanceOf(\stdClass::class, $inner['object']);
         $this->assertEquals((object)['foo' => 'bar'], $inner['object']);
 
-        $this->assertInstanceOf(IntegerPropertiesFake::class, $inner['class']);
+        $this->assertInstanceOf(Fakes\IntegerPropertiesFake::class, $inner['class']);
         $this->assertSame(null, $inner['class']->get('nullableInt'));
         $this->assertSame(858585, $inner['class']->get('nullableIntDefaultNull'));
         $this->assertSame(99, $inner['class']->get('nullableIntDefaultInt'));

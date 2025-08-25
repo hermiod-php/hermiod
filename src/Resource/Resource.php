@@ -68,7 +68,7 @@ final class Resource implements ResourceInterface
             $path,
             $this->getProperties(),
             new Property\Validation\Result(),
-            \is_object($json) ? new Json\ObjectFragment($json) : new Json\ArrayFragment($json),
+            $this->fragment($json),
         );
     }
 
@@ -163,10 +163,18 @@ final class Resource implements ResourceInterface
                 $next,
                 $property->getProperties(),
                 $result,
-                \is_object($data) ? new Json\ObjectFragment($data) : new Json\ArrayFragment($data),
+                $this->fragment($data)
             );
         }
 
         return $result;
+    }
+
+    /**
+     * @param array<mixed, mixed>|object $json
+     */
+    private function fragment(array|object &$json): Json\FragmentInterface
+    {
+        return \is_object($json) ? new Json\ObjectFragment($json) : new Json\ArrayFragment($json);
     }
 }

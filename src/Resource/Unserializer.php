@@ -37,16 +37,16 @@ final readonly class Unserializer implements UnserializerInterface
 
         if (\is_string($json)) {
             $json = \json_decode($json, true, flags: JSON_THROW_ON_ERROR);
-
-            if (!\is_array($json) || !\array_is_list($json)) {
-                throw JsonValueMustBeObjectException::new($json);
-            }
         }
 
-        return new Result(
-            $resource,
-            $hydrator,
-            $json,
-        );
+        if (\is_object($json) || (\is_array($json) && !\array_is_list($json))) {
+            return new Result(
+                $resource,
+                $hydrator,
+                $json,
+            );
+        }
+
+        throw JsonValueMustBeObjectException::new($json);
     }
 }
