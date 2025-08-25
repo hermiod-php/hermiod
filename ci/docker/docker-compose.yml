@@ -1,32 +1,68 @@
-x-common: &php-common
+x-volumes: &volumes
+  volumes:
+    - ../../src:/var/www/html/src
+    - ../../tests:/var/www/html/tests
+    - ../../composer.json:/var/www/html/composer.json
+
+x-php-config: &php-config
   volumes:
     - ../..:/var/www/html
   extra_hosts:
     - "host.docker.internal:host-gateway"
+  ports:
+    - "8080:80"
+    - "9003:9003"
   environment:
-    XDEBUG_CONFIG: 'mode=develop,debug client_host=host.docker.internal client_port=9003 start_with_request=yes idekey=PHPSTORM discover_client_host=0'
+    PHP_IDE_CONFIG: "serverName=hermiod"
+    XDEBUG_MODE: "develop,debug"
+    XDEBUG_START_WITH_REQUEST: "yes"
+    XDEBUG_CLIENT_HOST: "host.docker.internal"
+    XDEBUG_CLIENT_PORT: "9003"
+    XDEBUG_LOG: "/tmp/xdebug.log"
+
+x-build: &build
+  context: ../..
+  dockerfile: ci/docker/Dockerfile
 
 services:
   php82:
-    <<: *php-common
+    <<: *php-config
     build:
-      context: ../..
-      dockerfile: ci/docker/Dockerfile
+      <<: *build
       args:
         PHP_VERSION: 8.2
 
   php83:
-    <<: *php-common
+    <<: *php-config
     build:
-      context: ../..
-      dockerfile: ci/docker/Dockerfile
+      <<: *build
       args:
         PHP_VERSION: 8.3
 
   php84:
-    <<: *php-common
+    <<: *php-config
     build:
-      context: ../..
-      dockerfile: ci/docker/Dockerfile
+      <<: *build
+      args:
+        PHP_VERSION: 8.4
+
+  php82-ci:
+    <<: *volumes
+    build:
+      <<: *build
+      args:
+        PHP_VERSION: 8.2
+
+  php83-ci:
+    <<: *volumes
+    build:
+      <<: *build
+      args:
+        PHP_VERSION: 8.3
+
+  php84-ci:
+    <<: *volumes
+    build:
+      <<: *build
       args:
         PHP_VERSION: 8.4
