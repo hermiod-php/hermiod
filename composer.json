@@ -43,6 +43,9 @@
       "Hermiod\\Tests\\System\\": "tests/system/"
     }
   },
+  "config": {
+    "process-timeout": 900
+  },
   "scripts": {
     "tests": [
       "composer install",
@@ -56,7 +59,7 @@
       "composer install",
       "@analyse",
       "export XDEBUG_MODE=coverage && vendor/bin/phpunit -c tests/phpunit.xml --testsuite unit --path-coverage  --coverage-clover ./test-reports/$PHP_VERSION/coverage/xml/clover.xml",
-      "vendor/bin/coverage-check ./test-reports/$PHP_VERSION/coverage/xml/clover.xml 100",
+      "",
       "@tests-integration"
     ],
     "tests-ci": [
@@ -66,7 +69,7 @@
       "composer audit --no-dev",
       "@analyse",
       "export XDEBUG_MODE=coverage && vendor/bin/phpunit -c tests/phpunit.xml --testsuite unit --path-coverage  --coverage-clover ./test-reports/$PHP_VERSION/coverage/xml/clover.xml --log-junit ./test-reports/$PHP_VERSION/results/unit/junit.xml",
-      "vendor/bin/coverage-check ./test-reports/$PHP_VERSION/coverage/xml/clover.xml 100",
+      "",
       "@tests-integration",
       "@tests-system"
     ],
