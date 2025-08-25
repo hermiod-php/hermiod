@@ -36,11 +36,11 @@ final class Customer
     private int $orderCount = 1;
 
     public function __construct(
-        private string $name,
+        private readonly string $name,
         protected \DateTimeImmutable $birthDate,
     ) {}
     
-    public function getName(): name
+    public function getName(): string
     {
         return $this->name;
     }
@@ -71,7 +71,7 @@ API responses.
 
 The simplest method to decode to an object is via `toClass(array|object|string $json, string $class)`
 
-This will throw `\Hermiod\Exception\ConversionException` when issues with the JSON are detected, and this exception
+This will throw `Hermiod\Exception\ConversionException` when issues with the JSON are detected, and this exception
 contains the errors which can be converted to JSON.
 
 ```php
@@ -229,19 +229,23 @@ An interface can be mapped to a concretion in the ResourceManager directly.
 ```php
 $manager = \Hemiod\ResourceManager::create();
 
-$manager = $manager->withInterfaceResolver(
+$manager->addInterfaceResolver(
     \App\SomeTypeInterface::class,
-    fn () => \App\SomeConcrete::class,
+    \App\SomeConcrete::class,
 );
 
-$manager = $manager->withInterfaceResolver(
-    \App\SomeOtherInterface::class,
-    function (\Hemiod\Json\FramentInterface $data): string {
-        return match ($data->get('$.something.some-key')) {
-            'foo' => \App\SomeOtherFoo::class,
-            'bar' => \App\SomeOtherBar::class,
-            default => \App\SomeUnknownThing::class,
-        };
+$manager->addInterfaceResolver(
+    \App\Bank\AccountInterface::class,
+    function (array $fragment): string {
+        if (isset($fragment['iban'])) {
+            return \App\Bank\InternationalAccount::class;
+        }
+        
+        if (isset($fragment['bic'])) {
+            return \App\Bank\SwiftAccount::class;
+        }
+        
+        return \App\Bank\LocalAccount::class;
     },
 );
 ```
