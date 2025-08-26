@@ -48,6 +48,44 @@ final class CachedNamingStrategyTest extends TestCase
         }
     }
 
+    public function testCanWrapOtherStrategies()
+    {
+        $strategy = $this->createStrategyMock();
+
+        $strategy
+            ->expects($this->once())
+            ->method('format');
+
+        $cache = CachedNamingStrategy::wrap($strategy);
+
+        $this->assertInstanceOf(StrategyInterface::class, $cache);
+
+        $this->assertNotSame($strategy, $cache);
+
+        $this->assertInstanceOf(CachedNamingStrategy::class, $cache);
+
+        $cache->format('test');
+    }
+
+    public function testDoesNotWrapSelf()
+    {
+        $strategy = new CachedNamingStrategy(
+            $inner = $this->createStrategyMock()
+        );
+
+        $inner
+            ->expects($this->once())
+            ->method('format');
+
+        $cache = CachedNamingStrategy::wrap($strategy);
+
+        $this->assertInstanceOf(StrategyInterface::class, $cache);
+
+        $this->assertSame($strategy, $cache);
+
+        $cache->format('test');
+    }
+
     public function testDifferentFormatCallsDelegateToStrategy(): void
     {
         $strategy = $this->createStrategyMock();
