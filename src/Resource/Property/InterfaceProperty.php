@@ -107,7 +107,7 @@ final class InterfaceProperty implements PropertyInterface, Resource\RuntimeReso
             $name = $property->getPropertyName();
 
             $encoded[$name] = $property->normaliseJsonValue(
-                $reflection->getProperty($name)->getValue()
+                $reflection->getProperty($name)->getValue($value)
             );
         }
 
