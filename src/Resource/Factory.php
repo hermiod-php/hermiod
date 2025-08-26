@@ -16,7 +16,7 @@ final class Factory implements FactoryInterface
     /**
      * @var array<class-string, OptionsInterface>
      */
-    private static array $options = [];
+    private array $options = [];
 
     public function __construct(
         private readonly Property\FactoryInterface $properties,
@@ -31,7 +31,7 @@ final class Factory implements FactoryInterface
     /**
      * @inheritdoc
      */
-    public function createResourceForClass(string $class): ResourceInterface & PropertyBagInterface
+    public function createResourceForClass(string $class): ResourceInterface
     {
         return new Resource(
             $class,
@@ -61,8 +61,8 @@ final class Factory implements FactoryInterface
      */
     private function getOptionsForResourceClass(string $class): OptionsInterface
     {
-        if (isset(self::$options[$class])) {
-            return self::$options[$class];
+        if (isset($this->options[$class])) {
+            return $this->options[$class];
         }
 
         $reflection = new \ReflectionClass($class);
@@ -74,8 +74,8 @@ final class Factory implements FactoryInterface
             )
         );
 
-        return self::$options[$class] = $options instanceof OptionsInterface
-            ? $options
+        return $this->options[$class] = $options instanceof \ReflectionAttribute
+            ? $options->newInstance()
             : new Options();
     }
 }
