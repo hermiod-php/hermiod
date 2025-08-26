@@ -5,169 +5,441 @@ declare(strict_types=1);
 namespace Hermiod\Tests\Unit\Resource\Property;
 
 use Hermiod\Resource\FactoryInterface;
+use Hermiod\Resource\Path\PathInterface;
+use Hermiod\Resource\Property\ClassProperty;
 use Hermiod\Resource\Property\CollectionInterface;
 use Hermiod\Resource\Property\Exception\PropertyClassTypeNotFoundException;
 use Hermiod\Resource\Property\PropertyInterface;
-use Hermiod\Resource\Property\ClassProperty;
-use Hermiod\Resource\Property\Traits\ConstructWithNameAndNullableTrait;
-use Hermiod\Resource\Property\Traits\ConvertToSameJsonValue;
+use Hermiod\Resource\Property\Validation\ResultInterface;
 use Hermiod\Resource\ResourceInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ClassProperty::class)]
-#[CoversClass(ConstructWithNameAndNullableTrait::class)]
-#[CoversClass(ConvertToSameJsonValue::class)]
 class ClassPropertyTest extends TestCase
 {
+    private FactoryInterface $factory;
+
+    protected function setUp(): void
+    {
+        $this->factory = $this->createFactoryMock();
+    }
+
     public function testImplementsPropertyInterface(): void
     {
-        $this->assertInstanceOf(
-            PropertyInterface::class,
-            new ClassProperty(
-                'foo',
-                \get_class($this->createSerializableFake()),
-                true,
-                $this->createFactoryMock(),
-            ),
-        );
+        $property = new ClassProperty('test', \stdClass::class, false, $this->factory);
+
+        $this->assertInstanceOf(PropertyInterface::class, $property);
+    }
+
+    public function testImplementsResourceInterface(): void
+    {
+        $property = new ClassProperty('test', \stdClass::class, false, $this->factory);
+
+        $this->assertInstanceOf(ResourceInterface::class, $property);
     }
 
     public function testGetPropertyName(): void
     {
-        $property = new ClassProperty(
-            'foo',
-            \get_class($this->createSerializableFake()),
-            true,
-            $this->createFactoryMock(),
-        );
+        $property = new ClassProperty('testProperty', \stdClass::class, false, $this->factory);
 
-        $this->assertSame('foo', $property->getPropertyName());
+        $this->assertSame('testProperty', $property->getPropertyName());
     }
 
-    public function testGetWithoutDefaultNull(): void
+    public function testGetClassName(): void
     {
-        $property = new ClassProperty(
-            'foo',
-            \get_class($this->createSerializableFake()),
-            true,
-            $this->createFactoryMock(),
-        );
+        $property = new ClassProperty('test', \stdClass::class, false, $this->factory);
+
+        $this->assertSame(\stdClass::class, $property->getClassName());
+    }
+
+    public function testIsNullableWhenTrue(): void
+    {
+        $property = new ClassProperty('test', \stdClass::class, true, $this->factory);
+
+        $this->assertTrue($property->isNullable());
+    }
+
+    public function testIsNullableWhenFalse(): void
+    {
+        $property = new ClassProperty('test', \stdClass::class, false, $this->factory);
+
+        $this->assertFalse($property->isNullable());
+    }
+
+    public function testGetDefaultValueReturnsNull(): void
+    {
+        $property = new ClassProperty('test', \stdClass::class, false, $this->factory);
+
+        $this->assertNull($property->getDefaultValue());
+    }
+
+    public function testHasDefaultValueWhenNoDefault(): void
+    {
+        $property = new ClassProperty('test', \stdClass::class, false, $this->factory);
 
         $this->assertFalse($property->hasDefaultValue());
-        $this->assertNull($property->getDefaultValue());
     }
 
-    public function testGetWithDefaultNull(): void
+    public function testHasDefaultValueWhenWithDefaultNullValue(): void
     {
-        $property = ClassProperty::withDefaultNullValue(
-            'foo',
-            \get_class($this->createSerializableFake()),
-            true,
-            $this->createFactoryMock(),
-        );
+        $property = ClassProperty::withDefaultNullValue('test', \stdClass::class, true, $this->factory);
 
         $this->assertTrue($property->hasDefaultValue());
-        $this->assertNull($property->getDefaultValue());
     }
 
-    public function testThrowsOnInvalidClassname(): void
+    public function testWithDefaultNullValueCreatesNewInstance(): void
+    {
+        $property = ClassProperty::withDefaultNullValue('test', \stdClass::class, true, $this->factory);
+
+        $this->assertInstanceOf(ClassProperty::class, $property);
+        $this->assertTrue($property->hasDefaultValue());
+        $this->assertSame('test', $property->getPropertyName());
+        $this->assertSame(\stdClass::class, $property->getClassName());
+        $this->assertTrue($property->isNullable());
+    }
+
+    public function testConstructorThrowsExceptionForNonExistentClass(): void
     {
         $this->expectException(PropertyClassTypeNotFoundException::class);
 
-        new ClassProperty(
-            'foo',
-            '\\A\\Class\\Which\\Does\\Not\\Exist',
-            true,
-            $this->createFactoryMock(),
-        );
+        new ClassProperty('test', 'NonExistentClass', false, $this->factory);
     }
 
-    public function testCanJsonEncodeValueOfCorrectClassWhenJsonSerialisable(): void
+    public function testNormaliseJsonValueWithNonObject(): void
     {
-        $invocations = 0;
-        $expected = ['foo' => 'bar'];
+        $property = new ClassProperty('test', \stdClass::class, false, $this->factory);
 
-        $fake = $this->createSerializableFake(function () use (&$invocations, $expected) {
-            $invocations++;
-            return $expected;
-        });
-
-        $factory = $this->createFactoryMock();
-
-        $property = new ClassProperty(
-            'foo',
-            \get_class($fake),
-            true,
-            $factory,
-        );
-
-        $this->assertSame(
-            $expected,
-            $property->normaliseJsonValue($fake),
-        );
-
-        $this->assertSame(
-            1,
-            $invocations,
-            \sprintf(
-                'Expected %s::jsonSerialize() to be called %s times but was called %s times',
-                \get_class($fake),
-                1,
-                $invocations,
-            )
-        );
+        $this->assertNull($property->normaliseJsonValue('string'));
+        $this->assertNull($property->normaliseJsonValue(123));
+        $this->assertNull($property->normaliseJsonValue([]));
+        $this->assertNull($property->normaliseJsonValue(true));
     }
 
-    private function createSerializableFake(?\Closure $method = null): \JsonSerializable
+    public function testNormaliseJsonValueWithWrongObjectType(): void
     {
-        $method ??= fn () => null;
+        $property = new ClassProperty('test', \stdClass::class, false, $this->factory);
 
-        $fake = new class ($method) implements \JsonSerializable
-        {
-            public function __construct(
-                private ?\Closure $method,
-            ) {}
+        $this->assertNull($property->normaliseJsonValue(new \DateTime()));
+    }
 
+    public function testNormaliseJsonValueWithJsonSerializableObject(): void
+    {
+        // Create a concrete class that implements JsonSerializable for testing
+        $serializable = new class implements \JsonSerializable {
             public function jsonSerialize(): mixed
             {
-                return $this->method->__invoke();
+                return ['key' => 'value'];
             }
         };
 
-        return $fake;
+        $property = new ClassProperty('test', \get_class($serializable), false, $this->factory);
+
+        $result = $property->normaliseJsonValue($serializable);
+
+        $this->assertSame(['key' => 'value'], $result);
     }
 
-    private function createFactoryMock(array $properties = []): FactoryInterface & MockObject
+    public function testNormaliseJsonValueWithNonJsonSerializableObjectWhenCannotAutoSerialise(): void
     {
-        $factory = $this->createMock(FactoryInterface::class);
+        $object = new \stdClass();
 
-        $factory
+        $resource = $this->createResourceMock();
+        $resource->method('canAutomaticallySerialise')->willReturn(false);
+
+        $this->factory
+            ->expects($this->once())
             ->method('createResourceForClass')
-            ->willReturnCallback(function (string $class): ResourceInterface {
-                $resource = $this->createMock(ResourceInterface::class);
-                $collection = $this->createMock(CollectionInterface::class);
+            ->with(\stdClass::class)
+            ->willReturn($resource);
+        
+        $property = new ClassProperty('test', \stdClass::class, false, $this->factory);
 
-                $resource
-                    ->method('getProperties')
-                    ->willReturn($collection);
+        $result = $property->normaliseJsonValue($object);
 
-                $collection
-                    ->method('offsetExists')
-                    ->willReturnCallback(function (string $key) use (&$properties) {
-                        return isset($properties[$key]);
-                    });
+        $this->assertNull($result);
+    }
 
-                $collection
-                    ->method('offsetGet')
-                    ->willReturnCallback(function (string $key) use (&$properties) {
-                        return $properties[$key] ?? null;
-                    });
+    public function testNormaliseJsonValueWithNonJsonSerializableObjectWhenCanAutoSerialise(): void
+    {
+        $object = new class {
+            public string $name = 'test';
+            public int $age = 25;
+        };
 
-                return $resource;
-            });
+        $property1 = $this->createPropertyMock();
+        $property1->method('getPropertyName')->willReturn('name');
+        $property1->method('normaliseJsonValue')->with('test')->willReturn('test');
 
-        return $factory;
+        $property2 = $this->createPropertyMock();
+        $property2->method('getPropertyName')->willReturn('age');
+        $property2->method('normaliseJsonValue')->with(25)->willReturn(25);
+
+        // Create a concrete collection that implements the Iterator interface properly
+        $collection = new class([$property1, $property2]) implements CollectionInterface {
+            private array $properties;
+            private int $position = 0;
+
+            public function __construct(array $properties)
+            {
+                $this->properties = $properties;
+            }
+
+            public function rewind(): void
+            {
+                $this->position = 0;
+            }
+
+            public function current(): ?PropertyInterface
+            {
+                return $this->properties[$this->position] ?? null;
+            }
+
+            public function key(): mixed
+            {
+                return $this->position;
+            }
+
+            public function next(): void
+            {
+                ++$this->position;
+            }
+
+            public function valid(): bool
+            {
+                return isset($this->properties[$this->position]);
+            }
+
+            public function offsetExists(mixed $offset): bool
+            {
+                return isset($this->properties[$offset]);
+            }
+
+            public function offsetGet(mixed $offset): ?PropertyInterface
+            {
+                return $this->properties[$offset] ?? null;
+            }
+
+            public function offsetSet(mixed $offset, mixed $value): void
+            {
+                if (\is_null($offset)) {
+                    $this->properties[] = $value;
+                } else {
+                    $this->properties[$offset] = $value;
+                }
+            }
+
+            public function offsetUnset(mixed $offset): void
+            {
+                unset($this->properties[$offset]);
+            }
+        };
+
+        $resource = $this->createResourceMock();
+        $resource->method('canAutomaticallySerialise')->willReturn(true);
+        $resource->method('getProperties')->willReturn($collection);
+
+        $this->factory
+            ->expects($this->once())
+            ->method('createResourceForClass')
+            ->with(\get_class($object))
+            ->willReturn($resource);
+
+        $property = new ClassProperty('test', \get_class($object), false, $this->factory);
+
+        $result = $property->normaliseJsonValue($object);
+
+        $this->assertInstanceOf(\stdClass::class, $result);
+        $this->assertEquals((object)['name' => 'test', 'age' => 25], $result);
+    }
+
+    public function testCheckValueAgainstConstraintsWithNullAndNullable(): void
+    {
+        $path = $this->createPathMock();
+        $property = new ClassProperty('test', \stdClass::class, true, $this->factory);
+
+        $result = $property->checkValueAgainstConstraints($path, null);
+
+        $this->assertTrue($result->isValid());
+    }
+
+    public function testCheckValueAgainstConstraintsWithNonIterableValue(): void
+    {
+        $path = $this->createPathMock();
+        $property = new ClassProperty('test', \stdClass::class, false, $this->factory);
+
+        $result = $property->checkValueAgainstConstraints($path, 'string');
+
+        $this->assertFalse($result->isValid());
+    }
+
+    public function testCheckValueAgainstConstraintsWithArrayValue(): void
+    {
+        $path = $this->createPathMock();
+        $resultMock = $this->createValidationResultMock();
+
+        $resource = $this->createResourceMock();
+        $resource
+            ->expects($this->once())
+            ->method('validateAndTranspose')
+            ->with($path, $this->isType('array'))
+            ->willReturn($resultMock);
+
+        $this->factory
+            ->expects($this->once())
+            ->method('createResourceForClass')
+            ->with(\stdClass::class)
+            ->willReturn($resource);
+
+        $property = new ClassProperty('test', \stdClass::class, false, $this->factory);
+
+        $result = $property->checkValueAgainstConstraints($path, []);
+
+        $this->assertSame($resultMock, $result);
+    }
+
+    public function testCheckValueAgainstConstraintsWithObjectValue(): void
+    {
+        $path = $this->createPathMock();
+        $resultMock = $this->createValidationResultMock();
+
+        $resource = $this->createResourceMock();
+        $resource
+            ->expects($this->once())
+            ->method('validateAndTranspose')
+            ->with($path, $this->isType('object'))
+            ->willReturn($resultMock);
+
+        $this->factory
+            ->expects($this->once())
+            ->method('createResourceForClass')
+            ->with(\stdClass::class)
+            ->willReturn($resource);
+
+        $property = new ClassProperty('test', \stdClass::class, false, $this->factory);
+
+        $result = $property->checkValueAgainstConstraints($path, new \stdClass());
+
+        $this->assertSame($resultMock, $result);
+    }
+
+    public function testValidateAndTranspose(): void
+    {
+        $path = $this->createPathMock();
+        $json = new \stdClass();
+        $resultMock = $this->createValidationResultMock();
+
+        $resource = $this->createResourceMock();
+        $resource
+            ->expects($this->once())
+            ->method('validateAndTranspose')
+            ->with($path, $json)
+            ->willReturn($resultMock);
+
+        $this->factory
+            ->expects($this->once())
+            ->method('createResourceForClass')
+            ->with(\stdClass::class)
+            ->willReturn($resource);
+
+        $property = new ClassProperty('test', \stdClass::class, false, $this->factory);
+
+        $result = $property->validateAndTranspose($path, $json);
+
+        $this->assertSame($resultMock, $result);
+    }
+
+    public function testCanAutomaticallySerialise(): void
+    {
+        $resource = $this->createResourceMock();
+        $resource
+            ->expects($this->once())
+            ->method('canAutomaticallySerialise')
+            ->willReturn(true);
+
+        $this->factory
+            ->expects($this->once())
+            ->method('createResourceForClass')
+            ->with(\stdClass::class)
+            ->willReturn($resource);
+
+        $property = new ClassProperty('test', \stdClass::class, false, $this->factory);
+
+        $result = $property->canAutomaticallySerialise();
+
+        $this->assertTrue($result);
+    }
+
+    public function testGetProperties(): void
+    {
+        $collection = $this->createCollectionMock();
+
+        $resource = $this->createResourceMock();
+        $resource
+            ->expects($this->once())
+            ->method('getProperties')
+            ->willReturn($collection);
+
+        $this->factory
+            ->expects($this->once())
+            ->method('createResourceForClass')
+            ->with(\stdClass::class)
+            ->willReturn($resource);
+
+        $property = new ClassProperty('test', \stdClass::class, false, $this->factory);
+
+        $result = $property->getProperties();
+
+        $this->assertSame($collection, $result);
+    }
+
+    public function testInnerResourceIsLazilyCreated(): void
+    {
+        $resource = $this->createResourceMock();
+
+        $this->factory
+            ->expects($this->once())
+            ->method('createResourceForClass')
+            ->with(\stdClass::class)
+            ->willReturn($resource);
+
+        $property = new ClassProperty('test', \stdClass::class, false, $this->factory);
+
+        // First call creates the resource
+        $property->canAutomaticallySerialise();
+
+        // Second call should use cached resource (factory should only be called once)
+        $property->canAutomaticallySerialise();
+    }
+
+    private function createFactoryMock(): FactoryInterface|MockObject
+    {
+        return $this->createMock(FactoryInterface::class);
+    }
+
+    private function createResourceMock(): ResourceInterface|MockObject
+    {
+        return $this->createMock(ResourceInterface::class);
+    }
+
+    private function createPropertyMock(): PropertyInterface|MockObject
+    {
+        return $this->createMock(PropertyInterface::class);
+    }
+
+    private function createPathMock(): PathInterface|MockObject
+    {
+        return $this->createMock(PathInterface::class);
+    }
+
+    private function createCollectionMock(): CollectionInterface|MockObject
+    {
+        return $this->createMock(CollectionInterface::class);
+    }
+
+    private function createValidationResultMock(): ResultInterface|MockObject
+    {
+        return $this->createMock(ResultInterface::class);
     }
 }
