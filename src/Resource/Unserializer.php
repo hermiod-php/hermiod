@@ -36,7 +36,7 @@ final readonly class Unserializer implements UnserializerInterface
         $hydrator = $this->hydrators->createHydrator();
 
         if (\is_string($json)) {
-            $json = \json_decode($json, true, flags: JSON_THROW_ON_ERROR);
+            $json = \json_decode($json, true, flags: \JSON_THROW_ON_ERROR);
         }
 
         if (\is_object($json)) {

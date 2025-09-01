@@ -636,6 +636,101 @@ class UnserializerTest extends TestCase
         $unserializer->unserialize($primitive);
     }
 
+    public function testUnserializeWithSequentialArrayStartingFromZero(): void
+    {
+        $factory = $this->createResourceFactory();
+        $hydrator = $this->createHydratorFactory();
+        $class = 'TestClass';
+        $sequential = [0 => 'a', 1 => 'b', 2 => 'c'];
+
+        $unserializer = new Unserializer($factory, $hydrator, $class);
+
+        $this->expectException(JsonValueMustBeObjectException::class);
+
+        $unserializer->unserialize($sequential);
+    }
+
+    public function testUnserializeWithArrayIsListTrue(): void
+    {
+        $factory = $this->createResourceFactory();
+        $hydrator = $this->createHydratorFactory();
+        $class = 'TestClass';
+        $list = ['first', 'second', 'third'];
+
+        $unserializer = new Unserializer($factory, $hydrator, $class);
+
+        $this->expectException(JsonValueMustBeObjectException::class);
+
+        $unserializer->unserialize($list);
+    }
+
+    public function testUnserializeWithNonEmptyNonListArray(): void
+    {
+        $factory = $this->createResourceFactory();
+        $hydrator = $this->createHydratorFactory();
+        $resource = $this->createResource();
+        $hydratorMock = $this->createHydrator();
+        $class = 'TestClass';
+        $nonList = [1 => 'first', 3 => 'third', 5 => 'fifth']; // Non-sequential keys
+
+        $this->setupMockExpectations($factory, $hydrator, $resource, $hydratorMock, $class);
+
+        $unserializer = new Unserializer($factory, $hydrator, $class);
+        $result = $unserializer->unserialize($nonList);
+
+        $this->assertInstanceOf(ResultInterface::class, $result);
+    }
+
+    public function testUnserializeWithMixedKeysArray(): void
+    {
+        $factory = $this->createResourceFactory();
+        $hydrator = $this->createHydratorFactory();
+        $resource = $this->createResource();
+        $hydratorMock = $this->createHydrator();
+        $class = 'TestClass';
+        $mixed = ['name' => 'test', 0 => 'indexed', 'age' => 30]; // Mixed string and numeric keys
+
+        $this->setupMockExpectations($factory, $hydrator, $resource, $hydratorMock, $class);
+
+        $unserializer = new Unserializer($factory, $hydrator, $class);
+        $result = $unserializer->unserialize($mixed);
+
+        $this->assertInstanceOf(ResultInterface::class, $result);
+    }
+
+    #[DataProvider('unparseableInputProvider')]
+    public function testUnserializeWithVariousIncorrectInputTypes(mixed $value): void
+    {
+        $factory = $this->createResourceFactory();
+        $hydrator = $this->createHydratorFactory();
+        $class = 'TestClass';
+
+        $unserializer = new Unserializer($factory, $hydrator, $class);
+
+        $this->expectException(\TypeError::class);
+
+        $unserializer->unserialize($value);
+    }
+
+    public static function unparseableInputProvider(): array
+    {
+        $resource = \fopen('php://memory', 'r');
+
+        $data = [
+            'integer' => [42],
+            'float' => [3.14],
+            'boolean true' => [true],
+            'boolean false' => [false],
+            'null' => [null],
+            'resource' => [$resource],
+        ];
+
+        // Close resource after creating the data
+        \fclose($resource);
+
+        return $data;
+    }
+
     public static function classNameProvider(): array
     {
         return [
