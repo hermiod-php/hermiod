@@ -12,10 +12,10 @@ final class InvalidDefaultValueException extends \InvalidArgumentException imple
 {
     public static function new(string $type, mixed $given, bool $nullable, string ...$otherAcceptableTypes): self
     {
-        $otherAcceptableTypes[] = $type;
+        $allAcceptableTypes = [$type, ...$otherAcceptableTypes];
 
         if ($nullable) {
-            $otherAcceptableTypes[] = 'null';
+            $allAcceptableTypes[] = 'null';
         }
 
         return new self(
@@ -23,8 +23,8 @@ final class InvalidDefaultValueException extends \InvalidArgumentException imple
                 "The value type (%s) is not a valid default for the property type (%s). Acceptable %s (%s).",
                 \get_debug_type($given),
                 $type,
-                \count($otherAcceptableTypes) > 1 ? 'types are' : 'type is',
-                \implode('), (', $otherAcceptableTypes),
+                \count($allAcceptableTypes) > 1 ? 'types are' : 'type is',
+                \implode('), (', $allAcceptableTypes),
             )
         );
     }
