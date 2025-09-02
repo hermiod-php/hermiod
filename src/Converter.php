@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Hermiod;
 
 use Hermiod\Exception\ConversionException;
-use Hermiod\Resource\Unserializer\UnserializerInterface;
 use Hermiod\Result\ResultInterface;
 
 /**
@@ -13,11 +12,6 @@ use Hermiod\Result\ResultInterface;
  */
 final class Converter implements ConverterInterface
 {
-    /**
-     * @var array<class-string, UnserializerInterface<Type>>
-     */
-    private array $unserializers = [];
-
     /**
      * @return self<Type>
      */
