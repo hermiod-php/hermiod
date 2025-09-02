@@ -10,6 +10,8 @@ use Hermiod\Resource\Property\ClassProperty;
 use Hermiod\Resource\Property\CollectionInterface;
 use Hermiod\Resource\Property\Exception\PropertyClassTypeNotFoundException;
 use Hermiod\Resource\Property\PropertyInterface;
+use Hermiod\Resource\Property\Traits\ConstructWithNameAndNullableTrait;
+use Hermiod\Resource\Property\Traits\GetPropertyNameTrait;
 use Hermiod\Resource\Property\Validation\ResultInterface;
 use Hermiod\Resource\ResourceInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -17,6 +19,8 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ClassProperty::class)]
+#[CoversClass(ConstructWithNameAndNullableTrait::class)]
+#[CoversClass(GetPropertyNameTrait::class)]
 class ClassPropertyTest extends TestCase
 {
     private FactoryInterface $factory;

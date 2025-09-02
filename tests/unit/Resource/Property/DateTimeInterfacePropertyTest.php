@@ -8,12 +8,14 @@ use Hermiod\Resource\Path\PathInterface;
 use Hermiod\Resource\Property\PropertyInterface;
 use Hermiod\Resource\Property\DateTimeInterfaceProperty;
 use Hermiod\Resource\Property\Traits\ConstructWithNameAndNullableTrait;
+use Hermiod\Resource\Property\Traits\GetPropertyNameTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(DateTimeInterfaceProperty::class)]
 #[CoversClass(ConstructWithNameAndNullableTrait::class)]
+#[CoversClass(GetPropertyNameTrait::class)]
 class DateTimeInterfacePropertyTest extends TestCase
 {
     private const ISO_8601_FORMAT_WITH_MILLISECONDS = 'Y-m-d\TH:i:s.vP';

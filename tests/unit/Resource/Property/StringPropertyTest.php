@@ -11,12 +11,14 @@ use Hermiod\Resource\Property\PropertyInterface;
 use Hermiod\Resource\Property\StringProperty;
 use Hermiod\Resource\Property\Traits\ConstructWithNameAndNullableTrait;
 use Hermiod\Resource\Property\Traits\ConvertToSameJsonValue;
+use Hermiod\Resource\Property\Traits\GetPropertyNameTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(StringProperty::class)]
 #[CoversClass(ConstructWithNameAndNullableTrait::class)]
+#[CoversClass(GetPropertyNameTrait::class)]
 #[CoversClass(ConvertToSameJsonValue::class)]
 class StringPropertyTest extends TestCase
 {
@@ -271,6 +273,28 @@ class StringPropertyTest extends TestCase
         $property = StringProperty::withDefaultValue('foo', true, $default);
 
         $this->assertSame($expected, $property->normalisePhpValue($value));
+    }
+
+    #[DataProvider('jsonValueProvider')]
+    public function testNormalisingToJsonReturnsSameValue(mixed $value): void
+    {
+        $property = StringProperty::withDefaultValue('foo', true, null);
+
+        $this->assertSame($value, $property->normaliseJsonValue($value));
+    }
+
+    public static function jsonValueProvider(): array
+    {
+        return [
+            'string' => ['foo'],
+            'int' => [123],
+            'float' => [12.34],
+            'array' => [[]],
+            'object' => [(object) ['prop' => 'value']],
+            'true' => [true],
+            'false' => [false],
+            'null' => [null],
+        ];
     }
 
     public static function normalisationCasesWithoutDefault(): array

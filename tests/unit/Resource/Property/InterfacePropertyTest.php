@@ -10,16 +10,19 @@ use Hermiod\Resource\Property\FactoryInterface;
 use Hermiod\Resource\Property\InterfaceProperty;
 use Hermiod\Resource\Property\PropertyInterface;
 use Hermiod\Resource\Property\CollectionInterface;
+use Hermiod\Resource\Property\Traits\ConstructWithNameAndNullableTrait;
+use Hermiod\Resource\Property\Traits\GetPropertyNameTrait;
 use Hermiod\Resource\Property\Validation\Result;
 use Hermiod\Resource\Property\Validation\ResultInterface;
 use Hermiod\Resource\ResourceInterface;
 use Hermiod\Resource\RuntimeResolverInterface;
-use Hermiod\Resource\PropertyBagInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(InterfaceProperty::class)]
+#[CoversClass(ConstructWithNameAndNullableTrait::class)]
+#[CoversClass(GetPropertyNameTrait::class)]
 class InterfacePropertyTest extends TestCase
 {
     private FactoryInterface|MockObject $factory;
@@ -360,7 +363,7 @@ class InterfacePropertyTest extends TestCase
     private function createIntersectionTypeMock(): object
     {
         // Create a concrete test double class that implements all required interfaces
-        $testDoubleClass = new class implements ResourceInterface, PropertyInterface, PropertyBagInterface {
+        $testDoubleClass = new class implements ResourceInterface, PropertyInterface {
             public function canAutomaticallySerialise(): bool { return false; }
             public function getClassName(): string { return 'TestClass'; }
             public function validateAndTranspose(PathInterface $path, object|array &$json): ResultInterface {
@@ -375,6 +378,11 @@ class InterfacePropertyTest extends TestCase
                     public function offsetUnset(mixed $offset): void {}
                     public function getIterator(): \Traversable { return new \EmptyIterator(); }
                     public function count(): int { return 0; }
+                    public function current(): ?PropertyInterface { return null; }
+                    public function next(): void { }
+                    public function key(): mixed { return null; }
+                    public function valid(): bool { return false; }
+                    public function rewind(): void { }
                 };
                 return $mock;
             }
@@ -402,7 +410,7 @@ class InterfacePropertyTest extends TestCase
         ?CollectionInterface $properties = null,
         ?ResultInterface $validationResult = null
     ): object {
-        return new class($canAutoSerialise, $properties, $validationResult) implements ResourceInterface, PropertyInterface, PropertyBagInterface {
+        return new class($canAutoSerialise, $properties, $validationResult) implements ResourceInterface, PropertyInterface {
             public function __construct(
                 private bool $canAutoSerialise,
                 private ?CollectionInterface $properties,
@@ -424,6 +432,11 @@ class InterfacePropertyTest extends TestCase
                     public function offsetUnset(mixed $offset): void {}
                     public function getIterator(): \Traversable { return new \EmptyIterator(); }
                     public function count(): int { return 0; }
+                    public function current(): ?PropertyInterface { return null; }
+                    public function next(): void { }
+                    public function key(): mixed { return null; }
+                    public function valid(): bool { return false; }
+                    public function rewind(): void { }
                 };
             }
             public function getPropertyName(): string { return 'test'; }

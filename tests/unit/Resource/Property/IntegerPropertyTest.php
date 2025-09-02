@@ -11,12 +11,14 @@ use Hermiod\Resource\Property\PropertyInterface;
 use Hermiod\Resource\Property\IntegerProperty;
 use Hermiod\Resource\Property\Traits\ConstructWithNameAndNullableTrait;
 use Hermiod\Resource\Property\Traits\ConvertToSameJsonValue;
+use Hermiod\Resource\Property\Traits\GetPropertyNameTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(IntegerProperty::class)]
 #[CoversClass(ConstructWithNameAndNullableTrait::class)]
+#[CoversClass(GetPropertyNameTrait::class)]
 #[CoversClass(ConvertToSameJsonValue::class)]
 class IntegerPropertyTest extends TestCase
 {
@@ -67,6 +69,28 @@ class IntegerPropertyTest extends TestCase
         $new = $property->withConstraint($constraint);
 
         $this->assertNotSame($property, $new);
+    }
+
+    #[DataProvider('jsonValueProvider')]
+    public function testNormalisingToJsonReturnsSameValue(mixed $value): void
+    {
+        $property = IntegerProperty::withDefaultValue('foo', false, 666);
+
+        $this->assertSame($value, $property->normaliseJsonValue($value));
+    }
+
+    public static function jsonValueProvider(): array
+    {
+        return [
+            'string' => ['foo'],
+            'int' => [123],
+            'float' => [12.34],
+            'array' => [[]],
+            'object' => [(object) ['prop' => 'value']],
+            'true' => [true],
+            'false' => [false],
+            'null' => [null],
+        ];
     }
 
     #[DataProvider('validValueProvider')]

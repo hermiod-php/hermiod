@@ -9,6 +9,7 @@ use Hermiod\Resource\Property\Exception\InvalidDefaultValueException;
 use Hermiod\Resource\Property\PropertyInterface;
 use Hermiod\Resource\Property\BooleanProperty;
 use Hermiod\Resource\Property\Traits\ConstructWithNameAndNullableTrait;
+use Hermiod\Resource\Property\Traits\GetPropertyNameTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 
 #[CoversClass(BooleanProperty::class)]
 #[CoversClass(ConstructWithNameAndNullableTrait::class)]
+#[CoversClass(GetPropertyNameTrait::class)]
 class BooleanPropertyTest extends TestCase
 {
     public function testImplementsPropertyInterface(): void
@@ -64,6 +66,28 @@ class BooleanPropertyTest extends TestCase
         $this->expectException(InvalidDefaultValueException::class);
 
         BooleanProperty::withDefaultValue('foo', false, null);
+    }
+
+    #[DataProvider('jsonValueProvider')]
+    public function testNormalisingToJsonReturnsSameValue(mixed $value): void
+    {
+        $property = BooleanProperty::withDefaultValue('foo', false, true);
+
+        $this->assertSame($value, $property->normaliseJsonValue($value));
+    }
+
+    public static function jsonValueProvider(): array
+    {
+        return [
+            'string' => ['foo'],
+            'int' => [123],
+            'float' => [12.34],
+            'array' => [[]],
+            'object' => [(object) ['prop' => 'value']],
+            'true' => [true],
+            'false' => [false],
+            'null' => [null],
+        ];
     }
 
     #[TestWith([true])]
