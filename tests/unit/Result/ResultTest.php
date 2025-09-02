@@ -83,7 +83,13 @@ final class ResultTest extends TestCase
         $this->assertSame(
             $object,
             $result->getInstance(),
-            'instance() should return the hydrated object'
+            'Should return the hydrated object'
+        );
+
+        $this->assertSame(
+            $result->getInstance(),
+            $result->getInstance(),
+            'Should return the same hydrated object'
         );
     }
 
