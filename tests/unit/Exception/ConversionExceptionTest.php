@@ -23,7 +23,7 @@ final class ConversionExceptionTest extends TestCase
         $this->assertInstanceOf(ConversionException::class, $exception);
         $this->assertInstanceOf(\DomainException::class, $exception);
         $this->assertInstanceOf(Exception::class, $exception);
-        $this->assertSame('Invalid property in JSON structure', $exception->getMessage());
+        $this->assertSame('Invalid property in JSON structure. ', $exception->getMessage());
         $this->assertSame($errors, $exception->getErrors());
     }
 
@@ -37,7 +37,7 @@ final class ConversionExceptionTest extends TestCase
         $this->assertInstanceOf(ConversionException::class, $exception);
         $this->assertInstanceOf(\DomainException::class, $exception);
         $this->assertInstanceOf(Exception::class, $exception);
-        $this->assertSame('Invalid properties in JSON structure', $exception->getMessage());
+        $this->assertSame('Invalid properties in JSON structure. ', $exception->getMessage());
         $this->assertSame($errors, $exception->getErrors());
     }
 
@@ -48,7 +48,7 @@ final class ConversionExceptionTest extends TestCase
 
         $exception = ConversionException::dueToTranspositionErrors($errors);
 
-        $this->assertSame('Invalid properties in JSON structure', $exception->getMessage());
+        $this->assertSame('Invalid properties in JSON structure. ', $exception->getMessage());
         $this->assertSame($errors, $exception->getErrors());
     }
 
@@ -59,7 +59,7 @@ final class ConversionExceptionTest extends TestCase
 
         $exception = ConversionException::dueToTranspositionErrors($errors);
 
-        $this->assertSame('Invalid properties in JSON structure', $exception->getMessage());
+        $this->assertSame('Invalid properties in JSON structure. ', $exception->getMessage());
         $this->assertSame($errors, $exception->getErrors());
     }
 
@@ -111,7 +111,7 @@ final class ConversionExceptionTest extends TestCase
 
         $exception = ConversionException::dueToTranspositionErrors($errors);
 
-        $this->assertSame('Invalid properties in JSON structure', $exception->getMessage());
+        $this->assertSame('Invalid properties in JSON structure. ', $exception->getMessage());
         $this->assertSame($errors, $exception->getErrors());
     }
 }

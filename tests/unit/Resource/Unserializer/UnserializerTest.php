@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Hermiod\Tests\Unit\Resource;
+namespace Hermiod\Tests\Unit\Resource\Unserializer;
 
 use Hermiod\Exception\JsonValueMustBeObjectException;
 use Hermiod\Resource\FactoryInterface;
 use Hermiod\Resource\Hydrator\FactoryInterface as HydratorFactoryInterface;
 use Hermiod\Resource\Hydrator\HydratorInterface;
 use Hermiod\Resource\ResourceInterface;
-use Hermiod\Resource\Unserializer;
-use Hermiod\Resource\UnserializerInterface;
+use Hermiod\Resource\Unserializer\Unserializer;
+use Hermiod\Resource\Unserializer\UnserializerInterface;
 use Hermiod\Result\ResultInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -156,7 +156,7 @@ class UnserializerTest extends TestCase
 
         $unserializer = new Unserializer($factory, $hydrator, $class);
 
-        $this->expectException(\JsonException::class);
+        $this->expectException(JsonValueMustBeObjectException::class);
 
         $unserializer->unserialize($invalid);
     }
@@ -285,7 +285,7 @@ class UnserializerTest extends TestCase
 
         $unserializer = new Unserializer($factory, $hydrator, $class);
 
-        $this->expectException(\JsonException::class);
+        $this->expectException(JsonValueMustBeObjectException::class);
 
         $unserializer->unserialize($invalid);
     }
@@ -299,7 +299,7 @@ class UnserializerTest extends TestCase
 
         $unserializer = new Unserializer($factory, $hydrator, $class);
 
-        $this->expectException(\JsonException::class);
+        $this->expectException(JsonValueMustBeObjectException::class);
 
         $unserializer->unserialize($malformed);
     }
@@ -482,7 +482,7 @@ class UnserializerTest extends TestCase
 
         $unserializer = new Unserializer($factory, $hydrator, $class);
 
-        $this->expectException(\JsonException::class);
+        $this->expectException(JsonValueMustBeObjectException::class);
 
         $unserializer->unserialize($invalid);
     }

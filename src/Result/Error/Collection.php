@@ -24,6 +24,13 @@ final class Collection implements CollectionInterface
         );
     }
 
+    public static function fromThrowable(\Throwable $exception): self
+    {
+        return new self(
+            new Error($exception->getMessage())
+        );
+    }
+
     public function __construct(ErrorInterface ...$error)
     {
         $this->errors = $error;

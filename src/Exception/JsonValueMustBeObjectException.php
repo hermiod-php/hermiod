@@ -10,12 +10,22 @@ namespace Hermiod\Exception;
  */
 final class JsonValueMustBeObjectException extends \InvalidArgumentException implements Exception
 {
-    public static function new(mixed $actual): self
+    public static function invalidType(mixed $actual): self
     {
         return new self(
             \sprintf(
                 'JSON string must decode to an object, but resulting type was %s.',
                 \gettype($actual),
+            )
+        );
+    }
+
+    public static function invalidJson(string $error): self
+    {
+        return new self(
+            \sprintf(
+                "JSON string must decode to an object, but decoding failed with '%s'",
+                $error,
             )
         );
     }

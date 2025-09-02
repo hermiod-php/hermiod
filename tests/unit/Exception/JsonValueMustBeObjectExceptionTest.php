@@ -16,7 +16,7 @@ final class JsonValueMustBeObjectExceptionTest extends TestCase
     #[DataProvider('valueTypeProvider')]
     public function testNewWithVariousTypes(mixed $value, string $expectedType): void
     {
-        $exception = JsonValueMustBeObjectException::new($value);
+        $exception = JsonValueMustBeObjectException::invalidType($value);
 
         $this->assertInstanceOf(JsonValueMustBeObjectException::class, $exception);
         $this->assertInstanceOf(\InvalidArgumentException::class, $exception);
@@ -30,9 +30,26 @@ final class JsonValueMustBeObjectExceptionTest extends TestCase
         $this->assertSame($expectedMessage, $exception->getMessage());
     }
 
+    #[DataProvider('jsonErrorProvider')]
+    public function testInvalidJsonWithVariousErrors(string $error): void
+    {
+        $exception = JsonValueMustBeObjectException::invalidJson($error);
+
+        $this->assertInstanceOf(JsonValueMustBeObjectException::class, $exception);
+        $this->assertInstanceOf(\InvalidArgumentException::class, $exception);
+        $this->assertInstanceOf(Exception::class, $exception);
+
+        $expectedMessage = \sprintf(
+            "JSON string must decode to an object, but decoding failed with '%s'",
+            $error
+        );
+
+        $this->assertSame($expectedMessage, $exception->getMessage());
+    }
+
     public function testExceptionHierarchy(): void
     {
-        $exception = JsonValueMustBeObjectException::new('string');
+        $exception = JsonValueMustBeObjectException::invalidType('string');
 
         $this->assertInstanceOf(\InvalidArgumentException::class, $exception);
         $this->assertInstanceOf(\Exception::class, $exception);
@@ -40,15 +57,46 @@ final class JsonValueMustBeObjectExceptionTest extends TestCase
         $this->assertInstanceOf(Exception::class, $exception);
     }
 
-    public function testMessageFormat(): void
+    public function testInvalidTypeMessageFormat(): void
     {
-        $exception = JsonValueMustBeObjectException::new(123);
+        $exception = JsonValueMustBeObjectException::invalidType(123);
 
         $message = $exception->getMessage();
 
         $this->assertStringStartsWith('JSON string must decode to an object', $message);
         $this->assertStringContainsString('but resulting type was', $message);
         $this->assertStringEndsWith('.', $message);
+    }
+
+    public function testInvalidJsonMessageFormat(): void
+    {
+        $exception = JsonValueMustBeObjectException::invalidJson('Syntax error');
+
+        $message = $exception->getMessage();
+
+        $this->assertStringStartsWith('JSON string must decode to an object', $message);
+        $this->assertStringContainsString('but decoding failed with', $message);
+        $this->assertStringContainsString("'Syntax error'", $message);
+    }
+
+    public function testInvalidJsonWithEmptyError(): void
+    {
+        $exception = JsonValueMustBeObjectException::invalidJson('');
+
+        $expectedMessage = "JSON string must decode to an object, but decoding failed with ''";
+        $this->assertSame($expectedMessage, $exception->getMessage());
+    }
+
+    public function testInvalidJsonWithSpecialCharacters(): void
+    {
+        $error = "Error with \"quotes\" and 'apostrophes' and\nnewlines";
+        $exception = JsonValueMustBeObjectException::invalidJson($error);
+
+        $expectedMessage = \sprintf(
+            "JSON string must decode to an object, but decoding failed with '%s'",
+            $error
+        );
+        $this->assertSame($expectedMessage, $exception->getMessage());
     }
 
     public static function valueTypeProvider(): array
@@ -95,6 +143,28 @@ final class JsonValueMustBeObjectExceptionTest extends TestCase
 
             // Resource (closed)
             'closed resource' => [$resource, 'resource (closed)'],
+        ];
+    }
+
+    public static function jsonErrorProvider(): array
+    {
+        return [
+            'syntax error' => ['Syntax error'],
+            'unexpected token' => ['Unexpected token'],
+            'malformed json' => ['Malformed JSON'],
+            'invalid escape sequence' => ['Invalid escape sequence'],
+            'maximum depth exceeded' => ['Maximum stack depth exceeded'],
+            'control character error' => ['Control character error'],
+            'state mismatch' => ['State mismatch'],
+            'utf8 error' => ['Malformed UTF-8 characters'],
+            'empty error' => [''],
+            'error with quotes' => ['Error with "quotes" in message'],
+            'error with apostrophes' => ["Error with 'apostrophes' in message"],
+            'error with newlines' => ["Error with\nnewlines"],
+            'error with tabs' => ["Error with\ttabs"],
+            'long error message' => ['This is a very long error message that describes in detail what went wrong during JSON parsing and why the operation failed'],
+            'unicode error' => ['Error with unicode: ñáéíóú'],
+            'special characters' => ['Error with special chars: !@#$%^&*()'],
         ];
     }
 }

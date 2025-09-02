@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Hermiod;
 
 use Hermiod\Exception\ConversionException;
-use Hermiod\Resource\Unserializer;
-use Hermiod\Resource\UnserializerInterface;
+use Hermiod\Resource\Unserializer\UnserializerInterface;
 use Hermiod\Result\ResultInterface;
 
 /**
@@ -38,13 +37,18 @@ final class Converter implements ConverterInterface
                     new Resource\Name\CamelCase(),
                 ),
             ),
-            new Resource\Hydrator\LaminasHydratorFactory(),
+            new Resource\Unserializer\Factory(
+                new Resource\ProxyCallbackFactory(function () use (&$factory) {
+                    return $factory;
+                }),
+                new Resource\Hydrator\LaminasHydratorFactory(),
+            ),
         );
     }
 
     public function __construct(
         private Resource\FactoryInterface $resourceFactory,
-        private Resource\Hydrator\FactoryInterface $hydratorFactory,
+        private Resource\Unserializer\FactoryInterface $unserializerFactory,
     ) {}
 
     /**
@@ -75,7 +79,11 @@ final class Converter implements ConverterInterface
      */
     public function tryToClass(string $class, array|object|string $json): ResultInterface
     {
-        return $this->getUnserializer($class)->unserialize($json);
+        try {
+            return $this->unserializerFactory->createUnserializerForClass($class)->unserialize($json);
+        } catch (Exception\Exception $exception) {
+            throw ConversionException::dueToUnparsableJsonException($exception);
+        }
     }
 
     /**
@@ -108,22 +116,8 @@ final class Converter implements ConverterInterface
             Resource\Name\CachedNamingStrategy::wrap($strategy)
         );
 
-        $this->unserializers = [];
+        $this->unserializerFactory = $this->unserializerFactory->withResourceFactory($this->resourceFactory);
 
         return $this;
-    }
-
-    /**
-     * @param class-string<Type> $class
-     *
-     * @return UnserializerInterface<Type>
-     */
-    private function getUnserializer(string $class): UnserializerInterface
-    {
-        return $this->unserializers[$class] ??= new Unserializer(
-            $this->resourceFactory,
-            $this->hydratorFactory,
-            $class,
-        );
     }
 }
