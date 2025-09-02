@@ -19,10 +19,15 @@ final class Factory implements FactoryInterface
     ) {}
 
     /**
-     * @inheritDoc
+     * @template  Type of object
+     *
+     * @param class-string<Type> $class
+     *
+     * @return UnserializerInterface<Type>
      */
     public function createUnserializerForClass(string $class): UnserializerInterface
     {
+        /** @phpstan-ignore-next-line return.type */
         return $this->cache[$class] ??= new Unserializer(
             $this->resourceFactory,
             $this->hydratorFactory,
