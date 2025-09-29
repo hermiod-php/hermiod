@@ -46,7 +46,7 @@ final class ArrayValueStringIsEmailTest extends TestCase
         $message = $constraint->getMismatchExplanation($path, 'invalid-email');
 
         $this->assertSame(
-            "$.email must be an email address but 'invalid-email' given",
+            "$.email must be an email address string but 'invalid-email' given",
             $message,
             'Expected mismatch explanation to match'
         );

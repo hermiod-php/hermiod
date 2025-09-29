@@ -46,7 +46,7 @@ final class ArrayValueIsIntegerTest extends TestCase
 
         $this->assertStringContainsString('$.foo.bar[3]', $explanation, 'Expected explanation to include JSONPath');
         $this->assertStringContainsString('must be an integer', $explanation, 'Expected message to mention integer requirement');
-        $this->assertStringContainsString('double given', $explanation, 'Expected message to include actual type');
+        $this->assertStringContainsString('float given', $explanation, 'Expected message to include actual type');
     }
 
     // 👇 Private helper

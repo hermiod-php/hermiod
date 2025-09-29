@@ -46,7 +46,7 @@ final class ArrayValueIsStringTest extends TestCase
 
         $this->assertStringContainsString('$.profile.email', $explanation, 'Expected explanation to include JSONPath');
         $this->assertStringContainsString('must be a string', $explanation, 'Expected message to mention string requirement');
-        $this->assertStringContainsString('integer given', $explanation, 'Expected message to include actual type');
+        $this->assertStringContainsString('int given', $explanation, 'Expected message to include actual type');
     }
 
     private function createMockPath(string $string): PathInterface & \PHPUnit\Framework\MockObject\MockObject

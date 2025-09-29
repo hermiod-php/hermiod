@@ -6,6 +6,7 @@ namespace Hermiod\Tests\Unit\Attribute\Constraint;
 
 use Hermiod\Attribute\Constraint\ObjectValueIsString;
 use Hermiod\Resource\Path\PathInterface;
+use Hermiod\Traits\JsonCompatibleTypeName;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -13,6 +14,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ObjectValueIsString::class)]
 final class ObjectValueIsStringTest extends TestCase
 {
+    use JsonCompatibleTypeName;
+
     #[DataProvider('provideValidValues')]
     public function testValidValuesAreAccepted(mixed $value): void
     {
@@ -48,7 +51,7 @@ final class ObjectValueIsStringTest extends TestCase
         $message = $constraint->getMismatchExplanation($path, $value);
 
         $this->assertStringContainsString('$.value', $message, 'Expected explanation to include the path');
-        $this->assertStringContainsString(\gettype($value), $message, 'Expected explanation to include the value type');
+        $this->assertStringContainsString($this->getTypeName($value), $message, 'Expected explanation to include the value type');
     }
 
     /**
