@@ -24,10 +24,12 @@ use Hermiod\Tests\Unit\Fakes\FakeRuntimeResolverProperty;
 use Hermiod\Tests\Unit\Fakes\FakeValidationResult;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Medium;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Resource::class)]
+#[Medium]
 class ResourceTest extends TestCase
 {
     public function testImplementsResourceInterface(): void

@@ -23,6 +23,20 @@ final class Resolver implements ResolverInterface
             throw Exception\InterfaceNotFoundException::for($interface);
         }
 
+        if (\is_callable($resolver)) {
+            $this->resolvers[$interface] = $resolver;
+
+            return;
+        }
+
+        if (!\class_exists($resolver)) {
+            throw Exception\ResolvedClassNameException::noSuchClass($resolver);
+        }
+
+        if (!\is_a($resolver, $interface, true)) {
+            throw Exception\ResolvedClassNameException::classIsNotAnImplementationOf($interface, $resolver);
+        }
+
         $this->resolvers[$interface] = $resolver;
     }
 
@@ -52,9 +66,11 @@ final class Resolver implements ResolverInterface
 
         $resolved = $this->resolvers[$interface];
 
-        if (\is_callable($resolved)) {
-            $resolved = $resolved($fragment);
+        if (\is_string($resolved)) {
+            return $resolved;
         }
+
+        $resolved = $resolved($fragment);
 
         if (!\is_string($resolved)) {
             throw Exception\ResolvedClassNameException::didNotResolveToString($interface, $resolved);

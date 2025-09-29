@@ -24,7 +24,7 @@ final class ResolvedClassNameException extends \RuntimeException implements Exce
     {
         return new self(
             \sprintf(
-                "No resolver for %s did not resolve to a class string. %s returned.",
+                "The callable resolver for %s did not resolve to a class string. %s returned.",
                 $interface,
                 \get_debug_type($value),
             )
@@ -38,6 +38,16 @@ final class ResolvedClassNameException extends \RuntimeException implements Exce
                 "Resolved class %s is not an implementation of the interface %s",
                 $class,
                 $interface,
+            )
+        );
+    }
+
+    public static function noSuchClass(string $class): self
+    {
+        return new self(
+            \sprintf(
+                "Class '%s' not found",
+                $class,
             )
         );
     }

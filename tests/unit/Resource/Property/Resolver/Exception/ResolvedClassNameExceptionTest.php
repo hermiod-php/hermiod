@@ -40,10 +40,11 @@ final class ResolvedClassNameExceptionTest extends TestCase
         $this->assertInstanceOf(Exception::class, $exception);
 
         $expectedMessage = \sprintf(
-            "No resolver for %s did not resolve to a class string. %s returned.",
+            "The callable resolver for %s did not resolve to a class string. %s returned.",
             $interface,
             $expectedType
         );
+
         $this->assertSame($expectedMessage, $exception->getMessage());
     }
 
@@ -95,7 +96,7 @@ final class ResolvedClassNameExceptionTest extends TestCase
         $exception = ResolvedClassNameException::didNotResolveToString($interface, $value);
 
         $message = $exception->getMessage();
-        $this->assertStringStartsWith('No resolver for', $message);
+        $this->assertStringStartsWith('The callable resolver for', $message);
         $this->assertStringContainsString($interface, $message);
         $this->assertStringContainsString('did not resolve to a class string', $message);
         $this->assertStringContainsString('returned', $message);

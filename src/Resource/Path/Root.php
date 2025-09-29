@@ -24,7 +24,7 @@ final class Root implements PathInterface
         return \implode('', $this->path);
     }
 
-    public function withObjectKey(string $key): Root
+    public function withObjectKey(string $key): PathInterface
     {
         $key = \trim($key);
 
@@ -41,7 +41,7 @@ final class Root implements PathInterface
         return $copy;
     }
 
-    public function withArrayKey(int $key): Root
+    public function withArrayKey(int $key): PathInterface
     {
         $copy = clone $this;
 

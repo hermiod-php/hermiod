@@ -6,20 +6,17 @@ namespace Hermiod\Tests\Unit\Resource;
 
 use Hermiod\Resource\FactoryInterface;
 use Hermiod\Resource\Name\StrategyInterface;
-use Hermiod\Resource\Path;
-use Hermiod\Resource\Property;
 use Hermiod\Resource\Property\FactoryInterface as PropertyFactoryInterface;
-use Hermiod\Resource\Property\PropertyInterface;
-use Hermiod\Resource\Property\Resolver\ResolverInterface;
-use Hermiod\Resource\PropertyBagInterface;
 use Hermiod\Resource\ProxyCallbackFactory;
 use Hermiod\Resource\ResourceInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Medium;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ProxyCallbackFactory::class)]
+#[Medium]
 class ProxyCallbackFactoryTest extends TestCase
 {
     private FactoryInterface|MockObject $wrappedFactory;
@@ -273,7 +270,6 @@ class ProxyCallbackFactoryTest extends TestCase
 
     public function testClosureCapturingVariables(): void
     {
-        $capturedValue = 'captured';
         $mockFactory = $this->createMock(FactoryInterface::class);
         $mockResource = $this->createMock(ResourceInterface::class);
 
