@@ -42,53 +42,5 @@
       "Hermiod\\Tests\\Integration\\": "tests/integration/",
       "Hermiod\\Tests\\System\\": "tests/system/"
     }
-  },
-  "config": {
-    "process-timeout": 900
-  },
-  "scripts": {
-    "tests": [
-      "composer install",
-      "@analyse",
-      "@tests-unit",
-      "@tests-integration",
-      "@tests-system"
-    ],
-    "tests-coverage": [
-      "@php-version",
-      "composer install",
-      "@analyse",
-      "export XDEBUG_MODE=coverage && vendor/bin/phpunit -c tests/phpunit.xml --testsuite unit --path-coverage  --coverage-clover ./test-reports/$PHP_VERSION/coverage/xml/clover.xml",
-      "@tests-integration"
-    ],
-    "tests-ci": [
-      "@php-version",
-      "composer install",
-      "composer outdated --minor-only --direct --strict",
-      "composer audit --no-dev",
-      "@analyse",
-      "export XDEBUG_MODE=coverage && vendor/bin/phpunit -c tests/phpunit.xml --testsuite unit --path-coverage  --coverage-clover ./test-reports/$PHP_VERSION/coverage/xml/clover.xml --log-junit ./test-reports/$PHP_VERSION/results/unit/junit.xml",
-      "vendor/bin/coverage-check ./test-reports/$PHP_VERSION/coverage/xml/clover.xml 100",
-      "@tests-integration",
-      "@tests-system"
-    ],
-    "analyse": "vendor/bin/phpstan analyse --level max ./src",
-    "tests-unit": [
-      "@php-version",
-      "vendor/bin/phpunit -c tests/phpunit.xml --testsuite unit --log-junit ./test-reports/$PHP_VERSION/results/unit/junit.xml"
-    ],
-    "tests-unit-coverage": [
-      "@php-version",
-      "export XDEBUG_MODE=coverage && vendor/bin/phpunit -c tests/phpunit.xml --testsuite unit --path-coverage  --coverage-html ./test-reports/$PHP_VERSION/coverage/html"
-    ],
-    "tests-integration": [
-      "@php-version",
-      "vendor/bin/phpunit -c tests/phpunit.xml --testsuite integration --log-junit ./test-reports/$PHP_VERSION/results/integration/junit.xml"
-    ],
-    "tests-system": [
-      "@php-version",
-      "vendor/bin/phpunit -c tests/phpunit.xml --testsuite system --log-junit ./test-reports/$PHP_VERSION/results/system/junit.xml"
-    ],
-    "php-version": "export PHP_VERSION=$(php -r 'echo PHP_VERSION;')"
   }
 }

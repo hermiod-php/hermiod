@@ -4,7 +4,7 @@
 
 ![version](https://img.shields.io/badge/version-1.0.0-blue?labelColor=grey&style=flat)
 ![PHP](https://img.shields.io/badge/PHP-8.2.*_8.3.*_8.4.*-blue?labelColor=grey&style=flat)
-![coverage](https://img.shields.io/badge/coverage-100%25-green?labelColor=grey&style=flat)
+![coverage](https://img.shields.io/badge/coverage-90.90%25-green?labelColor=grey&style=flat)
 
 ## About
 
