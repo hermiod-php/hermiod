@@ -8,7 +8,7 @@
 
 ## About
 
-Hermiod is a Object JSON Mapper which aims to fill the gap between JSON and PHP
+Hermiod is an Object JSON Mapper which aims to fill the gap between JSON and PHP
 using similar paradigms to Doctrine's Object Relationship Mapper.
 
 PHP is a rich and expressive language with many features to express objects, properties, types, nullability, and defaults.
