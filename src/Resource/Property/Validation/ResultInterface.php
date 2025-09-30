@@ -19,7 +19,7 @@ interface ResultInterface
      */
     public function getValidationErrors(): array;
 
-    public function withErrors(string ...$error): ResultInterface;
+    public function withErrors(string $error, string ...$errors): ResultInterface;
 
     /**
      * @param callable(HydratorInterface $hydrator): void $callback

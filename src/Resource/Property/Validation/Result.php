@@ -40,11 +40,11 @@ final class Result implements ResultInterface
         return $this->validationErrors;
     }
 
-    public function withErrors(string ...$error): ResultInterface
+    public function withErrors(string $error, string ...$errors): ResultInterface
     {
         $copy = clone $this;
 
-        $copy->validationErrors = \array_merge($copy->validationErrors, $error);
+        $copy->validationErrors = \array_merge($copy->validationErrors, [$error], $errors);
 
         return $copy;
     }
