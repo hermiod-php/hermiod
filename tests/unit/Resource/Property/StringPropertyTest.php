@@ -7,6 +7,7 @@ namespace Hermiod\Tests\Unit\Resource\Property;
 use Hermiod\Attribute\Constraint\StringConstraintInterface;
 use Hermiod\Resource\Path\PathInterface;
 use Hermiod\Resource\Property\Exception\InvalidDefaultValueException;
+use Hermiod\Resource\Property\Exception\InvalidPropertyNameException;
 use Hermiod\Resource\Property\PropertyInterface;
 use Hermiod\Resource\Property\StringProperty;
 use Hermiod\Resource\Property\Traits\ConstructWithNameAndNullableTrait;
@@ -22,6 +23,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ConvertToSameJsonValue::class)]
 class StringPropertyTest extends TestCase
 {
+    use InvalidPhpPropertyNameProviderTrait;
+
     public function testImplementsPropertyInterface(): void
     {
         $this->assertInstanceOf(
@@ -349,5 +352,13 @@ class StringPropertyTest extends TestCase
 
             yield $key => [$value];
         }
+    }
+
+    #[DataProvider('invalidPhpPropertyNameProvider')]
+    public function testConstructorThrowsExceptionForInvalidPropertyName(string $name): void
+    {
+        $this->expectException(InvalidPropertyNameException::class);
+
+        new StringProperty($name, false);
     }
 }

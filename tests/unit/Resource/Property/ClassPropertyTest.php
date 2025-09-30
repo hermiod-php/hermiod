@@ -8,6 +8,7 @@ use Hermiod\Resource\FactoryInterface;
 use Hermiod\Resource\Path\PathInterface;
 use Hermiod\Resource\Property\ClassProperty;
 use Hermiod\Resource\Property\CollectionInterface;
+use Hermiod\Resource\Property\Exception\InvalidPropertyNameException;
 use Hermiod\Resource\Property\Exception\PropertyClassTypeNotFoundException;
 use Hermiod\Resource\Property\PropertyInterface;
 use Hermiod\Resource\Property\Traits\ConstructWithNameAndNullableTrait;
@@ -15,6 +16,7 @@ use Hermiod\Resource\Property\Traits\GetPropertyNameTrait;
 use Hermiod\Resource\Property\Validation\ResultInterface;
 use Hermiod\Resource\ResourceInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -23,6 +25,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(GetPropertyNameTrait::class)]
 class ClassPropertyTest extends TestCase
 {
+    use InvalidPhpPropertyNameProviderTrait;
+
     private FactoryInterface $factory;
 
     protected function setUp(): void
@@ -109,6 +113,14 @@ class ClassPropertyTest extends TestCase
         $this->expectException(PropertyClassTypeNotFoundException::class);
 
         new ClassProperty('test', 'NonExistentClass', false, $this->factory);
+    }
+
+    #[DataProvider('invalidPhpPropertyNameProvider')]
+    public function testConstructorThrowsExceptionForInvalidPropertyName(string $name): void
+    {
+        $this->expectException(InvalidPropertyNameException::class);
+
+        ClassProperty::withDefaultNullValue($name, \stdClass::class, true, $this->factory);
     }
 
     public function testNormaliseJsonValueWithNonObject(): void

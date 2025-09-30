@@ -8,8 +8,9 @@ use Hermiod\Attribute\Constraint\ObjectKeyConstraintInterface;
 use Hermiod\Attribute\Constraint\ObjectValueConstraintInterface;
 use Hermiod\Resource\Path\PathInterface;
 use Hermiod\Resource\Path\Root;
-use Hermiod\Resource\Property\PropertyInterface;
+use Hermiod\Resource\Property\Exception\InvalidPropertyNameException;
 use Hermiod\Resource\Property\ObjectProperty;
+use Hermiod\Resource\Property\PropertyInterface;
 use Hermiod\Resource\Property\Traits\ConstructWithNameAndNullableTrait;
 use Hermiod\Resource\Property\Traits\ConvertToSameJsonValue;
 use Hermiod\Resource\Property\Traits\GetPropertyNameTrait;
@@ -24,6 +25,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ConvertToSameJsonValue::class)]
 class ObjectPropertyTest extends TestCase
 {
+    use InvalidPhpPropertyNameProviderTrait;
+
     public function testImplementsPropertyInterface(): void
     {
         $this->assertInstanceOf(
@@ -480,6 +483,14 @@ class ObjectPropertyTest extends TestCase
 
             yield $key => [$value];
         }
+    }
+
+    #[DataProvider('invalidPhpPropertyNameProvider')]
+    public function testConstructorThrowsExceptionForInvalidPropertyName(string $name): void
+    {
+        $this->expectException(InvalidPropertyNameException::class);
+
+        new ObjectProperty($name, false);
     }
 
     public function createPathMock(): PathInterface & MockObject

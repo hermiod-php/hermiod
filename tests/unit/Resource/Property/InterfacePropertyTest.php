@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Hermiod\Tests\Unit\Resource\Property;
 
 use Hermiod\Resource\Path\PathInterface;
+use Hermiod\Resource\Property\Exception\InvalidPropertyNameException;
 use Hermiod\Resource\Property\Exception\PropertyClassTypeNotFoundException;
 use Hermiod\Resource\Property\FactoryInterface;
 use Hermiod\Resource\Property\InterfaceProperty;
@@ -17,14 +18,16 @@ use Hermiod\Resource\Property\Validation\ResultInterface;
 use Hermiod\Resource\ResourceInterface;
 use Hermiod\Resource\RuntimeResolverInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(InterfaceProperty::class)]
-#[CoversClass(ConstructWithNameAndNullableTrait::class)]
 #[CoversClass(GetPropertyNameTrait::class)]
 class InterfacePropertyTest extends TestCase
 {
+    use InvalidPhpPropertyNameProviderTrait;
+
     private FactoryInterface|MockObject $factory;
 
     protected function setUp(): void
@@ -328,6 +331,14 @@ class InterfacePropertyTest extends TestCase
         $result = $property->getConcreteResource($fragment);
 
         $this->assertSame($expectedResource, $result);
+    }
+
+    #[DataProvider('invalidPhpPropertyNameProvider')]
+    public function testConstructorThrowsExceptionForInvalidPropertyName(string $name): void
+    {
+        $this->expectException(InvalidPropertyNameException::class);
+
+        InterfaceProperty::withDefaultNullValue($name, \JsonSerializable::class, true, $this->factory);
     }
 
     private function createFactoryMock(): FactoryInterface|MockObject

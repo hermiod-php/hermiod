@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Hermiod\Tests\Unit\Resource\Property;
 
 use Hermiod\Resource\Path\PathInterface;
+use Hermiod\Resource\Property\Exception\InvalidPropertyNameException;
 use Hermiod\Resource\Property\PropertyInterface;
 use Hermiod\Resource\Property\MixedProperty;
 use Hermiod\Resource\Property\Traits\ConvertToSameJsonValue;
@@ -18,6 +19,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ConvertToSameJsonValue::class)]
 class MixedPropertyTest extends TestCase
 {
+    use InvalidPhpPropertyNameProviderTrait;
+
     public function testImplementsPropertyInterface(): void
     {
         $this->assertInstanceOf(
@@ -102,6 +105,14 @@ class MixedPropertyTest extends TestCase
             'bar',
             $property->normalisePhpValue(null),
         );
+    }
+
+    #[DataProvider('invalidPhpPropertyNameProvider')]
+    public function testConstructorThrowsExceptionForInvalidPropertyName(string $name): void
+    {
+        $this->expectException(InvalidPropertyNameException::class);
+
+        new MixedProperty($name);
     }
 
     public static function typesProvider(): \Generator

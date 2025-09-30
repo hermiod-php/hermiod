@@ -13,14 +13,16 @@ use Hermiod\Resource\Path\PathInterface;
 final class MixedProperty implements PropertyInterface, PrimitiveInterface
 {
     use Traits\ConvertToSameJsonValue;
+    use Traits\GetPropertyNameTrait;
 
     private mixed $default = null;
 
     private bool $hasDefault = false;
 
-    public function __construct(
-        private readonly string $name
-    ) {}
+    public function __construct(string $name)
+    {
+        $this->setName($name);
+    }
 
     public static function withDefaultValue(string $name, mixed $default): self
     {
@@ -35,11 +37,6 @@ final class MixedProperty implements PropertyInterface, PrimitiveInterface
     public function isNullable(): bool
     {
         return true;
-    }
-
-    public function getPropertyName(): string
-    {
-        return $this->name;
     }
 
     public function getDefaultValue(): mixed

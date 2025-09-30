@@ -12,12 +12,15 @@ use Hermiod\Resource\Property\Traits\GetPropertyNameTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Hermiod\Resource\Property\Exception\InvalidPropertyNameException;
 
 #[CoversClass(DateTimeInterfaceProperty::class)]
 #[CoversClass(ConstructWithNameAndNullableTrait::class)]
 #[CoversClass(GetPropertyNameTrait::class)]
 class DateTimeInterfacePropertyTest extends TestCase
 {
+    use InvalidPhpPropertyNameProviderTrait;
+
     private const ISO_8601_FORMAT_WITH_MILLISECONDS = 'Y-m-d\TH:i:s.vP';
 
     public function testImplementsPropertyInterface(): void
@@ -333,5 +336,13 @@ class DateTimeInterfacePropertyTest extends TestCase
 
             yield $key => [$value];
         }
+    }
+
+    #[DataProvider('invalidPhpPropertyNameProvider')]
+    public function testConstructorThrowsExceptionForInvalidPropertyName(string $name): void
+    {
+        $this->expectException(InvalidPropertyNameException::class);
+
+        new DateTimeInterfaceProperty($name, false);
     }
 }

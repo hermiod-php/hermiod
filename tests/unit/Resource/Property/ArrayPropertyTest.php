@@ -8,6 +8,7 @@ use Hermiod\Attribute\Constraint\ArrayConstraintInterface;
 use Hermiod\Resource\Path\PathInterface;
 use Hermiod\Resource\Path\Root;
 use Hermiod\Resource\Property\Exception\InvalidDefaultValueException;
+use Hermiod\Resource\Property\Exception\InvalidPropertyNameException;
 use Hermiod\Resource\Property\PropertyInterface;
 use Hermiod\Resource\Property\ArrayProperty;
 use Hermiod\Resource\Property\Traits\ConstructWithNameAndNullableTrait;
@@ -24,6 +25,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ConvertToSameJsonValue::class)]
 class ArrayPropertyTest extends TestCase
 {
+    use InvalidPhpPropertyNameProviderTrait;
+
     public function testImplementsPropertyInterface(): void
     {
         $this->assertInstanceOf(
@@ -371,6 +374,14 @@ class ArrayPropertyTest extends TestCase
         $property = ArrayProperty::withDefaultValue('foo', true, $default);
 
         $this->assertSame($expected, $property->normalisePhpValue($value));
+    }
+
+    #[DataProvider('invalidPhpPropertyNameProvider')]
+    public function testConstructorThrowsExceptionForInvalidPropertyName(string $name): void
+    {
+        $this->expectException(InvalidPropertyNameException::class);
+
+        new ArrayProperty($name, false);
     }
 
     public static function normalisationCasesWithoutDefault(): array

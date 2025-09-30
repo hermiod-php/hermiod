@@ -6,6 +6,7 @@ namespace Hermiod\Tests\Unit\Resource\Property;
 
 use Hermiod\Resource\Path\PathInterface;
 use Hermiod\Resource\Property\Exception\InvalidDefaultValueException;
+use Hermiod\Resource\Property\Exception\InvalidPropertyNameException;
 use Hermiod\Resource\Property\PropertyInterface;
 use Hermiod\Resource\Property\BooleanProperty;
 use Hermiod\Resource\Property\Traits\ConstructWithNameAndNullableTrait;
@@ -20,6 +21,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(GetPropertyNameTrait::class)]
 class BooleanPropertyTest extends TestCase
 {
+    use InvalidPhpPropertyNameProviderTrait;
+
     public function testImplementsPropertyInterface(): void
     {
         $this->assertInstanceOf(
@@ -215,5 +218,13 @@ class BooleanPropertyTest extends TestCase
 
             yield $key => [$value];
         }
+    }
+
+    #[DataProvider('invalidPhpPropertyNameProvider')]
+    public function testConstructorThrowsExceptionForInvalidPropertyName(string $name): void
+    {
+        $this->expectException(InvalidPropertyNameException::class);
+
+        new BooleanProperty($name, false);
     }
 }
