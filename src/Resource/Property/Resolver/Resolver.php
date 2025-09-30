@@ -66,7 +66,8 @@ final class Resolver implements ResolverInterface
 
         $resolved = $this->resolvers[$interface];
 
-        if (\is_string($resolved)) {
+        if (!\is_callable($resolved)) {
+            /** @var class-string $resolved */
             return $resolved;
         }
 
