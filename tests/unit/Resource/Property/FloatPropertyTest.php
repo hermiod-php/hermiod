@@ -40,6 +40,20 @@ class FloatPropertyTest extends TestCase
         $this->assertSame('foo', $property->getPropertyName());
     }
 
+    public function testIsNullableWhenTrue(): void
+    {
+        $property = new FloatProperty('foo', true);
+
+        $this->assertTrue($property->isNullable());
+    }
+
+    public function testIsNullableWhenFalse(): void
+    {
+        $property = new FloatProperty('foo', false);
+
+        $this->assertFalse($property->isNullable());
+    }
+
     public function testGetDefaultValueWhenNoneSet(): void
     {
         $property = new FloatProperty('foo', false);

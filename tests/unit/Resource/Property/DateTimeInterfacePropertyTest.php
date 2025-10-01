@@ -38,6 +38,20 @@ class DateTimeInterfacePropertyTest extends TestCase
         $this->assertSame('foo', $property->getPropertyName());
     }
 
+    public function testIsNullableWhenTrue(): void
+    {
+        $property = new DateTimeInterfaceProperty('foo', true);
+
+        $this->assertTrue($property->isNullable());
+    }
+
+    public function testIsNullableWhenFalse(): void
+    {
+        $property = new DateTimeInterfaceProperty('foo', false);
+
+        $this->assertFalse($property->isNullable());
+    }
+
     public function testGetDefaultValueWhenNoneSet(): void
     {
         $property = new DateTimeInterfaceProperty('foo', false);

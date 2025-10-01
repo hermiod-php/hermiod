@@ -38,6 +38,20 @@ class BooleanPropertyTest extends TestCase
         $this->assertSame('foo', $property->getPropertyName());
     }
 
+    public function testIsNullableWhenTrue(): void
+    {
+        $property = new BooleanProperty('foo', true);
+
+        $this->assertTrue($property->isNullable());
+    }
+
+    public function testIsNullableWhenFalse(): void
+    {
+        $property = new BooleanProperty('foo', false);
+
+        $this->assertFalse($property->isNullable());
+    }
+
     public function testGetDefaultValueWhenNoneSet(): void
     {
         $property = new BooleanProperty('foo', false);

@@ -42,6 +42,20 @@ class ArrayPropertyTest extends TestCase
         $this->assertSame('foo', $property->getPropertyName());
     }
 
+    public function testIsNullableWhenTrue(): void
+    {
+        $property = new ArrayProperty('foo', true);
+
+        $this->assertTrue($property->isNullable());
+    }
+
+    public function testIsNullableWhenFalse(): void
+    {
+        $property = new ArrayProperty('foo', false);
+
+        $this->assertFalse($property->isNullable());
+    }
+
     public function testGetDefaultValueWhenNoneSet(): void
     {
         $property = new ArrayProperty('foo', false);

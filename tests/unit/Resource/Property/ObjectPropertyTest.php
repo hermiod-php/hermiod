@@ -42,6 +42,20 @@ class ObjectPropertyTest extends TestCase
         $this->assertSame('foo', $property->getPropertyName());
     }
 
+    public function testIsNullableWhenTrue(): void
+    {
+        $property = new ObjectProperty('foo', true);
+
+        $this->assertTrue($property->isNullable());
+    }
+
+    public function testIsNullableWhenFalse(): void
+    {
+        $property = new ObjectProperty('foo', false);
+
+        $this->assertFalse($property->isNullable());
+    }
+
     public function testGetDefaultValueWhenNoneSet(): void
     {
         $property = new ObjectProperty('foo', false);
