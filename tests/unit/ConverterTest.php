@@ -228,6 +228,18 @@ final class ConverterTest extends TestCase
         $converter->tryToClass(FakeUserClass::class, ['name' => 'test']);
     }
 
+    public function testEstablishedDefaultsWork(): void
+    {
+        $converter = Converter::create();
+
+        $this->assertInstanceOf(Converter::class, $converter);
+
+        $instance = $converter->toClass(FakeUserClass::class, '{"name": "test", "empty": {}}');
+
+        $this->assertInstanceOf(FakeUserClass::class, $instance);
+        $this->assertInstanceOf(FakeEmptyClass::class, $instance->empty);
+    }
+
     public static function successfulConversionProvider(): array
     {
         $userObject = new FakeUserClass();
@@ -275,15 +287,15 @@ final class ConverterTest extends TestCase
         return [
             'valid json string' => [
                 FakeUserClass::class,
-                '{"name": "test"}'
+                '{"name": "test", "empty": {}}'
             ],
             'valid array' => [
                 FakeUserClass::class,
-                ['name' => 'test']
+                ['name' => 'test', 'empty' => []]
             ],
             'valid object' => [
                 FakeUserClass::class,
-                (object)['name' => 'test']
+                (object)['name' => 'test', 'empty' => []]
             ],
             'empty data to empty class' => [
                 FakeEmptyClass::class,
