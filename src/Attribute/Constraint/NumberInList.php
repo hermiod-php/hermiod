@@ -23,7 +23,12 @@ final class NumberInList implements NumberConstraintInterface
 
     public function valueMatchesConstraint(int|float $value): bool
     {
-        return \in_array($value, $this->values, true);
+        /**
+         * We intentionally use in_array here without strict checking
+         * because we want to allow matching between ints and floats.
+         * We have already narrowed the types in this class.
+         */
+        return \in_array($value, $this->values);
     }
 
     public function getMismatchExplanation(PathInterface $path, int|float $value): string

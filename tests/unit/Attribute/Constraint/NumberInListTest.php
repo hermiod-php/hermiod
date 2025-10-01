@@ -35,6 +35,26 @@ final class NumberInListTest extends TestCase
         );
     }
 
+    public function testIntAndFloatValuesAreComparable(): void
+    {
+        $constraint = new NumberInList(10);
+
+        $this->assertTrue(
+            $constraint->valueMatchesConstraint(10.0),
+            "Expected int 10 to match float 10.0"
+        );
+    }
+
+    public function testFloatAndIntValuesAreComparable(): void
+    {
+        $constraint = new NumberInList(10.0);
+
+        $this->assertTrue(
+            $constraint->valueMatchesConstraint(10),
+            "Expected float 10.0 to match int 10"
+        );
+    }
+
     #[DataProvider('provideInvalidNumbers')]
     public function testMismatchExplanationIncludesDetails(int|float $input): void
     {
