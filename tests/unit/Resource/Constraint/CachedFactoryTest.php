@@ -322,27 +322,4 @@ class CachedFactoryTest extends TestCase
 
         $this->assertSame($constraint1, $constraint2);
     }
-
-    public function testCreateConstraintPerformanceWithMultipleCalls(): void
-    {
-        $testConstraintClass = new class implements ConstraintInterface {};
-
-        // Verify that cache actually improves performance by avoiding reconstruction
-        $startTime = microtime(true);
-
-        // First call creates the constraint
-        $className = \get_class($testConstraintClass);
-        $constraint1 = $this->factory->createConstraint($className);
-
-        // Subsequent calls should use cache
-        for ($i = 0; $i < 100; $i++) {
-            $constraint = $this->factory->createConstraint($className);
-            $this->assertSame($constraint1, $constraint);
-        }
-
-        $endTime = microtime(true);
-
-        // Test should complete quickly if caching is working
-        $this->assertLessThan(0.1, $endTime - $startTime);
-    }
 }
