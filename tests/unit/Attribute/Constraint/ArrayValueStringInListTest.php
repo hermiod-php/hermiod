@@ -52,6 +52,31 @@ final class ArrayValueStringInListTest extends TestCase
         );
     }
 
+    #[DataProvider('nonStringErrorMessageValueProvider')]
+    public function testCanFormatErrorWithNonStringValue(mixed $value, string $type): void
+    {
+        $constraint = new ArrayValueStringInList('red');
+        $path = $this->createMock(PathInterface::class);
+
+        $this->assertStringContainsString(
+            "but $type given",
+            $constraint->getMismatchExplanation($path, $value),
+        );
+    }
+
+    public static function nonStringErrorMessageValueProvider(): array
+    {
+        return [
+            'integer' => [42, 'int'],
+            'float' => [3.14, 'float'],
+            'boolean true' => [true, 'bool'],
+            'boolean false' => [false, 'bool'],
+            'null' => [null, 'null'],
+            'array' => [[1, 2, 3], 'array'],
+            'object' => [new \stdClass(), 'object'],
+        ];
+    }
+
     /**
      * @return array<string, array{0: mixed}>
      */
