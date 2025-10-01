@@ -12,12 +12,16 @@ trait ConstructWithNameAndNullableTrait
 {
     use GetPropertyNameTrait;
 
+    private bool $nullable;
+
     public function __construct(
         string $name,
-        private bool $nullable
+        bool $nullable,
     )
     {
         $this->setName($name);
+
+        $this->nullable = $nullable;
     }
 
     public function isNullable(): bool
