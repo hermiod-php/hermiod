@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Hermiod\Tests\Unit\Attribute\Constraint;
 
 use Hermiod\Attribute\Constraint\ObjectValueNumberInList;
+use Hermiod\Attribute\Constraint\Traits\MapValueNumberInList;
 use Hermiod\Resource\Path\PathInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ObjectValueNumberInList::class)]
+#[CoversClass(MapValueNumberInList::class)]
 final class ObjectValueNumberInListTest extends TestCase
 {
     #[DataProvider('provideValidValues')]
@@ -52,6 +54,21 @@ final class ObjectValueNumberInListTest extends TestCase
         $this->assertStringContainsString('10', $message);
         $this->assertStringContainsString('30.5', $message);
         $this->assertStringContainsString('42', $message);
+
+        $message = $constraint->getMismatchExplanation($path, 42.1);
+        $this->assertStringContainsString('42.1', $message);
+    }
+
+
+
+    public function testComparableFloatsAndIntsMatch(): void
+    {
+        $constraint = new ObjectValueNumberInList(10);
+
+        $this->assertTrue(
+            $constraint->mapValueMatchesConstraint(10.0),
+            'Expected float 10.0 to match int 10 in list'
+        );
     }
 
     public static function provideValidValues(): \Generator

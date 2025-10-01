@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Hermiod\Tests\Unit\Attribute\Constraint;
 
 use Hermiod\Attribute\Constraint\ObjectValueNumberLessThanOrEqual;
+use Hermiod\Attribute\Constraint\Traits\MapValueNumberLessThanOrEqual;
 use Hermiod\Resource\Path\PathInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ObjectValueNumberLessThanOrEqual::class)]
+#[CoversClass(MapValueNumberLessThanOrEqual::class)]
 final class ObjectValueNumberLessThanOrEqualTest extends TestCase
 {
     #[DataProvider('provideValidValues')]
@@ -59,6 +61,10 @@ final class ObjectValueNumberLessThanOrEqualTest extends TestCase
         $this->assertStringContainsString('101', $message);
         $this->assertStringContainsString('100', $message);
         $this->assertStringContainsString('less than or equal to', $message);
+
+        $message = $constraint->getMismatchExplanation($path, 101.1);
+
+        $this->assertStringContainsString('101.1', $message);
     }
 
     /**

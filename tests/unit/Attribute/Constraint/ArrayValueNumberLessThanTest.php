@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Hermiod\Tests\Unit\Attribute\Constraint;
 
 use Hermiod\Attribute\Constraint\ArrayValueNumberLessThan;
+use Hermiod\Attribute\Constraint\Traits\MapValueNumberLessThan;
 use Hermiod\Resource\Path\PathInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ArrayValueNumberLessThan::class)]
+#[CoversClass(MapValueNumberLessThan::class)]
 final class ArrayValueNumberLessThanTest extends TestCase
 {
     #[DataProvider('provideMatchingValues')]
@@ -47,6 +49,14 @@ final class ArrayValueNumberLessThanTest extends TestCase
 
         $this->assertSame(
             '$.items[2] must be a number less than 5 but 8 given',
+            $message,
+            'Expected mismatch explanation to match'
+        );
+
+        $message = $constraint->getMismatchExplanation($path, 8.1);
+
+        $this->assertSame(
+            '$.items[2] must be a number less than 5 but 8.1 given',
             $message,
             'Expected mismatch explanation to match'
         );

@@ -6,12 +6,14 @@ namespace Hermiod\Tests\Unit\Attribute\Constraint;
 
 use Hermiod\Attribute\Constraint\ArrayConstraintInterface;
 use Hermiod\Attribute\Constraint\ArrayValueNumberGreaterThan;
+use Hermiod\Attribute\Constraint\Traits\MapValueNumberGreaterThan;
 use Hermiod\Resource\Path\PathInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ArrayValueNumberGreaterThan::class)]
+#[CoversClass(MapValueNumberGreaterThan::class)]
 final class ArrayValueNumberGreaterThanTest extends TestCase
 {
     public function testImplementsArrayConstraintInterface(): void
@@ -47,6 +49,9 @@ final class ArrayValueNumberGreaterThanTest extends TestCase
         $this->assertStringContainsString('$.age', $message, 'Expected path to be included in explanation');
         $this->assertStringContainsString('must be a number greater than 5', $message, 'Expected threshold to be in explanation');
         $this->assertStringContainsString('3 given', $message, 'Expected actual value to be included');
+
+        $message = $constraint->getMismatchExplanation($path, 3.1);
+        $this->assertStringContainsString('3.1 given', $message, 'Expected actual value to be included');
     }
 
     private function createMockPath(string $value): PathInterface & \PHPUnit\Framework\MockObject\MockObject

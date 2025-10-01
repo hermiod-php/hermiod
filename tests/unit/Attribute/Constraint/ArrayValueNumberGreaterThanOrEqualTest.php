@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Hermiod\Tests\Unit\Attribute\Constraint;
 
 use Hermiod\Attribute\Constraint\ArrayValueNumberGreaterThanOrEqual;
+use Hermiod\Attribute\Constraint\Traits\MapValueNumberGreaterThanOrEqual;
 use Hermiod\Resource\Path\PathInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ArrayValueNumberGreaterThanOrEqual::class)]
+#[CoversClass(MapValueNumberGreaterThanOrEqual::class)]
 final class ArrayValueNumberGreaterThanOrEqualTest extends TestCase
 {
     #[DataProvider('provideMatchingValues')]
@@ -47,6 +49,14 @@ final class ArrayValueNumberGreaterThanOrEqualTest extends TestCase
 
         $this->assertSame(
             '$.limit must be a number greater than or equal to 10 but 7 given',
+            $message,
+            'Expected mismatch explanation to match'
+        );
+
+        $message = $constraint->getMismatchExplanation($path, 7.1);
+
+        $this->assertSame(
+            '$.limit must be a number greater than or equal to 10 but 7.1 given',
             $message,
             'Expected mismatch explanation to match'
         );

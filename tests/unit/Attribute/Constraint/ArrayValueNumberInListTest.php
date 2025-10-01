@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Hermiod\Tests\Unit\Attribute\Constraint;
 
 use Hermiod\Attribute\Constraint\ArrayValueNumberInList;
+use Hermiod\Attribute\Constraint\Traits\MapValueNumberInList;
 use Hermiod\Resource\Path\PathInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ArrayValueNumberInList::class)]
+#[CoversClass(MapValueNumberInList::class)]
 final class ArrayValueNumberInListTest extends TestCase
 {
     #[DataProvider('provideMatchingValues')]
@@ -49,6 +51,24 @@ final class ArrayValueNumberInListTest extends TestCase
             '$.data must be one of [10, 20] but 15 given',
             $message,
             'Expected mismatch explanation to match'
+        );
+
+        $message = $constraint->getMismatchExplanation($path, 15.1);
+
+        $this->assertSame(
+            '$.data must be one of [10, 20] but 15.1 given',
+            $message,
+            'Expected mismatch explanation to match'
+        );
+    }
+
+    public function testComparableFloatsAndIntsMatch(): void
+    {
+        $constraint = new ArrayValueNumberInList(10);
+
+        $this->assertTrue(
+            $constraint->mapValueMatchesConstraint(10.0),
+            'Expected float 10.0 to match int 10 in list'
         );
     }
 

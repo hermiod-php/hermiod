@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Hermiod\Tests\Unit\Attribute\Constraint;
 
 use Hermiod\Attribute\Constraint\ObjectValueNumberGreaterThanOrEqual;
+use Hermiod\Attribute\Constraint\Traits\MapValueNumberGreaterThanOrEqual;
 use Hermiod\Resource\Path\PathInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ObjectValueNumberGreaterThanOrEqual::class)]
+#[CoversClass(MapValueNumberGreaterThanOrEqual::class)]
 final class ObjectValueNumberGreaterThanOrEqualTest extends TestCase
 {
     #[DataProvider('provideValidValues')]
@@ -48,9 +50,12 @@ final class ObjectValueNumberGreaterThanOrEqualTest extends TestCase
         $message = $constraint->getMismatchExplanation($path, 4);
 
         $this->assertStringContainsString('$.value', $message);
-        $this->assertStringContainsString('4', $message);
+        $this->assertStringContainsString('4 given', $message);
         $this->assertStringContainsString('5', $message);
         $this->assertStringContainsString('greater than or equal', $message);
+
+        $message = $constraint->getMismatchExplanation($path, 4.1);
+        $this->assertStringContainsString('4.1 given', $message);
     }
 
     public static function provideValidValues(): \Generator

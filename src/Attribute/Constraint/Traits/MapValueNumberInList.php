@@ -26,7 +26,12 @@ trait MapValueNumberInList
     public function mapValueMatchesConstraint(mixed $value): bool
     {
         if (\is_int($value) || \is_float($value)) {
-            return \in_array($value, $this->values, true);
+            /**
+             * We intentionally use in_array here without strict checking
+             * because we want to allow matching between ints and floats.
+             * We have already narrowed the types in the class.
+             */
+            return \in_array($value, $this->values);
         }
 
         return false;

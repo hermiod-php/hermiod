@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Hermiod\Tests\Unit\Attribute\Constraint;
 
 use Hermiod\Attribute\Constraint\ObjectValueNumberLessThan;
+use Hermiod\Attribute\Constraint\Traits\MapValueNumberLessThan;
 use Hermiod\Resource\Path\PathInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ObjectValueNumberLessThan::class)]
+#[CoversClass(MapValueNumberLessThan::class)]
 final class ObjectValueNumberLessThanTest extends TestCase
 {
     #[DataProvider('provideValidValues')]
