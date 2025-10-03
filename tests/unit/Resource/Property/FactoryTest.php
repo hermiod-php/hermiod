@@ -52,6 +52,14 @@ final class FactoryTest extends TestCase
         $this->factory = new Factory($this->constraints, $this->resources, $this->resolver);
     }
 
+    public function testCanGetInterfaceResolver(): void
+    {
+        $resolver = $this->createResolverMock();
+        $factory = new Factory($this->constraints, $this->resources, $resolver);
+
+        $this->assertSame($resolver, $factory->getInterfaceResolver());
+    }
+
     public function testCreatePropertyFromReflectionPropertyThrowsExceptionForUnsupportedBuiltinType(): void
     {
         $this->expectException(UnsupportedPropertyTypeException::class);
