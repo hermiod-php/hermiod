@@ -29,6 +29,13 @@ class MixedPropertyTest extends TestCase
         );
     }
 
+    public function testIsAlwaysNullable(): void
+    {
+        $property = new MixedProperty('foo');
+
+        $this->assertTrue($property->isNullable());
+    }
+
     public function testGetPropertyName(): void
     {
         $property = new MixedProperty('foo');
