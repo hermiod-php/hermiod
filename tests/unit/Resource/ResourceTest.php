@@ -18,6 +18,7 @@ use Hermiod\Resource\Property\Validation\ResultInterface;
 use Hermiod\Resource\Resource;
 use Hermiod\Resource\ResourceInterface;
 use Hermiod\Resource\RuntimeResolverInterface;
+use Hermiod\Tests\Unit\Fakes\FakeEmptyClass;
 use Hermiod\Tests\Unit\Fakes\FakeResourceProperty;
 use Hermiod\Tests\Unit\Fakes\FakeResourcePropertyWithChildren;
 use Hermiod\Tests\Unit\Fakes\FakeRuntimeResolverProperty;
@@ -173,6 +174,7 @@ class ResourceTest extends TestCase
         $data = ['name' => 'test'];
         $property = $this->createProperty();
         $filter = \ReflectionProperty::IS_PUBLIC;
+
         $class = new class {
             public string $name;
         };
@@ -362,13 +364,14 @@ class ResourceTest extends TestCase
         $data = ['test_property' => 'value'];
         $validationResult = $this->createValidationResult();
         $filter = \ReflectionProperty::IS_PUBLIC;
+
         $class = new class {
             public string $name;
         };
 
         $this->setupOptionsForGetProperties($options, $filter);
 
-        $property = $this->createMock(PropertyInterface::class);
+        $property = $this->createMockForIntersectionOfInterfaces([PropertyInterface::class, PrimitiveInterface::class]);
 
         $factory
             ->expects($this->once())
@@ -391,6 +394,11 @@ class ResourceTest extends TestCase
             ->expects($this->atLeastOnce())
             ->method('getPropertyName')
             ->willReturn('testProperty');
+
+        $property
+            ->expects($this->atLeastOnce())
+            ->method('normalisePhpValue')
+            ->willReturnCallback(fn ($value) => $value);
 
         $property
             ->expects($this->once())
@@ -653,6 +661,82 @@ class ResourceTest extends TestCase
         }
     }
 
+    public function testValidateAndTransposeRecursiveHydration(): void
+    {
+        $factory = $this->createPropertyFactory();
+        $naming = $this->createNamingStrategy();
+        $options = $this->createOptions();
+        $filter = \ReflectionProperty::IS_PUBLIC;
+        $path = $this->createMock(PathInterface::class);
+
+        $naming
+            ->expects($this->once())
+            ->method('format')
+            ->with('empty')
+            ->willReturn('empty');
+
+        $path
+            ->method('withObjectKey')
+            ->willReturn($path);
+
+        $class = new class {
+            public FakeEmptyClass $empty;
+        };
+
+        $this->setupOptionsForGetProperties($options, $filter);
+
+        $property = $this->createMockForIntersectionOfInterfaces([PropertyInterface::class, ResourceInterface::class]);
+
+        $property
+            ->method('getClassName')
+            ->willReturn(FakeEmptyClass::class);
+
+        $property
+            ->method('checkValueAgainstConstraints')
+            ->willReturnCallback(function (): ResultInterface {
+                $mock = $this->createMock(ResultInterface::class);
+
+                $mock
+                    ->method('isValid')
+                    ->willReturn(true);
+
+                return $mock;
+            });
+
+        $property
+            ->expects($this->atLeastOnce())
+            ->method('getPropertyName')
+            ->willReturn('empty');
+
+        $factory
+            ->expects($this->once())
+            ->method('createPropertyFromReflectionProperty')
+            ->willReturn($property);
+
+        $resource = new Resource($class::class, $factory, $naming, $options);
+
+        $data = ['empty' => ['foo' => 'bar']];
+
+        $result = $resource->validateAndTranspose(
+            $path,
+            $data
+        );
+
+        $hydrator = $this->createMock(HydratorInterface::class);
+
+        $hydrator
+            ->expects($this->once())
+            ->method('hydrate')
+            ->willReturnCallback(function ($class, $data) {
+                $this->assertSame(FakeEmptyClass::class, $class);
+                $this->assertIsArray($data);
+
+                return new FakeEmptyClass();
+            });
+
+        $result->hydrate($hydrator);
+    }
+
     public function testValidateAndTransposeWithNonArrayNonObjectData(): void
     {
         // Reset the static depth that might have been set by previous tests
@@ -869,26 +953,6 @@ class ResourceTest extends TestCase
         return $this->createMock(PropertyInterface::class);
     }
 
-    private function createPrimitiveProperty(): PrimitiveInterface|MockObject
-    {
-        return $this->createMock(PrimitiveInterface::class);
-    }
-
-    private function createResourceProperty(): ResourceInterface|MockObject
-    {
-        return $this->createMock(ResourceInterface::class);
-    }
-
-    private function createRuntimeResolverProperty(): RuntimeResolverInterface|MockObject
-    {
-        return $this->createMock(RuntimeResolverInterface::class);
-    }
-
-    private function createPropertyCollection(): CollectionInterface|MockObject
-    {
-        return $this->createMock(CollectionInterface::class);
-    }
-
     private function createPath(): PathInterface|MockObject
     {
         return $this->createMock(PathInterface::class);
@@ -897,16 +961,6 @@ class ResourceTest extends TestCase
     private function createValidationResult(): ResultInterface|MockObject
     {
         return $this->createMock(ResultInterface::class);
-    }
-
-    private function createHydrator(): HydratorInterface|MockObject
-    {
-        return $this->createMock(HydratorInterface::class);
-    }
-
-    private function createFragment(): FragmentInterface|MockObject
-    {
-        return $this->createMock(FragmentInterface::class);
     }
 
     public function testValidateAndTransposeWithResourcePropertyHavingNestedProperties(): void
